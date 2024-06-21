@@ -1,6 +1,5 @@
-# s2json ![GitHub Actions Workflow Status][test-workflow] [![npm][npm-image]][npm-url] [![crate][crate-image]][crate-url] [![downloads][downloads-image]][downloads-url] [![bundle][bundle-image]][bundle-url] [![docs-ts][docs-ts-image]][docs-ts-url] [![docs-rust][docs-rust-image]][docs-rust-url] ![doc-coverage][doc-coverage-image] [![Discord][discord-image]][discord-url]
+# s2json [![npm][npm-image]][npm-url] [![crate][crate-image]][crate-url] [![downloads][downloads-image]][downloads-url] [![bundle][bundle-image]][bundle-url] [![docs-ts][docs-ts-image]][docs-ts-url] [![docs-rust][docs-rust-image]][docs-rust-url] ![doc-coverage][doc-coverage-image] [![Discord][discord-image]][discord-url]
 
-[test-workflow]: https://img.shields.io/github/actions/workflow/status/Open-S2/s2json/test.yml?logo=github
 [npm-image]: https://img.shields.io/npm/v/s2json-spec.svg?logo=npm&logoColor=white
 [npm-url]: https://npmjs.org/package/s2json-spec
 [crate-image]: https://img.shields.io/crates/v/s2json.svg?logo=rust&logoColor=white
