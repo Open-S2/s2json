@@ -1,11 +1,11 @@
 /** Primitive types supported by Properties */
-type Primitive = string | number | boolean | null;
+export type Primitive = string | number | boolean | null;
 
 /**
  * When an array is used, it must be an array of the same type.
  * Arrays are also limited to primitives and objects of primitives
  */
-type ValueArray =
+export type ValueArray =
   Array<Primitive | { [key: string]: Primitive }> extends Array<infer U> ? U[] : never;
 
 /**

@@ -1,6 +1,6 @@
 {
-  "name": "s2json",
-  "version": "0.3.0",
+  "name": "s2json-spec",
+  "version": "1.0.0",
   "description": "S2JSON is a specification for encoding a variety of geographic data structures",
   "keywords": [
     "vector",
@@ -20,20 +20,16 @@
     ".": "./dist/index.js"
   },
   "scripts": {
-    "lint+build+test+docs+test:cov": "bun run lint && bun run build && bun run test && bun run docs && bun run test:cov",
-    "lint": "eslint src test",
+    "lint+build+docs": "bun run lint && bun run build && bun run docs",
+    "lint": "eslint src",
     "lint:fix": "bun run lint -- --fix",
-    "prettier": "bunx prettier src test tools benchmarks --check",
+    "prettier": "bunx prettier src tools benchmarks --check",
     "prettier:fix": "bunx prettier -- --write",
     "format": "bunx prettier:fix && bun run lint:fix",
     "build": "rm -rf dist && mkdir dist && rm -f -- tsconfig.tsbuildinfo && tsc && bun run build.ts",
     "types:bundle": "bun run types:build && node scripts/types.mjs",
-    "prepublishOnly": "bun run lint+build+test+docs+test:cov",
+    "prepublishOnly": "bun run lint+build+docs",
     "package-check": "package-check",
-    "test:dev": "bun test --watch --coverage",
-    "test": "bun test",
-    "test:coverage": "bun run test --coverage",
-    "test:cov": "bun run tools/buildCoverage.ts",
     "docs": "typedoc"
   },
   "repository": {

@@ -1,20 +1,19 @@
-# s2json ![GitHub Actions Workflow Status][test-workflow] [![npm][npm-image]][npm-url] [![crate][crate-image]][crate-url] [![downloads][downloads-image]][downloads-url] [![bundle][bundle-image]][bundle-url] [![docs-ts][docs-ts-image]][docs-ts-url] [![docs-rust][docs-rust-image]][docs-rust-url] ![doc-coverage][doc-coverage-image] ![code-coverage][code-coverage-image] [![Discord][discord-image]][discord-url]
+# s2json ![GitHub Actions Workflow Status][test-workflow] [![npm][npm-image]][npm-url] [![crate][crate-image]][crate-url] [![downloads][downloads-image]][downloads-url] [![bundle][bundle-image]][bundle-url] [![docs-ts][docs-ts-image]][docs-ts-url] [![docs-rust][docs-rust-image]][docs-rust-url] ![doc-coverage][doc-coverage-image] [![Discord][discord-image]][discord-url]
 
 [test-workflow]: https://img.shields.io/github/actions/workflow/status/Open-S2/s2json/test.yml?logo=github
-[npm-image]: https://img.shields.io/npm/v/s2json.svg?logo=npm&logoColor=white
-[npm-url]: https://npmjs.org/package/s2json
+[npm-image]: https://img.shields.io/npm/v/s2json-spec.svg?logo=npm&logoColor=white
+[npm-url]: https://npmjs.org/package/s2json-spec
 [crate-image]: https://img.shields.io/crates/v/s2json.svg?logo=rust&logoColor=white
 [crate-url]: https://crates.io/crates/s2json
-[bundle-image]: https://img.shields.io/bundlejs/size/s2json?exports=VectorTile
-[bundle-url]: https://bundlejs.com/?q=s2json&treeshake=%5B%7B+VectorTile+%7D%5D
-[downloads-image]: https://img.shields.io/npm/dm/s2json.svg
-[downloads-url]: https://www.npmjs.com/package/s2json
+[bundle-image]: https://img.shields.io/bundlejs/size/s2json-spec?exports=VectorTile
+[bundle-url]: https://bundlejs.com/?q=s2json-spec&treeshake=%5B%7B+VectorTile+%7D%5D
+[downloads-image]: https://img.shields.io/npm/dm/s2json-spec.svg
+[downloads-url]: https://www.npmjs.com/package/s2json-spec
 [docs-ts-image]: https://img.shields.io/badge/docs-typescript-yellow.svg
-[docs-ts-url]: https://open-s2.github.io/s2json/
+[docs-ts-url]: https://open-s2.github.io/s2json-spec/
 [docs-rust-image]: https://img.shields.io/badge/docs-rust-yellow.svg
 [docs-rust-url]: https://docs.rs/s2json
 [doc-coverage-image]: https://raw.githubusercontent.com/Open-S2/s2json/master/assets/doc-coverage.svg
-[code-coverage-image]: https://raw.githubusercontent.com/Open-S2/s2json/master/assets/code-coverage.svg
 [discord-image]: https://img.shields.io/discord/953563031701426206?logo=discord&logoColor=white
 [discord-url]: https://discord.opens2.com
 
@@ -67,13 +66,13 @@ The
 
 ```bash
 # bun
-bun add -D s2json
+bun add -D s2json-spec
 # pnpm
-pnpm add -D s2json
+pnpm add -D s2json-spec
 # yarn
-yarn add -D s2json
+yarn add -D s2json-spec
 # npm
-npm install -D s2json
+npm install -D s2json-spec
 
 # cargo
 cargo install s2json --dev
