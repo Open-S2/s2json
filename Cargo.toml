@@ -19,6 +19,9 @@ exclude = [
     "/test",
     "/tools",
     "/src",
+    "/s2json-spec",
+    "TODO",
+    "/.github",
 ]
 
 [lib]
