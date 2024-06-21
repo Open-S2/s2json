@@ -5,7 +5,3 @@ tsconfig.build.tsbuildinfo
 tsconfig.test.tsbuildinfo
 .DS_Store
 target/
-benchmarks/data/bing/mvt/*.mvt
-tools/fetchBingTiles.ts
-tools/fetchOMT.ts
-s2json-spec/1.0.0/README.bak.md

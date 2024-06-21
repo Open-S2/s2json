@@ -10,7 +10,6 @@ CONTRIBUTE.md
 target/
 ovtile/
 .helix/
-s2json-spec/
 docs/
 benchmarks/
 tools/
