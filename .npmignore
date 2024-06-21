@@ -1,0 +1,17 @@
+test
+fixtures
+proto
+tsconfig.tsbuildinfo
+TODO
+node_modules
+.eslint.config.mjs
+.gitignore
+CONTRIBUTE.md
+target/
+ovtile/
+.helix/
+s2json-spec/
+docs/
+benchmarks/
+tools/
+s2json-spec/
