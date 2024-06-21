@@ -9,7 +9,7 @@
 [downloads-image]: https://img.shields.io/npm/dm/s2json-spec.svg
 [downloads-url]: https://www.npmjs.com/package/s2json-spec
 [docs-ts-image]: https://img.shields.io/badge/docs-typescript-yellow.svg
-[docs-ts-url]: https://open-s2.github.io/s2json-spec/
+[docs-ts-url]: https://open-s2.github.io/s2json/
 [docs-rust-image]: https://img.shields.io/badge/docs-rust-yellow.svg
 [docs-rust-url]: https://docs.rs/s2json
 [doc-coverage-image]: https://raw.githubusercontent.com/Open-S2/s2json/master/assets/doc-coverage.svg
