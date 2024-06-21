@@ -1,19 +1,13 @@
-# Open Vector Tile Spec Changelog
+# S2JSON Spec Changelog
 
 ## 1.0.0
 
 Initial release.
 
-Features added from Mapbox Vector Tile Spec:
+Rough estimation of the changes from GeoJSON:
 
-* 🔗 lightweight zero dependency builds.
-* 🌴 Proper module treeshake.
-* 🦺 Complete TypeScript support / safety.
-* 🗜 Pre-Tessellated & Indexed geometries to quickly ship data to the renderer.
+* Properties data is clearly defined on how it can be shaped.
 * 🧊 Support for 3D geometries.
-* ♏ Support for M-Values for each geometry point (used by lines and polygons).
-* ♻️ Feature Properties & M-Values are stored as "Shapes" which reuses objects only needing to do lookups on values.
-* 🏛 Column encoding of data to make it more compact. Better gzip and brotli compression.
-* 🪺 Support nested objects in properties and m-values.
-* 📦 All features support first class BBOX data like IDs.
-* 😑 Lines support "offsets" to know the distance it's traveled.
+* ♏ Support for M-Values for each geometry point.
+* ♻️ Feature Properties & M-Values are defined in scope to ensure they can be easily processed by lower level languages as structures, but also adds value to other projects down the line.
+* GeoJSON no longer supports `GeometryCollection`.
