@@ -10,4 +10,4 @@ Rough estimation of the changes from GeoJSON:
 * 🧊 Support for 3D geometries.
 * ♏ Support for M-Values for each geometry point.
 * ♻️ Feature Properties & M-Values are defined in scope to ensure they can be easily processed by lower level languages as structures, but also adds value to other projects down the line.
-* GeoJSON no longer supports `GeometryCollection`.
+* 🛑 GeoJSON no longer supports `GeometryCollection`.

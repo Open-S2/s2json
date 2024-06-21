@@ -6,7 +6,7 @@ export type Primitive = string | number | boolean | null;
  * Arrays are also limited to primitives and objects of primitives
  */
 export type ValueArray =
-  Array<Primitive | { [key: string]: Primitive }> extends Array<infer U> ? U[] : never;
+  Array<Primitive | { [key: string]: Primitive }> extends (infer U)[] ? U[] : never;
 
 /**
  * Supports primitive types `string`, `number`, `boolean`, `null`
@@ -20,14 +20,27 @@ export type Value = Primitive | ValueArray | { [key: string]: Value };
 export type Properties = Record<string, Value>;
 /** Shape of a feature's M-Values object */
 export type MValue = Properties;
+/**
+ *
+ */
+type AllEqual<T> = T extends [infer First, ...infer Rest]
+  ? Rest extends [First, ...infer _]
+    ? AllEqual<Rest>
+    : false
+  : true;
+
+/**
+ *
+ */
+type UniformArray<M extends MValue = MValue> = AllEqual<M[]> extends true ? M[] : never;
 /** LineString Properties Shape */
-export type LineStringMValues = MValue[];
+export type LineStringMValues<M extends MValue = MValue> = UniformArray<M>;
 /** MultiLineString Properties Shape */
-export type MultiLineStringMValues = MValue[][];
+export type MultiLineStringMValues<M extends MValue = MValue> = UniformArray<M>[];
 /** Polygon MValues Shape */
-export type PolygonMValues = MValue[][];
+export type PolygonMValues<M extends MValue = MValue> = UniformArray<M>[];
 /** MultiPolygon MValues Shape */
-export type MultiPolygonMValues = MValue[][][];
+export type MultiPolygonMValues<M extends MValue = MValue> = UniformArray<M>[][];
 
 /** All possible M-Value shapes */
 export type MValues =

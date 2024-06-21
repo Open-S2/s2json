@@ -1,5 +1,5 @@
-import type { Properties } from './values';
 import type { BBox, Geometry } from './geometry';
+import type { MValue, Properties } from './values';
 
 export * from './geometry';
 export * from './values';
@@ -36,16 +36,22 @@ export interface S2FeatureCollection
 /** Either an S2 or WG Feature type */
 export type FeatureType = 'Feature' | 'S2Feature';
 /** Base component to build either an S2 or WG Feature */
-export interface BaseFeature<T = FeatureType, G = Geometry> {
+export interface BaseFeature<
+  T = FeatureType,
+  P extends Properties = Properties,
+  M extends MValue = MValue,
+> {
   type: T;
   id?: number;
-  properties: Properties;
-  geometry: G;
+  properties: P;
+  geometry: Geometry<M>;
 }
 /** WG Feature */
-export interface Feature extends BaseFeature<'Feature'> {}
+export interface Feature<P extends Properties = Properties, M extends MValue = MValue>
+  extends BaseFeature<'Feature', P, M> {}
 /** S2 Feature */
-export interface S2Feature extends BaseFeature<'S2Feature'> {
+export interface S2Feature<P extends Properties = Properties, M extends MValue = MValue>
+  extends BaseFeature<'S2Feature', P, M> {
   face: Face;
 }
 

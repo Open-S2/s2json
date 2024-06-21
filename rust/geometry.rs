@@ -118,7 +118,7 @@ pub struct BaseGeometry<G = Geometry, M = MValues, B = BBOX> {
 /// PointGeometry is a point
 pub type PointGeometry = BaseGeometry<Point, MValue, BBox>;
 /// MultiPointGeometry contains multiple points
-pub type MultiPointGeometry = BaseGeometry<MultiPoint, MValue, BBox>;
+pub type MultiPointGeometry = BaseGeometry<MultiPoint, LineStringMValues, BBox>;
 /// LineStringGeometry is a line
 pub type LineStringGeometry = BaseGeometry<LineString, LineStringMValues, BBox>;
 /// MultiLineStringGeometry contains multiple lines
@@ -130,7 +130,7 @@ pub type MultiPolygonGeometry = BaseGeometry<MultiPolygon, MultiPolygonMValues, 
 /// Point3DGeometry is a 3D point
 pub type Point3DGeometry = BaseGeometry<Point3D, MValue, BBox3D>;
 /// MultiPoint3DGeometry contains multiple 3D points
-pub type MultiPoint3DGeometry = BaseGeometry<MultiPoint3D, MValue, BBox3D>;
+pub type MultiPoint3DGeometry = BaseGeometry<MultiPoint3D, LineStringMValues, BBox3D>;
 /// LineString3DGeometry is a 3D line
 pub type LineString3DGeometry = BaseGeometry<LineString3D, LineStringMValues, BBox3D>;
 /// MultiLineString3DGeometry contains multiple 3D lines

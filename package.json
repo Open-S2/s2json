@@ -1,6 +1,6 @@
 {
   "name": "s2json-spec",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "S2JSON is a specification for encoding a variety of geographic data structures",
   "keywords": [
     "vector",

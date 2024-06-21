@@ -26,7 +26,7 @@ Notable features of S2JSON are:
 * 🧊 Support for 3D geometries.
 * ♏ Support for M-Values for each geometry point.
 * ♻️ Feature Properties & M-Values are defined in scope to ensure they can be easily processed by lower level languages as structures, but also adds value to other projects down the line.
-* GeoJSON no longer supports `GeometryCollection`.
+* 🛑 GeoJSON no longer supports `GeometryCollection`.
 
 This spec also extends the spec to include M-Values, Attribution,
 
