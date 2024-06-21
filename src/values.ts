@@ -20,18 +20,14 @@ export type Value = Primitive | ValueArray | { [key: string]: Value };
 export type Properties = Record<string, Value>;
 /** Shape of a feature's M-Values object */
 export type MValue = Properties;
-/**
- *
- */
+/** Ensure all elements in an array are the same */
 type AllEqual<T> = T extends [infer First, ...infer Rest]
   ? Rest extends [First, ...infer _]
     ? AllEqual<Rest>
     : false
   : true;
 
-/**
- *
- */
+/** Uniform MValues Shape */
 type UniformArray<M extends MValue = MValue> = AllEqual<M[]> extends true ? M[] : never;
 /** LineString Properties Shape */
 export type LineStringMValues<M extends MValue = MValue> = UniformArray<M>;
