@@ -21,11 +21,9 @@
   "typescript": {
     "main": "lib/index.ts"
   },
-  "main": "./client/out/extension.js",
+  "main": "./dist/index.js",
   "exports": {
-    ".": "./dist/index.js",
-    "./client": "./client/out/extension.js",
-    "./server": "./server/out/server.js"
+    ".": "./dist/index.js"
   },
   "scripts": {
     "lint+build+docs+test": "bun run lint && bun run build && bun run docs && bun test",
@@ -40,9 +38,8 @@
     "prepublishOnly": "bun run lint+build+docs+test",
     "package-check": "package-check",
     "docs": "typedoc",
-    "vscode:prepublish": "bun run compile",
-    "watch": "tsc -watch -p ./",
-    "postinstall": "cd client && bun install && cd ../server && bun install && cd .."
+    "vscode:prepublish": "bun run prepublishOnly",
+    "watch": "tsc -watch -p ./"
   },
   "repository": {
     "type": "git",
@@ -134,6 +131,8 @@
   },
   "activationEvents": [
     "onLanguage:s2json",
-    "onLanguage:geojson"
+    "onLanguage:geojson",
+    "onLanguage:s2jsonl",
+    "onLanguage:geojsonl"
   ]
 }
