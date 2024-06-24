@@ -108,10 +108,8 @@
   "include": [
     "eslint.config.mjs",
     "build.ts",
-    "benchmarks/**/*.ts",
     "src/**/*.ts",
-    "test/**/*.ts",
-    "tools/**/*.ts",
-    ".dependency-cruiser.cjs"
-  ]
+    "test/**/*.ts"
+  ],
+  "exclude": ["node_modules", "dist", "out", "*.js"]
 }

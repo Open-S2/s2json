@@ -5,3 +5,7 @@ tsconfig.build.tsbuildinfo
 tsconfig.test.tsbuildinfo
 .DS_Store
 target/
+client/node_modules/**
+client/out/**
+server/node_modules/**
+server/out/**

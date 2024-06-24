@@ -45,6 +45,7 @@ export interface BaseFeature<
   id?: number;
   properties: P;
   geometry: Geometry<M>;
+  metadata?: Record<string, unknown>;
 }
 /** WG Feature */
 export interface Feature<P extends Properties = Properties, M extends MValue = MValue>

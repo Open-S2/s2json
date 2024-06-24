@@ -65,18 +65,20 @@ pub struct S2FeatureCollection {
 
 /// Component to build either an S2 or WG Feature
 #[derive(Debug, PartialEq)]
-pub struct Feature {
+pub struct Feature<M = ()> {
     /// Unique identifier
     pub id: Option<u64>,
     /// Properties of the feature
     pub properties: Properties,
     /// Geometry of the feature
     pub geometry: Geometry,
+    /// Metadata of the feature
+    pub metadata: Option<M>,
 }
 
 /// Component to build either an S2 or WG Feature
 #[derive(Debug, PartialEq)]
-pub struct S2Feature {
+pub struct S2Feature<M = ()> {
     /// Unique identifier
     pub id: Option<u64>,
     /// Cube-Face of the feature
@@ -85,6 +87,8 @@ pub struct S2Feature {
     pub properties: Properties,
     /// Geometry of the feature
     pub geometry: Geometry,
+    /// Metadata of the feature
+    pub metadata: Option<M>,
 }
 
 //? Utility types

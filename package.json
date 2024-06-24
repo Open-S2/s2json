@@ -10,27 +10,39 @@
     "s2",
     "spec"
   ],
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
   "type": "module",
   "types": "./dist/index.d.ts",
   "typescript": {
     "main": "lib/index.ts"
   },
-  "main": "dist/index.js",
+  "main": "./client/out/extension.js",
   "exports": {
-    ".": "./dist/index.js"
+    ".": "./dist/index.js",
+    "./client": "./client/out/extension.js",
+    "./server": "./server/out/server.js"
   },
   "scripts": {
-    "lint+build+docs": "bun run lint && bun run build && bun run docs",
+    "lint+build+docs+test": "bun run lint && bun run build && bun run docs && bun test",
     "lint": "eslint src",
     "lint:fix": "bun run lint -- --fix",
     "prettier": "bunx prettier src tools benchmarks --check",
     "prettier:fix": "bunx prettier -- --write",
     "format": "bunx prettier:fix && bun run lint:fix",
-    "build": "rm -rf dist && mkdir dist && rm -f -- tsconfig.tsbuildinfo && tsc && bun run build.ts",
+    "build": "tsc -p ./",
+    "test:watch": "bun test --watch",
     "types:bundle": "bun run types:build && node scripts/types.mjs",
-    "prepublishOnly": "bun run lint+build+docs",
+    "prepublishOnly": "bun run lint+build+docs+test",
     "package-check": "package-check",
-    "docs": "typedoc"
+    "docs": "typedoc",
+    "vscode:prepublish": "bun run compile",
+    "watch": "tsc -watch -p ./",
+    "postinstall": "cd client && bun install && cd ../server && bun install && cd .."
   },
   "repository": {
     "type": "git",
@@ -48,8 +60,10 @@
   "homepage": "https://github.com/Open-S2/s2json#readme",
   "devDependencies": {
     "@skypack/package-check": "^0.2.2",
-    "@types/bun": "^1.1.1",
+    "@types/bun": "latest",
     "@types/node": "^20.12.11",
+    "@types/vscode": "^1.90.0",
+    "ajv": "^8.16.0",
     "dependency-cruiser": "^16.3.2",
     "eslint": "^9.3.0",
     "eslint-config-prettier": "^9.1.0",
@@ -59,7 +73,67 @@
     "prettier": "^3.2.5",
     "typedoc": "^0.25.13",
     "typedoc-plugin-coverage": "^3.1.1",
-    "typescript": "^5.4.5",
-    "typescript-eslint": "^7.8.0"
-  }
+    "typescript-eslint": "^7.8.0",
+    "vscode-languageclient": "^9.0.1",
+    "vscode-languageserver": "^9.0.1",
+    "vscode-languageserver-textdocument": "^1.0.11",
+    "vscode-test": "^1.6.1"
+  },
+  "peerDependencies": {
+    "typescript": "^5.4.5"
+  },
+  "contributes": {
+    "languages": [
+      {
+        "id": "s2json",
+        "aliases": ["S2JSON", "s2json"],
+        "extensions": [".s2json", ".s2geojson"],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "geojson",
+        "aliases": ["GeoJSON", "geojson"],
+        "extensions": [".geojson", ".geojsonl", ".geojsonld"],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "s2jsonl",
+        "aliases": ["S2JSON", "s2json"],
+        "extensions": [".s2jsonl", ".s2jsonld"],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "geojsonl",
+        "aliases": ["GeoJSON", "geojson"],
+        "extensions": [".geojsonl", ".geojsonld"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "s2json",
+        "scopeName": "source.json.comments",
+        "path": "./syntaxes/s2json.tmLanguage.json"
+      },
+      {
+        "language": "s2jsonl",
+        "scopeName": "source.json.lines",
+        "path": "./syntaxes/s2jsonL.tmLanguage.json"
+      },
+      {
+        "language": "geojson",
+        "scopeName": "source.geojson.comments",
+        "path": "./syntaxes/s2json.tmLanguage.json"
+      },
+      {
+        "language": "geojsonl",
+        "scopeName": "source.geojson.lines",
+        "path": "./syntaxes/s2jsonL.tmLanguage.json"
+      }
+    ]
+  },
+  "activationEvents": [
+    "onLanguage:s2json",
+    "onLanguage:geojson"
+  ]
 }

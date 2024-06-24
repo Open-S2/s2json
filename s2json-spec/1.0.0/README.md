@@ -1,22 +1,20 @@
 # S2JSON Specification 1.0.0
 
-TODO:
-
-[ ] - Tile Explainer
-[ ] - Column Cache
-[ ] - Layers
-[ ] - Features
-  [ ] - Shapes
-  [ ] - Feature Properties
-  [ ] - M-Values
-  [ ] - line offsets
-  [ ] - bbox
-  [ ] - Points, Lines, Polygons, Points3D, Lines3D, Polygons3D
-  [ ] - encoding
-
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
 "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in
 this document are to be interpreted as described in [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt).
+
+## 0. Conventions & Terminology
+
+The ordering of the members of any JSON object defined in this document MUST be considered irrelevant, as specified by [RFC7159](https://www.ietf.org/rfc/rfc7159.txt).
+
+Some examples use the combination of a JavaScript single-line comment (//) followed by an ellipsis (...) as placeholder notation for content deemed irrelevant by the authors.  These placeholders must of course be deleted or otherwise replaced, before attempting to validate the corresponding JSON code example.
+
+Whitespace is used in the examples inside this document to help illustrate the data structures, but it is not required.  Unquoted whitespace is not significant in JSON.
+
+WG: [World Geodetic System 1984 (WGS84)](https://gisgeography.com/wgs84-world-geodetic-system/)
+S2: [S2 Geometry](http://s2geometry.io/about/overview)
+LonLat: [Longitude, Latitude](https://en.wikipedia.org/wiki/Longitude_and_latitude)
 
 ## 1. Purpose
 
@@ -24,46 +22,170 @@ This document specifies a space-efficient encoding format for tiled geographic v
 
 ## 2. File Format
 
-The Vector Tile format primarily uses [Google Protocol Buffers](https://developers.google.com/protocol-buffers/) as a encoding format. Protocol Buffers are a language-neutral, platform-neutral extensible mechanism for serializing structured data. Some
+Files are JSON (JavaScript Object Notation) files. Data is stored as utf-8 variable encoded strings. Some text in feature properties or m-values MAY contain [Unicode](https://en.wikipedia.org/wiki/Unicode) characters.
 
 ### 2.1. File Extension
 
-The filename extension for Vector Tile files SHOULD be `ovt`. For example, a file might be named `vector.ovt`.
+The filename extension for Vector Tile files MAY be `.json`. For example, a file might be named `data.json`. However, while OPTIONAL, it is strongly RECOMMENDED that that WGS84 features be stored as `.geojson` and S2 Geometry features be stored as `.s2json`.
 
-### 2.2. Multipurpose Internet Mail Extensions (MIME)
+### 2.2. Data Storage
 
-When serving Vector Tiles the MIME type SHOULD be `application/pbf`.
+There are two ways in which data may be stored in a string and/or a file: Line delimited JSON and Single JSON Object.
 
-## 3. Projection and Bounds
+#### 2.2.1 Line Delimited JSON
 
-A Vector Tile represents data based on a square extent within a 0-1 coordinate space. A Vector Tile SHOULD NOT contain information about its bounds and projection. The file format assumes that the decoder knows the bounds and projection of a Vector Tile before decoding it.
+Each Line is a Valid JSON Value. Thus, a collection of `Feature` or `S2Feature` objects are stored individually on each line. Lines are separated by utf-8 newline characters, `\n` or `\r\n`.
 
-[Web Mercator](https://en.wikipedia.org/wiki/Web_Mercator) is the projection of reference, and [the Google tile scheme](http://www.maptiler.org/google-maps-coordinates-tile-bounds-projection/) is the tile extent convention of reference. Together, they provide a 1-to-1 relationship between a specific geographical area, at a specific level of detail, and a path such as `https://example.com/17/65535/43602.ovt`.
+Note that JSON allows encoding Unicode strings with only ASCII escape sequences, however those escapes will be hard to read when viewed in a text editor.
 
-Vector Tiles MAY be used to represent data with any projection and tile extent scheme.
+#### 2.2.2 Single JSON Object
 
-## 4. Internal Structure
+This may be either a `Feature`, `S2Feature`, `FeatureCollection`, or `S2FeatureCollection` object.
 
-This specification describes the structure of data within a Vector Tile. The reader should have an understanding of the [Vector Tile protobuf schema document](vector_tile.proto) and the structures it defines.
+## 3. Coordinate Reference Systems
 
-### 4.1. Tile
+### 3.1. WGS84 (EPSG:4326)
 
-A Vector Tile consists of one or more layers and a column-cache system if OVT is used.
+### 3.2. S2 (S2 Geometry)
 
-### 4.2. Column Cache
+## 4. S2 Face
 
-### 4.3. Layers
+## 5. Attributions
 
-### 4.4. Features
+## 5. Values
 
-### 4.5. Geometry Encoding
+### 5.1. Primitive Values
 
-#### 4.5.1. Geometry Types
+### 5.2. Array Values
 
-The `geometry` field is described in each feature by the `type` field which must be a value in the enum `GeomType`. The following geometry types are supported:
+### 5.3. Object Values (nested values)
 
-* POINTS
-* LINESTRINGS
-* POLYGONS
+## 6. Properties
 
-Geometry collections are not supported.
+## 7. MValues
+
+### 7.0. MValue
+
+### 7.1. LineStringMValues
+
+### 7.2. MultiLineStringMValues
+
+### 7.3. PolygonMValues
+
+### 7.4. MultiPolygonMValues
+
+## 8. FeatureCollections
+
+### 8.1. FeatureCollection
+
+### 8.1.1. FeatureCollection Type
+
+### 8.1.2. FeatureCollection Features
+
+### 8.1.3. FeatureCollection BBox
+
+### 8.1.4. FeatureCollection Attributions
+
+### 8.2. S2FeatureCollection
+
+### 8.2.1. S2FeatureCollection Type
+
+### 8.2.2. S2FeatureCollection Features
+
+### 8.2.3. S2FeatureCollection BBox
+
+### 8.2.4. S2FeatureCollection Attributions
+
+### 8.2.5. S2FeatureCollection Faces
+
+## 9. Features
+
+### 9.1. Feature
+
+### 9.1.1. Feature ID
+
+### 9.1.2. Feature Properties
+
+### 9.1.3. Feature Geometry
+
+### 9.2. S2Feature
+
+### 9.2.1 S2Feature ID
+
+### 9.2.2. S2Feature Properties
+
+### 9.2.3. S2Feature Geometry
+
+### 9.2.4. S2Feature Face
+
+You may ask yourself: "Why not place the `Face` property inside the geometry object?" However, this is not a constructive solution, since we want to operate on the vector geometry in the same way regardless of the projection type, and so we want to maintain the same interface.
+
+## 10. Geometry
+
+### 10.1. Geometry Types
+
+### 10.2. Geometry BBox
+
+#### 10.2.1. Geometry BBox 2D
+
+#### 10.2.2. Geometry BBox 3D
+
+### 10.3. Geometry Coordinates
+
+#### 10.3.1. Point
+
+#### 10.3.2. Point3D
+
+#### 10.3.3. MultiPoint
+
+#### 10.3.4. MultiPoint3D
+
+#### 10.3.5. LineString
+
+#### 10.3.6. LineString3D
+
+#### 10.3.7. MultiLineString
+
+#### 10.3.8. MultiLineString3D
+
+#### 10.3.9. Polygon
+
+#### 10.3.10. Polygon3D
+
+#### 10.3.11. MultiPolygon
+
+#### 10.3.12. MultiPolygon3D
+
+### 10.4. Geometry MValues
+
+A geometries M-Values are OPTIONAL. The M-Values size and length always watch the geometries coordinates length and size. For example, if the Geometry type is a `LineString` the M-Values is also a `LineString` in shape, and it's length matches the coordinates length.
+
+Example:
+
+```json
+{
+  "type": "MultiLineString",
+  "coordinates": [
+    [
+      [100.0, 0.0],
+      [101.0, 1.0]
+    ],
+    [
+      [102.0, 2.0],
+      [103.0, 3.0]
+    ]
+  ],
+  "mValues": [
+    [
+      { "foo": "bar" },
+      { "foo": "baz" }
+    ],
+    [
+      { "foo": "qux" },
+      { "foo": "quux" }
+    ]
+  ]
+}
+```
+
+## 11. Examples

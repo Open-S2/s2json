@@ -5,7 +5,7 @@
 [crate-image]: https://img.shields.io/crates/v/s2json.svg?logo=rust&logoColor=white
 [crate-url]: https://crates.io/crates/s2json
 [bundle-image]: https://img.shields.io/bundlejs/size/s2json-spec?exports=VectorTile
-[bundle-url]: https://bundlejs.com/?q=s2json-spec&treeshake=%5B%7B+VectorTile+%7D%5D
+[bundle-url]: https://bundlejs.com/?q=s2json-spec
 [downloads-image]: https://img.shields.io/npm/dm/s2json-spec.svg
 [downloads-url]: https://www.npmjs.com/package/s2json-spec
 [docs-ts-image]: https://img.shields.io/badge/docs-typescript-yellow.svg
@@ -25,12 +25,10 @@ Notable features of S2JSON are:
 * Properties data is clearly defined on how it can be shaped.
 * 🧊 Support for 3D geometries.
 * ♏ Support for M-Values for each geometry point.
+* 🪩 Support for `S2Feature` and `S2FeatureCollection` types based upon the S2 Geometry *spherical projection*.
 * ♻️ Feature Properties & M-Values are defined in scope to ensure they can be easily processed by lower level languages as structures, but also adds value to other projects down the line.
 * 🛑 GeoJSON no longer supports `GeometryCollection`.
-
-This spec also extends the spec to include M-Values, Attribution,
-
-The
+* 📝 Attribution can be added to either a `FeatureCollection` or `S2FeatureCollection`
 
 ```json
 // GeoJSON example
@@ -94,6 +92,33 @@ The `bacon coverage` tool is used to generate the coverage report. To utilize th
 
 ```bash
 pip install pycobertura
+```
+
+### Validated Your Data
+
+> Note: Be sure to set `resolveJsonModule: true` in your `tsconfig.json` to ensure json may be loaded as a module.
+
+```ts
+import Ajv from 'ajv';
+import * as schema from 's2json-spec/s2json.schema.json'; // Path to the schema
+
+import type { Feature } from 's2json-spec';
+
+const ajv = new Ajv();
+const validate = ajv.compile(schema);
+
+const feature: Feature = {
+  type: 'Feature',
+  geometry: {
+    type: 'Point',
+    coordinates: [125.6, 10.1]
+  },
+  properties: {
+    name: 'Dinagat Islands'
+  },
+};
+
+validate(feature); // true
 ```
 
 ### Running Tests

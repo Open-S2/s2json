@@ -52,6 +52,20 @@ export type MultiLineString3D = LineString3D[];
 export type Polygon3D = Point3D[][];
 /** Definition of a 3D MultiPolygon */
 export type MultiPolygon3D = Polygon3D[];
+/** All possible geometry coordinates */
+export type Coordinates =
+  | Point
+  | MultiPoint
+  | LineString
+  | MultiLineString
+  | Polygon
+  | MultiPolygon
+  | Point3D
+  | MultiPoint3D
+  | LineString3D
+  | MultiLineString3D
+  | Polygon3D
+  | MultiPolygon3D;
 
 /** All possible geometry types */
 export type GeometryType =
@@ -85,9 +99,9 @@ export type Geometry<M extends MValue = MValue> =
   | MultiPolygon3DGeometry<M>;
 
 /** BaseGeometry with MValues is the a generic geometry type that includes MValues */
-export interface BaseGeometry<T = GeometryType, G = Geometry, M = MValues, B = BBOX> {
+export interface BaseGeometry<T = GeometryType, C = Coordinates, M = MValues, B = BBOX> {
   type: T;
-  coordinates: G;
+  coordinates: C;
   mValues?: M;
   bbox?: B;
 }

@@ -1,0 +1,4 @@
+{
+	"displayName": "GeoJSON and S2JSON Langauges",
+	"description": "Provides syntax highlighting & bracket matching in GeoJSON and S2JSON files."
+}
