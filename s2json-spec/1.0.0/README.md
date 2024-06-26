@@ -26,7 +26,7 @@ Files are JSON (JavaScript Object Notation) files. Data is stored as utf-8 varia
 
 ### 2.1. File Extension
 
-The filename extension for Vector Tile files MAY be `.json`. For example, a file might be named `data.json`. However, while OPTIONAL, it is strongly RECOMMENDED that that WGS84 features be stored as `.geojson` and S2 Geometry features be stored as `.s2json`.
+The filename extension for Vector Tile files MAY be `.json`. For example, a file might be named `data.json`. However, while OPTIONAL, it is strongly RECOMMENDED that that WGS84 features be stored as `.geojson` or `.geojsonld`, and S2 Geometry features be stored as `.s2json` or `.s2jsonld`.
 
 ### 2.2. Data Storage
 
@@ -50,29 +50,131 @@ This may be either a `Feature`, `S2Feature`, `FeatureCollection`, or `S2FeatureC
 
 ## 4. S2 Face
 
+In S2 Geometry, the world is represented as a unit sphere and divided into six faces using a cube -like projection. Each face of the cube is identified by an integer index from 0 to 5 inclusive.
+
+Example:
+
+```json
+{
+  "type": "S2Feature",
+  "properties": {
+    "name": "Example Feature"
+  },
+  "geometry": {
+    "type": "Point",
+    "coordinates": [0.1, 0.5]
+  },
+  "face": 2
+}
+```
+
 ## 5. Attributions
+
+Attributions provide metadata about the sources of data used in the S2JSON file. They typically include information about the data provider, licensing, and other relevant details that should be displayed when the data is used or visualized.
+
+Attributions are OPTIONAL.
+
+Example:
+
+```json
+{
+  "type": "S2FeatureCollection",
+  "features": [],
+  "faces": [],
+  "attributions": {
+    "Open S2": "https://opens2.com/legal/data"
+  }
+}
+```
 
 ## 5. Values
 
 ### 5.1. Primitive Values
 
-### 5.2. Array Values
+Primitive values include strings, numbers, booleans, and null.
 
-### 5.3. Object Values (nested values)
+Example:
+
+```json
+{
+  "stringValue": "example",
+  "numberValue": 42,
+  "booleanValue": true,
+  "nullValue": null
+}
+```
+
+5.2. Array Values
+
+Array values are ordered lists of values. Once you use an array, each item must be of the same type. Each item can be either a primitive value or an object whose keys are strings and values are primitive values.
+
+Example:
+
+```json
+{
+  "arrayValue": [1, 2, 3, 4, 5]
+}
+```
+
+5.3. Object Values (nested values)
+
+Object values are collections of key-value pairs, where values can be of any type, including nested objects.
+
+Example:
+
+```json
+{
+  "objectValue": {
+    "key1": "value1",
+    "key2": {
+      "nestedKey": "nestedValue"
+    }
+  }
+}
+```
 
 ## 6. Properties
 
+Properties are key-value pairs that store additional data about features. The key is a string and the value is any Value type: `primitive`, `array`, or `object`.
+
+Example:
+
+```json
+{
+  "properties": {
+    "name": "Example Feature",
+    "category": "example",
+    "metadata": {
+      "createdBy": "user123",
+      "createdAt": "2023-01-01T00:00:00Z"
+    }
+  }
+}
+```
+
 ## 7. MValues
 
-### 7.0. MValue
+MValues provide additional attribute data for each coordinate in a geometry. They are OPTIONAL and follow the same structure as `properties`.
 
-### 7.1. LineStringMValues
+The length of mValues MUST match the length of the corresponding coordinates.
 
-### 7.2. MultiLineStringMValues
+All mValues MUST have the same structure with the same key-value pairs.
 
-### 7.3. PolygonMValues
+Example:
 
-### 7.4. MultiPolygonMValues
+```json
+{
+  "type": "LineString",
+  "coordinates": [
+    [100.0, 0.0],
+    [101.0, 1.0]
+  ],
+  "mValues": [
+    { "foo": "bar" },
+    { "foo": "baz" }
+  ]
+}
+```
 
 ## 8. FeatureCollections
 
@@ -118,7 +220,7 @@ This may be either a `Feature`, `S2Feature`, `FeatureCollection`, or `S2FeatureC
 
 ### 9.2.4. S2Feature Face
 
-You may ask yourself: "Why not place the `Face` property inside the geometry object?" However, this is not a constructive solution, since we want to operate on the vector geometry in the same way regardless of the projection type, and so we want to maintain the same interface.
+You may ask yourself: "Why not place the `Face` property inside the geometry object?" However, this is not a constructive solution, since we want to operate on the vector geometry in the same way regardless of the projection type, and so we want to maintain the same geometry interface for all projections.
 
 ## 10. Geometry
 
