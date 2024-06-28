@@ -27,13 +27,14 @@
     ".": "./dist/index.js"
   },
   "scripts": {
-    "lint+build+docs+test": "bun run lint && bun run build && bun run docs && bun test",
+    "lint+build+docs+test": "bun run lint && bun run build && bun run docs && bun run test",
     "lint": "eslint src",
     "lint:fix": "bun run lint -- --fix",
     "prettier": "bunx prettier src tools benchmarks --check",
     "prettier:fix": "bunx prettier -- --write",
     "format": "bunx prettier:fix && bun run lint:fix",
     "build": "tsc -p ./",
+    "test": "bun test",
     "test:watch": "bun test --watch",
     "types:bundle": "bun run types:build && node scripts/types.mjs",
     "prepublishOnly": "bun run lint+build+docs+test",
