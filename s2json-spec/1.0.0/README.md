@@ -260,7 +260,7 @@ You may ask yourself: "Why not place the `Face` property inside the geometry obj
 
 ### 10.4. Geometry MValues
 
-A geometries M-Values are OPTIONAL. The M-Values size and length always watch the geometries coordinates length and size. For example, if the Geometry type is a `LineString` the M-Values is also a `LineString` in shape, and it's length matches the coordinates length.
+A geometries M-Values are OPTIONAL. The M-Values size and length always match the geometries coordinates length and size. For example, if the Geometry type is a `LineString` the M-Values is also a `LineString` in shape, and it's length matches the coordinates length.
 
 Example:
 
