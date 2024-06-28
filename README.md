@@ -1,20 +1,31 @@
-# s2json [![npm][npm-image]][npm-url] [![crate][crate-image]][crate-url] [![downloads][downloads-image]][downloads-url] [![bundle][bundle-image]][bundle-url] [![docs-ts][docs-ts-image]][docs-ts-url] [![docs-rust][docs-rust-image]][docs-rust-url] ![doc-coverage][doc-coverage-image] [![Discord][discord-image]][discord-url]
+<h1 style="text-align: center;">
+  <div align="center">s2json</div>
+</h1>
 
-[npm-image]: https://img.shields.io/npm/v/s2json-spec.svg?logo=npm&logoColor=white
-[npm-url]: https://npmjs.org/package/s2json-spec
-[crate-image]: https://img.shields.io/crates/v/s2json.svg?logo=rust&logoColor=white
-[crate-url]: https://crates.io/crates/s2json
-[bundle-image]: https://img.shields.io/bundlejs/size/s2json-spec?exports=VectorTile
-[bundle-url]: https://bundlejs.com/?q=s2json-spec
-[downloads-image]: https://img.shields.io/npm/dm/s2json-spec.svg
-[downloads-url]: https://www.npmjs.com/package/s2json-spec
-[docs-ts-image]: https://img.shields.io/badge/docs-typescript-yellow.svg
-[docs-ts-url]: https://open-s2.github.io/s2json/
-[docs-rust-image]: https://img.shields.io/badge/docs-rust-yellow.svg
-[docs-rust-url]: https://docs.rs/s2json
-[doc-coverage-image]: https://raw.githubusercontent.com/Open-S2/s2json/master/assets/doc-coverage.svg
-[discord-image]: https://img.shields.io/discord/953563031701426206?logo=discord&logoColor=white
-[discord-url]: https://discord.opens2.com
+<p align="center">
+  <a href="https://npmjs.org/package/s2json-spec">
+    <img src="https://img.shields.io/npm/v/s2json-spec.svg?logo=npm&logoColor=white" alt="npm">
+  </a>
+  <a href="https://crates.io/crates/s2json">
+    <img src="https://img.shields.io/crates/v/s2json.svg?logo=rust&logoColor=white" alt="crate">
+  </a>
+  <a href="https://www.npmjs.com/package/s2json-spec">
+    <img src="https://img.shields.io/npm/dm/s2json-spec.svg" alt="downloads">
+  </a>
+  <a href="https://bundlejs.com/?q=s2json-spec&treeshake=%5B%7B+VectorTile+%7D%5D">
+    <img src="https://img.shields.io/bundlejs/size/s2json-spec?exports=VectorTile" alt="bundle">
+  </a>
+  <a href="https://open-s2.github.io/s2json/">
+    <img src="https://img.shields.io/badge/docs-typescript-yellow.svg" alt="docs-ts">
+  </a>
+  <a href="https://docs.rs/s2json">
+    <img src="https://img.shields.io/badge/docs-rust-yellow.svg" alt="docs-rust">
+  </a>
+  <img src="https://raw.githubusercontent.com/Open-S2/s2json/master/assets/doc-coverage.svg" alt="doc-coverage">
+  <a href="https://discord.opens2.com">
+    <img src="https://img.shields.io/discord/953563031701426206?logo=discord&logoColor=white" alt="Discord">
+  </a>
+</p>
 
 ## About
 

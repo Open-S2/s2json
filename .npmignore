@@ -16,3 +16,5 @@ tools/
 s2json-spec/
 client/
 server/
+coverage/**
+*.profraw

@@ -125,3 +125,14 @@ pub enum JSONCollection {
     /// An S2 Feature
     S2Feature(S2Feature),
 }
+
+#[cfg(test)]
+mod tests {
+    // use super::*;
+
+    #[test]
+    fn it_works() {
+        let result = 2 + 2;
+        assert_eq!(result, 4);
+    }
+}
