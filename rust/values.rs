@@ -1,56 +1,61 @@
 extern crate alloc;
 
+use serde::{Serialize, Deserialize};
 use alloc::string::String;
 use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
 
 /// Primitive types supported by Properties
-#[derive(Debug, PartialEq)]
-pub enum Primitive {
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[serde(rename_all = "lowercase")]
+pub enum PrimitiveShape {
     /// String type utf8 encoded
-    String(String),
+    String,
     /// unsigned 64 bit integer
-    Unsigned(u64),
+    U64,
     /// signed 64 bit integer
-    Signed(i64),
+    I64,
     /// floating point number
-    Float(f32),
+    F32,
     /// double precision floating point number
-    Double(f64),
+    F64,
     /// boolean
-    Boolean(bool),
+    Bool,
     /// null
     Null,
 }
 
-/// When an array is used, it must be an array of the same type.
-/// Arrays are also limited to primitives and objects of primitives
-#[derive(Debug, PartialEq)]
-pub enum ValueArray {
-    /// Array of primitives
-    Primitives(Vec<Primitive>),
-    /// Array of objects that may only contain primitives
-    Objects(Vec<BTreeMap<String, Primitive>>),
+/// Arrays may contain either a primitive or an object whose values are primitives
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[serde(untagged)]
+pub enum ShapePrimitiveType {
+    /// Primitive type
+    Primitive(PrimitiveShape),
+    /// Nested shape that can only contain primitives
+    NestedPrimitive(BTreeMap<String, PrimitiveShape>),
 }
 
 /// Supports primitive types `string`, `number`, `boolean`, `null`
 /// May be an array of those types, or an object of those types
 /// Object keys are always strings, values can be any basic type, an array, or a nested object.
 /// Array values must all be the same type.
-#[derive(Debug, PartialEq)]
-pub enum Value {
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[serde(untagged)]
+pub enum ShapeType {
     /// A primitive value
-    Primitive(Primitive),
+    Primitive(PrimitiveShape),
     /// An array of values
-    Array(ValueArray),
+    Array(Vec<ShapePrimitiveType>),
     /// A nested object
-    Object(BTreeMap<String, Value>),
+    Nested(Shape),
 }
 
+/// Shape design
+pub type Shape = BTreeMap<String, ShapeType>;
 /// Shape of a features properties object
-pub type Properties = BTreeMap<String, Value>;
+pub type Properties = Shape;
 /// Shape of a feature's M-Values object
-pub type MValue = Properties;
+pub type MValue = Shape;
 
 /// LineString Properties Shape
 pub type LineStringMValues = Vec<MValue>;
@@ -62,7 +67,7 @@ pub type PolygonMValues = Vec<LineStringMValues>;
 pub type MultiPolygonMValues = Vec<PolygonMValues>;
 
 /// All possible M-Value shapes
-#[derive(Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum MValues {
     /// Single M-Value
     MValue(MValue),

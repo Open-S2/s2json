@@ -8,6 +8,7 @@
 
 extern crate alloc;
 
+use serde::{Serialize, Deserialize};
 use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
@@ -23,48 +24,71 @@ pub use values::*;
 //? S2 specific type
 
 /// Cube-face on the S2 sphere
-pub type Face = u8;
-/// Cube face 0
-pub const FACE_0: Face = 0;
-/// Cube face 1
-pub const FACE_1: Face = 1;
-/// Cube face 2
-pub const FACE_2: Face = 2;
-/// Cube face 3
-pub const FACE_3: Face = 3;
-/// Cube face 4
-pub const FACE_4: Face = 4;
-/// Cube face 5
-pub const FACE_5: Face = 5;
+#[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub enum Face {
+    /// Face 0
+    Face0 = 0,
+    /// Face 1
+    Face1 = 1,
+    /// Face 2
+    Face2 = 2,
+    /// Face 3
+    Face3 = 3,
+    /// Face 4
+    Face4 = 4,
+    /// Face 5
+    Face5 = 5,
+}
+impl From<Face> for u8 {
+    fn from(face: Face) -> Self {
+        face as u8
+    }
+}
+impl From<u8> for Face {
+    fn from(face: u8) -> Self {
+        match face {
+            1 => Face::Face1,
+            2 => Face::Face2,
+            3 => Face::Face3,
+            4 => Face::Face4,
+            5 => Face::Face5,
+            _ => Face::Face0,
+        }
+    }
+}
 
 //? FeatureCollections
 
 /// WG FeatureCollection
-#[derive(Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct FeatureCollection {
     /// Collection of WG features
     pub features: Vec<Feature>,
     /// Attribution data
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub attributions: Option<Attributions>,
     /// Bounding box
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub bbox: Option<BBox>,
 }
 
 /// S2 FeatureCollection
-#[derive(Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct S2FeatureCollection {
     /// Collection of S2 features
     pub features: Vec<S2Feature>,
     /// Attribution data
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub attributions: Option<Attributions>,
     /// Bounding box
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub bbox: Option<BBox>,
 }
 
 //? Features
 
 /// Component to build either an S2 or WG Feature
-#[derive(Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Feature<M = ()> {
     /// Unique identifier
     pub id: Option<u64>,
@@ -73,13 +97,15 @@ pub struct Feature<M = ()> {
     /// Geometry of the feature
     pub geometry: Geometry,
     /// Metadata of the feature
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<M>,
 }
 
 /// Component to build either an S2 or WG Feature
-#[derive(Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct S2Feature<M = ()> {
     /// Unique identifier
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<u64>,
     /// Cube-Face of the feature
     pub face: Face,
@@ -88,6 +114,7 @@ pub struct S2Feature<M = ()> {
     /// Geometry of the feature
     pub geometry: Geometry,
     /// Metadata of the feature
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<M>,
 }
 
@@ -99,6 +126,7 @@ pub struct S2Feature<M = ()> {
 pub type Attributions = BTreeMap<String, String>;
 
 /// Either an S2 or WG FeatureCollection
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub enum FeatureCollections {
     /// An WG FeatureCollection
     FeatureCollection(FeatureCollection),
@@ -107,6 +135,7 @@ pub enum FeatureCollections {
 }
 
 /// Either an S2 or WG Feature
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub enum Features {
     /// An WG Feature
     Feature(Feature),
@@ -115,6 +144,7 @@ pub enum Features {
 }
 
 /// All major S2JSON types
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub enum JSONCollection {
     /// An WG FeatureCollection
     FeatureCollection(FeatureCollection),
