@@ -7,20 +7,19 @@ use alloc::collections::BTreeMap;
 
 /// Primitive types supported by Properties
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-#[serde(rename_all = "lowercase")]
-pub enum PrimitiveShape {
+pub enum PrimitiveValue {
     /// String type utf8 encoded
-    String,
+    String(String),
     /// unsigned 64 bit integer
-    U64,
+    U64(u64),
     /// signed 64 bit integer
-    I64,
+    I64(i64),
     /// floating point number
-    F32,
+    F32(f32),
     /// double precision floating point number
-    F64,
+    F64(f64),
     /// boolean
-    Bool,
+    Bool(bool),
     /// null
     Null,
 }
@@ -28,11 +27,11 @@ pub enum PrimitiveShape {
 /// Arrays may contain either a primitive or an object whose values are primitives
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(untagged)]
-pub enum ShapePrimitiveType {
+pub enum ValuePrimitiveType {
     /// Primitive type
-    Primitive(PrimitiveShape),
+    Primitive(PrimitiveValue),
     /// Nested shape that can only contain primitives
-    NestedPrimitive(BTreeMap<String, PrimitiveShape>),
+    NestedPrimitive(BTreeMap<String, PrimitiveValue>),
 }
 
 /// Supports primitive types `string`, `number`, `boolean`, `null`
@@ -41,21 +40,21 @@ pub enum ShapePrimitiveType {
 /// Array values must all be the same type.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(untagged)]
-pub enum ShapeType {
+pub enum ValueType {
     /// A primitive value
-    Primitive(PrimitiveShape),
+    Primitive(PrimitiveValue),
     /// An array of values
-    Array(Vec<ShapePrimitiveType>),
+    Array(Vec<ValuePrimitiveType>),
     /// A nested object
-    Nested(Shape),
+    Nested(Value),
 }
 
 /// Shape design
-pub type Shape = BTreeMap<String, ShapeType>;
+pub type Value = BTreeMap<String, ValueType>;
 /// Shape of a features properties object
-pub type Properties = Shape;
+pub type Properties = Value;
 /// Shape of a feature's M-Values object
-pub type MValue = Shape;
+pub type MValue = Value;
 
 /// LineString Properties Shape
 pub type LineStringMValues = Vec<MValue>;
