@@ -21,7 +21,9 @@
   <a href="https://docs.rs/s2json">
     <img src="https://img.shields.io/badge/docs-rust-yellow.svg" alt="docs-rust">
   </a>
-  <img src="https://raw.githubusercontent.com/Open-S2/s2json/master/assets/doc-coverage.svg" alt="doc-coverage">
+  <a href="https://coveralls.io/github/Open-S2/s2json?branch=master">
+    <img src="https://coveralls.io/repos/github/Open-S2/s2json/badge.svg?branch=master" alt="code-coverage">
+  </a>
   <a href="https://discord.opens2.com">
     <img src="https://img.shields.io/discord/953563031701426206?logo=discord&logoColor=white" alt="Discord">
   </a>

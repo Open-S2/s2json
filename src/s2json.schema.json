@@ -79,6 +79,8 @@
     },
     "valueArray": {
       "type": "array",
+      "minItems": 0,
+      "maxItems": 16,
       "items": {
         "oneOf": [
           { "$ref": "#/definitions/primitive" },

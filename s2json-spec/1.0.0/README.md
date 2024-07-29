@@ -132,7 +132,7 @@ Example:
 
 ### 5.2. Array Values
 
-Array values are ordered lists of values. Once you use an array, each item MUST be of the same type. Each item MUST be either a primitive value or an object whose keys are strings and values are primitive values.
+Array values are ordered lists of values. Once you use an array, each item MUST be of the same type. Each item MUST be either a primitive value or an object whose keys are strings and values are primitive values. The maximum number of items in an array is 16.
 
 Example:
 

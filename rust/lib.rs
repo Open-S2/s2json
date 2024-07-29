@@ -127,6 +127,7 @@ pub type Attributions = BTreeMap<String, String>;
 
 /// Either an S2 or WG FeatureCollection
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[serde(untagged)]
 pub enum FeatureCollections {
     /// An WG FeatureCollection
     FeatureCollection(FeatureCollection),
@@ -136,6 +137,7 @@ pub enum FeatureCollections {
 
 /// Either an S2 or WG Feature
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[serde(untagged)]
 pub enum Features {
     /// An WG Feature
     Feature(Feature),
@@ -145,6 +147,7 @@ pub enum Features {
 
 /// All major S2JSON types
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[serde(untagged)]
 pub enum JSONCollection {
     /// An WG FeatureCollection
     FeatureCollection(FeatureCollection),
@@ -158,11 +161,28 @@ pub enum JSONCollection {
 
 #[cfg(test)]
 mod tests {
-    // use super::*;
+    use super::*;
 
     #[test]
-    fn it_works() {
-        let result = 2 + 2;
-        assert_eq!(result, 4);
+    fn face() {
+        let face = Face::Face0;
+        assert_eq!(u8::from(face), 0);
+        let face = Face::Face1;
+        assert_eq!(u8::from(face), 1);
+        let face = Face::Face2;
+        assert_eq!(u8::from(face), 2);
+        let face = Face::Face3;
+        assert_eq!(u8::from(face), 3);
+        let face = Face::Face4;
+        assert_eq!(u8::from(face), 4);
+        let face = Face::Face5;
+        assert_eq!(u8::from(face), 5);
+
+        assert_eq!(Face::Face0, Face::from(0));
+        assert_eq!(Face::Face1, Face::from(1));
+        assert_eq!(Face::Face2, Face::from(2));
+        assert_eq!(Face::Face3, Face::from(3));
+        assert_eq!(Face::Face4, Face::from(4));
+        assert_eq!(Face::Face5, Face::from(5));
     }
 }

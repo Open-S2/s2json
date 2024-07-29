@@ -7,6 +7,7 @@ use alloc::collections::BTreeMap;
 
 /// Primitive types supported by Properties
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[serde(untagged)]
 pub enum PrimitiveValue {
     /// String type utf8 encoded
     String(String),
@@ -46,15 +47,15 @@ pub enum ValueType {
     /// An array of values
     Array(Vec<ValuePrimitiveType>),
     /// A nested object
-    Nested(Value),
+    Nested(Shape),
 }
 
 /// Shape design
-pub type Value = BTreeMap<String, ValueType>;
+pub type Shape = BTreeMap<String, ValueType>;
 /// Shape of a features properties object
-pub type Properties = Value;
+pub type Properties = Shape;
 /// Shape of a feature's M-Values object
-pub type MValue = Value;
+pub type MValue = Shape;
 
 /// LineString Properties Shape
 pub type LineStringMValues = Vec<MValue>;
@@ -67,6 +68,7 @@ pub type MultiPolygonMValues = Vec<PolygonMValues>;
 
 /// All possible M-Value shapes
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[serde(untagged)]
 pub enum MValues {
     /// Single M-Value
     MValue(MValue),
@@ -78,4 +80,123 @@ pub enum MValues {
     PolygonMValues(PolygonMValues),
     /// MultiPolygon M-Value
     MultiPolygonMValues(MultiPolygonMValues),
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn primitive_value() {
+        let prim_value = PrimitiveValue::String("test".into());
+        assert_eq!(prim_value, PrimitiveValue::String("test".into()));
+        let prim_value = PrimitiveValue::U64(1);
+        assert_eq!(prim_value, PrimitiveValue::U64(1));
+        let prim_value = PrimitiveValue::I64(1);
+        assert_eq!(prim_value, PrimitiveValue::I64(1));
+        let prim_value = PrimitiveValue::F32(1.0);
+        assert_eq!(prim_value, PrimitiveValue::F32(1.0));
+        let prim_value = PrimitiveValue::F64(1.0);
+        assert_eq!(prim_value, PrimitiveValue::F64(1.0));
+        let prim_value = PrimitiveValue::Bool(true);
+        assert_eq!(prim_value, PrimitiveValue::Bool(true));
+        let prim_value = PrimitiveValue::Null;
+        assert_eq!(prim_value, PrimitiveValue::Null);
+    }
+
+    #[test]
+    fn primitive_string_serialize() {
+        let prim_value = PrimitiveValue::String("test".into());
+        let serialized = serde_json::to_string(&prim_value).unwrap();
+        assert_eq!(serialized, "\"test\"");
+        let deserialize = serde_json::from_str::<PrimitiveValue>(&serialized).unwrap();
+        assert_eq!(deserialize, PrimitiveValue::String("test".into()));
+    }
+
+    #[test]
+    fn primitive_u64_serialize() {
+        let prim_value = PrimitiveValue::U64(1);
+        let serialized = serde_json::to_string(&prim_value).unwrap();
+        assert_eq!(serialized, "1");
+        let deserialize = serde_json::from_str::<PrimitiveValue>(&serialized).unwrap();
+        assert_eq!(deserialize, PrimitiveValue::U64(1));
+    }
+
+    #[test]
+    fn primitive_i64_serialize() {
+        let prim_value = PrimitiveValue::I64(-1);
+        let serialized = serde_json::to_string(&prim_value).unwrap();
+        assert_eq!(serialized, "-1");
+        let deserialize = serde_json::from_str::<PrimitiveValue>(&serialized).unwrap();
+        assert_eq!(deserialize, PrimitiveValue::I64(-1));
+    }
+
+    #[test]
+    fn primitive_f32_serialize() {
+        let prim_value = PrimitiveValue::F32(1.0);
+        let serialized = serde_json::to_string(&prim_value).unwrap();
+        assert_eq!(serialized, "1.0");
+        let deserialize = serde_json::from_str::<PrimitiveValue>(&serialized).unwrap();
+        assert_eq!(deserialize, PrimitiveValue::F32(1.0));
+    }
+
+    #[test]
+    fn primitive_f64_serialize() {
+        let prim_value = PrimitiveValue::F64(-135435345435345345.0);
+        let serialized = serde_json::to_string(&prim_value).unwrap();
+        assert_eq!(serialized, "-1.3543534543534534e17");
+        let deserialize = serde_json::from_str::<PrimitiveValue>(&serialized).unwrap();
+        assert_eq!(deserialize, PrimitiveValue::F32(-1.3543534e17));
+    }
+
+    #[test]
+    fn primitive_bool_serialize() {
+        let prim_value = PrimitiveValue::Bool(true);
+        let serialized = serde_json::to_string(&prim_value).unwrap();
+        assert_eq!(serialized, "true");
+        let deserialize = serde_json::from_str::<PrimitiveValue>(&serialized).unwrap();
+        assert_eq!(deserialize, PrimitiveValue::Bool(true));
+    }
+
+    #[test]
+    fn primitive_null_serialize() {
+        let prim_value = PrimitiveValue::Null;
+        let serialized = serde_json::to_string(&prim_value).unwrap();
+        assert_eq!(serialized, "null");
+        let deserialize = serde_json::from_str::<PrimitiveValue>(&serialized).unwrap();
+        assert_eq!(deserialize, PrimitiveValue::Null);
+    }
+
+    #[test]
+    fn shape_serialize() {
+        let shape: Shape = BTreeMap::from([
+            ("type".into(), ValueType::Primitive(PrimitiveValue::String("Point".into()))),
+            ("coordinates".into(), ValueType::Primitive(PrimitiveValue::F32(1.0))),
+        ]);
+        let serialized = serde_json::to_string(&shape).unwrap();
+        assert_eq!(serialized, "{\"coordinates\":1.0,\"type\":\"Point\"}");
+        let deserialize = serde_json::from_str::<Shape>(&serialized).unwrap();
+        assert_eq!(deserialize, shape);
+
+        let shape_str = r#"
+        {
+            "class": "ocean",
+            "offset": 22,
+            "info": {
+                "name": "Pacific Ocean",
+                "value": 22.2
+            }
+        }
+        "#;
+
+        let deserialize = serde_json::from_str::<Shape>(shape_str).unwrap();
+        assert_eq!(deserialize, BTreeMap::from([
+            ("class".into(), ValueType::Primitive(PrimitiveValue::String("ocean".into()))),
+            ("offset".into(), ValueType::Primitive(PrimitiveValue::U64(22))),
+            ("info".into(), ValueType::Nested(BTreeMap::from([
+                ("name".into(), ValueType::Primitive(PrimitiveValue::String("Pacific Ocean".into()))),
+                ("value".into(), ValueType::Primitive(PrimitiveValue::F32(22.2))),
+            ]))),
+        ]));
+    }
 }
