@@ -14,6 +14,10 @@ license = "MIT"
 # Include only specific files and directories
 exclude = [
     "/assets",
+    "/fixtures",
+    "/syntaxes",
+    "s2json-spec-1.0.2.vsix",
+    "language-configuration.json",
     "/benchmarks",
     "/coverage",
     "/docs",
