@@ -11,3 +11,4 @@ server/node_modules/**
 server/out/**
 coverage/**
 *.profraw
+cobertura.xml
