@@ -47,15 +47,15 @@ pub enum ValueType {
     /// An array of values
     Array(Vec<ValuePrimitiveType>),
     /// A nested object
-    Nested(Shape),
+    Nested(Value),
 }
 
 /// Shape design
-pub type Shape = BTreeMap<String, ValueType>;
+pub type Value = BTreeMap<String, ValueType>;
 /// Shape of a features properties object
-pub type Properties = Shape;
+pub type Properties = Value;
 /// Shape of a feature's M-Values object
-pub type MValue = Shape;
+pub type MValue = Value;
 
 /// LineString Properties Shape
 pub type LineStringMValues = Vec<MValue>;
@@ -168,17 +168,17 @@ mod tests {
     }
 
     #[test]
-    fn shape_serialize() {
-        let shape: Shape = BTreeMap::from([
+    fn value_serialize() {
+        let value: Value = BTreeMap::from([
             ("type".into(), ValueType::Primitive(PrimitiveValue::String("Point".into()))),
             ("coordinates".into(), ValueType::Primitive(PrimitiveValue::F32(1.0))),
         ]);
-        let serialized = serde_json::to_string(&shape).unwrap();
+        let serialized = serde_json::to_string(&value).unwrap();
         assert_eq!(serialized, "{\"coordinates\":1.0,\"type\":\"Point\"}");
-        let deserialize = serde_json::from_str::<Shape>(&serialized).unwrap();
-        assert_eq!(deserialize, shape);
+        let deserialize = serde_json::from_str::<Value>(&serialized).unwrap();
+        assert_eq!(deserialize, value);
 
-        let shape_str = r#"
+        let value_str = r#"
         {
             "class": "ocean",
             "offset": 22,
@@ -189,7 +189,7 @@ mod tests {
         }
         "#;
 
-        let deserialize = serde_json::from_str::<Shape>(shape_str).unwrap();
+        let deserialize = serde_json::from_str::<Value>(value_str).unwrap();
         assert_eq!(deserialize, BTreeMap::from([
             ("class".into(), ValueType::Primitive(PrimitiveValue::String("ocean".into()))),
             ("offset".into(), ValueType::Primitive(PrimitiveValue::U64(22))),

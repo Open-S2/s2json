@@ -42,7 +42,6 @@ where
         seq.end()
     }
 }
-
 impl<'de, T> Deserialize<'de> for BBox<T>
 where
     T: Deserialize<'de> + Copy,
@@ -122,7 +121,6 @@ where
         seq.end()
     }
 }
-
 impl<'de, T> Deserialize<'de> for BBox3D<T>
 where
     T: Deserialize<'de> + Copy,
