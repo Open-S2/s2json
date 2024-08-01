@@ -60,7 +60,7 @@ impl From<u8> for Face {
 //? FeatureCollections
 
 /// WG FeatureCollection
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct FeatureCollection {
     /// Collection of WG features
     pub features: Vec<Feature>,
@@ -73,7 +73,7 @@ pub struct FeatureCollection {
 }
 
 /// S2 FeatureCollection
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct S2FeatureCollection {
     /// Collection of S2 features
     pub features: Vec<S2Feature>,
@@ -88,7 +88,7 @@ pub struct S2FeatureCollection {
 //? Features
 
 /// Component to build either an S2 or WG Feature
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct Feature<M = ()> {
     /// Unique identifier
     pub id: Option<u64>,
@@ -102,7 +102,7 @@ pub struct Feature<M = ()> {
 }
 
 /// Component to build either an S2 or WG Feature
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct S2Feature<M = ()> {
     /// Unique identifier
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -126,7 +126,7 @@ pub struct S2Feature<M = ()> {
 pub type Attributions = BTreeMap<String, String>;
 
 /// Either an S2 or WG FeatureCollection
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 #[serde(untagged)]
 pub enum FeatureCollections {
     /// An WG FeatureCollection
@@ -136,7 +136,7 @@ pub enum FeatureCollections {
 }
 
 /// Either an S2 or WG Feature
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 #[serde(untagged)]
 pub enum Features {
     /// An WG Feature
@@ -146,7 +146,7 @@ pub enum Features {
 }
 
 /// All major S2JSON types
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 #[serde(untagged)]
 pub enum JSONCollection {
     /// An WG FeatureCollection

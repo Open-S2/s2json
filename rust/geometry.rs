@@ -168,7 +168,7 @@ where
 }
 
 /// BBox or BBox3D
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq)]
 pub enum BBOX {
     /// 2D bounding box
     BBox(BBox),
@@ -202,7 +202,7 @@ pub type Polygon3D = Vec<Vec<Point3D>>;
 pub type MultiPolygon3D = Vec<Polygon3D>;
 
 /// All possible geometry shapes
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
 pub enum Geometry {
     /// Point Shape
     Point(PointGeometry),
@@ -231,7 +231,7 @@ pub enum Geometry {
 }
 
 /// BaseGeometry is the a generic geometry type
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq)]
 pub struct BaseGeometry<G = Geometry, M = MValues, B = BBOX> {
     /// The geometry shape
     pub coordinates: G,
