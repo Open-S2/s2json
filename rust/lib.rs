@@ -8,11 +8,6 @@
 
 extern crate alloc;
 
-use serde::{Serialize, Deserialize};
-use alloc::collections::BTreeMap;
-use alloc::string::String;
-use alloc::vec::Vec;
-
 /// All geometry types and structs
 pub mod geometry;
 /// All values types and structs
@@ -20,6 +15,12 @@ pub mod values;
 
 pub use geometry::*;
 pub use values::*;
+
+use serde::{Deserialize, Serialize};
+
+use alloc::collections::BTreeMap;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 //? S2 specific type
 
