@@ -1,11 +1,22 @@
-import type { BBox, Geometry } from './geometry';
-import type { MValue, Properties } from './values';
+import type { BBox, Geometry } from './geometry.spec';
+import type { MValue, Properties } from './values.spec';
 
-export * from './geometry';
-export * from './values';
+export * from './s2';
+export * from './wm';
+export * from './bbox';
+export * from './util';
+
+export * from './geometry.spec';
+export * from './values.spec';
+
+import * as schema from './s2json.schema.json';
+export { schema };
 
 // NOTE: S2 -> S2Geometry
 // NOTE: WG -> WGS84
+
+/** Whether the projection is S2 or WM */
+export type Projection = 'WM' | 'S2';
 
 //! S2 specific type
 

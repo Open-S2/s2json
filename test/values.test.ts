@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 
-import type { Primitive } from '../src/values';
+import type { Primitive } from '../src';
 
 describe('primitive', () => {
   it('can be `string | number | boolean | null`', () => {

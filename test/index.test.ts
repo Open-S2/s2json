@@ -1,7 +1,7 @@
 import Ajv from 'ajv';
 import { describe, expect, it } from 'bun:test';
 
-import * as schema from '../src/s2json.schema.json'; // Path to your JSON schema file
+import { schema } from '../src';
 
 import type { Feature } from '../src';
 

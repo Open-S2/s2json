@@ -1,5 +1,5 @@
 #![no_std]
-#![deny(missing_docs)]
+// #![deny(missing_docs)]
 
 //! The `s2json` Rust crate provides functionalities to read and write S2JSON Spec data structures.
 //! This crate is a 0 dependency package that uses `no_std` and is intended to be used in
@@ -10,11 +10,23 @@ extern crate alloc;
 
 /// All geometry types and structs
 pub mod geometry;
+/// Conjoined CellID System
+pub mod id;
+/// All S2 tooling
+pub mod s2;
+/// All utility tools
+pub mod util;
 /// All values types and structs
 pub mod values;
+/// All WM tooling
+pub mod wm;
 
 pub use geometry::*;
+pub use id::*;
+pub use s2::*;
+pub use util::*;
 pub use values::*;
+pub use wm::*;
 
 use serde::{Deserialize, Serialize};
 

@@ -1,3 +1,5 @@
 # TODO
 
 [ ] - Write more tests coverage to ensure validation is working as expected
+[ ] - finish conversion for WM->S2
+[ ] - add conversion tests for both WM and S2

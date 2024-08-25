@@ -24,6 +24,70 @@ pub struct BBox<T = f64> {
     /// top most latitude (WG) or S (S2)
     pub top: T,
 }
+impl<T> BBox<T> {
+    /// Creates a new BBox
+    pub fn new(left: T, bottom: T, right: T, top: T) -> Self
+    where
+        T: Copy,
+    {
+        BBox { left, bottom, right, top }
+    }
+
+    /// Checks if a point is within the BBox
+    pub fn point_overlap(&self, point: Point) -> bool
+    where
+        T: Into<f64> + Copy, // Ensures that comparison operators work for type T
+    {
+        point.0 >= self.left.into()
+            && point.0 <= self.right.into()
+            && point.1 >= self.bottom.into()
+            && point.1 <= self.top.into()
+    }
+
+    /// Checks if another bounding box overlaps with this one and returns the overlap
+    pub fn overlap(&self, other: &BBox<T>) -> Option<BBox<T>>
+    where
+        T: PartialOrd + Copy,
+    {
+        if self.left > other.right
+            || self.right < other.left
+            || self.bottom > other.top
+            || self.top < other.bottom
+        {
+            None
+        } else {
+            let left = if self.left > other.left { self.left } else { other.left };
+            let bottom = if self.bottom > other.bottom { self.bottom } else { other.bottom };
+            let right = if self.right < other.right { self.right } else { other.right };
+            let top = if self.top < other.top { self.top } else { other.top };
+
+            Some(BBox { left, bottom, right, top })
+        }
+    }
+}
+impl BBox<f64> {
+    pub fn from_uv_zoom(u: f64, v: f64, zoom: u8) -> Self {
+        let division_factor = 2. / (1 << zoom) as f64;
+
+        BBox {
+            left: division_factor * u - 1.0,
+            bottom: division_factor * v - 1.0,
+            right: division_factor * (u + 1.0) - 1.0,
+            top: division_factor * (v + 1.0) - 1.0,
+        }
+    }
+
+    pub fn from_st_zoom(s: f64, t: f64, zoom: u8) -> Self {
+        let division_factor = (2. / (1 << zoom) as f64) * 0.5;
+
+        BBox {
+            left: division_factor * s,
+            bottom: division_factor * t,
+            right: division_factor * (s + 1.),
+            top: division_factor * (t + 1.),
+        }
+    }
+}
 impl<T> Serialize for BBox<T>
 where
     T: Serialize + Copy,
@@ -66,33 +130,18 @@ where
             where
                 V: SeqAccess<'de>,
             {
-                let left = seq
-                    .next_element()?
-                    .ok_or_else(|| de::Error::invalid_length(0, &self))?;
-                let bottom = seq
-                    .next_element()?
-                    .ok_or_else(|| de::Error::invalid_length(1, &self))?;
-                let right = seq
-                    .next_element()?
-                    .ok_or_else(|| de::Error::invalid_length(2, &self))?;
-                let top = seq
-                    .next_element()?
-                    .ok_or_else(|| de::Error::invalid_length(3, &self))?;
-                Ok(BBox {
-                    left,
-                    bottom,
-                    right,
-                    top,
-                })
+                let left =
+                    seq.next_element()?.ok_or_else(|| de::Error::invalid_length(0, &self))?;
+                let bottom =
+                    seq.next_element()?.ok_or_else(|| de::Error::invalid_length(1, &self))?;
+                let right =
+                    seq.next_element()?.ok_or_else(|| de::Error::invalid_length(2, &self))?;
+                let top = seq.next_element()?.ok_or_else(|| de::Error::invalid_length(3, &self))?;
+                Ok(BBox { left, bottom, right, top })
             }
         }
 
-        deserializer.deserialize_tuple(
-            4,
-            BBoxVisitor {
-                marker: core::marker::PhantomData,
-            },
-        )
+        deserializer.deserialize_tuple(4, BBoxVisitor { marker: core::marker::PhantomData })
     }
 }
 
@@ -159,41 +208,22 @@ where
             where
                 V: SeqAccess<'de>,
             {
-                let left = seq
-                    .next_element()?
-                    .ok_or_else(|| de::Error::invalid_length(0, &self))?;
-                let bottom = seq
-                    .next_element()?
-                    .ok_or_else(|| de::Error::invalid_length(1, &self))?;
-                let right = seq
-                    .next_element()?
-                    .ok_or_else(|| de::Error::invalid_length(2, &self))?;
-                let top = seq
-                    .next_element()?
-                    .ok_or_else(|| de::Error::invalid_length(3, &self))?;
-                let back = seq
-                    .next_element()?
-                    .ok_or_else(|| de::Error::invalid_length(4, &self))?;
-                let front = seq
-                    .next_element()?
-                    .ok_or_else(|| de::Error::invalid_length(5, &self))?;
-                Ok(BBox3D {
-                    left,
-                    bottom,
-                    right,
-                    top,
-                    back,
-                    front,
-                })
+                let left =
+                    seq.next_element()?.ok_or_else(|| de::Error::invalid_length(0, &self))?;
+                let bottom =
+                    seq.next_element()?.ok_or_else(|| de::Error::invalid_length(1, &self))?;
+                let right =
+                    seq.next_element()?.ok_or_else(|| de::Error::invalid_length(2, &self))?;
+                let top = seq.next_element()?.ok_or_else(|| de::Error::invalid_length(3, &self))?;
+                let back =
+                    seq.next_element()?.ok_or_else(|| de::Error::invalid_length(4, &self))?;
+                let front =
+                    seq.next_element()?.ok_or_else(|| de::Error::invalid_length(5, &self))?;
+                Ok(BBox3D { left, bottom, right, top, back, front })
             }
         }
 
-        deserializer.deserialize_tuple(
-            6,
-            BBox3DVisitor {
-                marker: core::marker::PhantomData,
-            },
-        )
+        deserializer.deserialize_tuple(6, BBox3DVisitor { marker: core::marker::PhantomData })
     }
 }
 
@@ -311,69 +341,43 @@ mod tests {
 
     #[test]
     fn test_bbox() {
-        let bbox = BBox {
-            left: 0.0,
-            bottom: 0.0,
-            right: 1.0,
-            top: 1.0,
-        };
-        assert_eq!(
-            bbox,
-            BBox {
-                left: 0.0,
-                bottom: 0.0,
-                right: 1.0,
-                top: 1.0
-            }
-        );
+        let bbox = BBox { left: 0.0, bottom: 0.0, right: 1.0, top: 1.0 };
+        assert_eq!(bbox, BBox { left: 0.0, bottom: 0.0, right: 1.0, top: 1.0 });
         let bbox_str = serde_json::to_string(&bbox).unwrap();
         assert_eq!(bbox_str, "[0.0,0.0,1.0,1.0]");
         let str_bbox: BBox = serde_json::from_str(&bbox_str).unwrap();
         assert_eq!(str_bbox, bbox);
 
         let default_bbox = BBox::default();
-        assert_eq!(
-            default_bbox,
-            BBox {
-                left: 0.0,
-                bottom: 0.0,
-                right: 0.0,
-                top: 0.0
-            }
-        );
+        assert_eq!(default_bbox, BBox { left: 0.0, bottom: 0.0, right: 0.0, top: 0.0 });
 
         let default_bbox_2 = BBOX::default();
         assert_eq!(
             default_bbox_2,
-            BBOX::BBox(BBox {
-                left: 0.0,
-                bottom: 0.0,
-                right: 0.0,
-                top: 0.0
-            })
+            BBOX::BBox(BBox { left: 0.0, bottom: 0.0, right: 0.0, top: 0.0 })
         );
     }
 
     #[test]
+    fn test_bbox_functions() {
+        let bbox = BBox { left: 0.0, bottom: 0.0, right: 1.0, top: 1.0 };
+        assert!(bbox.point_overlap((0.5, 0.5)));
+        assert!(!bbox.point_overlap((2.0, 2.0)));
+        let bbox2 = BBox { left: 0.5, bottom: 0.5, right: 1.5, top: 1.5 };
+        assert_eq!(
+            bbox.overlap(&bbox2),
+            Some(BBox { left: 0.5, bottom: 0.5, right: 1.0, top: 1.0 })
+        );
+        let bbox3 = BBox { left: 2.0, bottom: 2.0, right: 3.0, top: 3.0 };
+        assert_eq!(bbox3.overlap(&bbox), None);
+    }
+
+    #[test]
     fn test_bbox3d() {
-        let bbox = BBox3D {
-            left: 0.0,
-            bottom: 0.0,
-            right: 1.0,
-            top: 1.0,
-            back: 0.0,
-            front: 1.0,
-        };
+        let bbox = BBox3D { left: 0.0, bottom: 0.0, right: 1.0, top: 1.0, back: 0.0, front: 1.0 };
         assert_eq!(
             bbox,
-            BBox3D {
-                left: 0.0,
-                bottom: 0.0,
-                right: 1.0,
-                top: 1.0,
-                back: 0.0,
-                front: 1.0
-            }
+            BBox3D { left: 0.0, bottom: 0.0, right: 1.0, top: 1.0, back: 0.0, front: 1.0 }
         );
         let bbox_str = serde_json::to_string(&bbox).unwrap();
         assert_eq!(bbox_str, "[0.0,0.0,1.0,1.0,0.0,1.0]");
@@ -383,32 +387,14 @@ mod tests {
         let default_bbox = BBox3D::default();
         assert_eq!(
             default_bbox,
-            BBox3D {
-                left: 0.0,
-                bottom: 0.0,
-                right: 0.0,
-                top: 0.0,
-                back: 0.0,
-                front: 0.0
-            }
+            BBox3D { left: 0.0, bottom: 0.0, right: 0.0, top: 0.0, back: 0.0, front: 0.0 }
         );
     }
 
     #[test]
     fn test_point_geometry() {
-        let point = PointGeometry {
-            coordinates: (0.0, 0.0),
-            m_values: None,
-            bbox: None,
-        };
-        assert_eq!(
-            point,
-            PointGeometry {
-                coordinates: (0.0, 0.0),
-                m_values: None,
-                bbox: None
-            }
-        );
+        let point = PointGeometry { coordinates: (0.0, 0.0), m_values: None, bbox: None };
+        assert_eq!(point, PointGeometry { coordinates: (0.0, 0.0), m_values: None, bbox: None });
         let point_str = serde_json::to_string(&point).unwrap();
         assert_eq!(point_str, "{\"coordinates\":[0.0,0.0]}");
         let str_point: PointGeometry = serde_json::from_str(&point_str).unwrap();
@@ -445,10 +431,7 @@ mod tests {
             }
         );
         let point_str = serde_json::to_string(&point).unwrap();
-        assert_eq!(
-            point_str,
-            "{\"coordinates\":[0.0,0.0,0.0],\"bbox\":[0.0,0.0,1.0,1.0,0.0,1.0]}"
-        );
+        assert_eq!(point_str, "{\"coordinates\":[0.0,0.0,0.0],\"bbox\":[0.0,0.0,1.0,1.0,0.0,1.0]}");
         let str_point: Point3DGeometry = serde_json::from_str(&point_str).unwrap();
         assert_eq!(str_point, point);
     }
@@ -532,10 +515,7 @@ mod tests {
             }
         );
         let multi_point_str = serde_json::to_string(&multi_point).unwrap();
-        assert_eq!(
-            multi_point_str,
-            "{\"coordinates\":[[0.0,0.0,0.0],[1.0,1.0,1.0]]}"
-        );
+        assert_eq!(multi_point_str, "{\"coordinates\":[[0.0,0.0,0.0],[1.0,1.0,1.0]]}");
         let str_multi_point: MultiPoint3DGeometry = serde_json::from_str(&multi_point_str).unwrap();
         assert_eq!(str_multi_point, multi_point);
     }
@@ -556,10 +536,7 @@ mod tests {
             }
         );
         let polygon_str = serde_json::to_string(&polygon).unwrap();
-        assert_eq!(
-            polygon_str,
-            "{\"coordinates\":[[[0.0,0.0],[1.0,1.0],[0.0,1.0]]]}"
-        );
+        assert_eq!(polygon_str, "{\"coordinates\":[[[0.0,0.0],[1.0,1.0],[0.0,1.0]]]}");
         let str_polygon: PolygonGeometry = serde_json::from_str(&polygon_str).unwrap();
         assert_eq!(str_polygon, polygon);
     }
@@ -580,10 +557,7 @@ mod tests {
             }
         );
         let polygon_str = serde_json::to_string(&polygon).unwrap();
-        assert_eq!(
-            polygon_str,
-            "{\"coordinates\":[[[0.0,0.0,0.0],[1.0,1.0,1.0],[0.0,1.0,1.0]]]}"
-        );
+        assert_eq!(polygon_str, "{\"coordinates\":[[[0.0,0.0,0.0],[1.0,1.0,1.0],[0.0,1.0,1.0]]]}");
         let str_polygon: Polygon3DGeometry = serde_json::from_str(&polygon_str).unwrap();
         assert_eq!(str_polygon, polygon);
     }
@@ -604,10 +578,7 @@ mod tests {
             }
         );
         let multi_polygon_str = serde_json::to_string(&multi_polygon).unwrap();
-        assert_eq!(
-            multi_polygon_str,
-            "{\"coordinates\":[[[[0.0,0.0],[1.0,1.0],[0.0,1.0]]]]}"
-        );
+        assert_eq!(multi_polygon_str, "{\"coordinates\":[[[[0.0,0.0],[1.0,1.0],[0.0,1.0]]]]}");
         let str_multi_polygon: MultiPolygonGeometry =
             serde_json::from_str(&multi_polygon_str).unwrap();
         assert_eq!(str_multi_polygon, multi_polygon);
@@ -616,22 +587,14 @@ mod tests {
     #[test]
     fn test_multi_polygon3d_geometry() {
         let multi_polygon = MultiPolygon3DGeometry {
-            coordinates: vec![vec![vec![
-                (0.0, 0.0, 0.0),
-                (1.0, 1.0, 1.0),
-                (0.0, 1.0, 1.0),
-            ]]],
+            coordinates: vec![vec![vec![(0.0, 0.0, 0.0), (1.0, 1.0, 1.0), (0.0, 1.0, 1.0)]]],
             m_values: None,
             bbox: None,
         };
         assert_eq!(
             multi_polygon,
             MultiPolygon3DGeometry {
-                coordinates: vec![vec![vec![
-                    (0.0, 0.0, 0.0),
-                    (1.0, 1.0, 1.0),
-                    (0.0, 1.0, 1.0)
-                ]]],
+                coordinates: vec![vec![vec![(0.0, 0.0, 0.0), (1.0, 1.0, 1.0), (0.0, 1.0, 1.0)]]],
                 m_values: None,
                 bbox: None
             }

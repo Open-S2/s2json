@@ -1,3 +1,4 @@
+import type { Face } from '.';
 import type {
   LineStringMValues,
   MValue,
@@ -5,7 +6,7 @@ import type {
   MultiLineStringMValues,
   MultiPolygonMValues,
   PolygonMValues,
-} from './values';
+} from './values.spec';
 
 /**
  * A BBOX is defined in lon-lat space and helps with zooming motion to
@@ -27,6 +28,9 @@ export type BBox3D = [
 
 /** Either a 2D or 3D bounding box */
 export type BBOX = BBox | BBox3D;
+
+/** A Point in S2 Space with a Face */
+export type STPoint = [face: Face, s: number, t: number];
 
 /** Definition of a Point. May represent WebMercator Lon-Lat or S2Geometry S-T */
 export type Point = [x: number, y: number];
