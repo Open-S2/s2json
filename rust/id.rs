@@ -1,11 +1,15 @@
 use crate::s2::S2CellId;
 use crate::wm::WMCellId;
 
+/// Cell ID works with both S2 and WM with a common interface
 pub enum CellId {
+    /// S2 Cell ID
     S2(S2CellId),
+    /// WM Cell ID
     WM(WMCellId),
 }
 impl CellId {
+    /// Return the subdivision level of the cell
     pub fn level(&self) -> u8 {
         match self {
             CellId::S2(id) => id.level(),
@@ -13,6 +17,7 @@ impl CellId {
         }
     }
 
+    /// Which cube face this cell belongs to, in the range 0..5 for S2, always 0 for WM
     pub fn face(&self) -> u8 {
         match self {
             CellId::S2(id) => id.face(),
@@ -20,6 +25,7 @@ impl CellId {
         }
     }
 
+    /// Given an S2CellID, check if it is a Face Cell (zoom 0).
     pub fn is_face(&self) -> bool {
         match self {
             CellId::S2(id) => id.is_face(),
@@ -27,6 +33,8 @@ impl CellId {
         }
     }
 
+    /// Return the cell corresponding to a given S2 cube face.
+    /// WM returns 0
     pub fn from_face(face: u8) -> CellId {
         match face {
             0 => CellId::S2(S2CellId::from_face(face)),
@@ -34,6 +42,7 @@ impl CellId {
         }
     }
 
+    /// Given an ID, get the parent quad tile
     pub fn parent(&self) -> CellId {
         match self {
             CellId::S2(id) => CellId::S2(id.parent(None)),
@@ -41,6 +50,7 @@ impl CellId {
         }
     }
 
+    /// Check if the first CellID contains the second (its a subset)
     pub fn contains(&self, other: &CellId) -> bool {
         match (self, other) {
             (CellId::S2(id1), CellId::S2(id2)) => id1.contains(id2),

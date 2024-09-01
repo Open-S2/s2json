@@ -37,12 +37,18 @@ use super::LOOKUP_IJ;
 // extra position bit lets us encode each cell as its Hilbert curve position
 // at the cell center, which is halfway along the portion of the Hilbert curve
 // that fills that cell.
-pub const K_FACE_BITS: u8 = 3;
-pub const K_NUM_FACES: u8 = 6;
-pub const K_MAX_LEVEL: u64 = K_MAX_CELL_LEVEL as u64; // Valid levels: 0..K_MAX_LEVEL
-pub const K_POS_BITS: u64 = 2 * K_MAX_LEVEL + 1;
-pub const K_MAX_SIZE: u32 = 1 << K_MAX_LEVEL;
 
+/// The number of bits used to encode the face of the cell.
+pub const K_FACE_BITS: u8 = 3;
+/// The number of faces in the S2 cell projection
+pub const K_NUM_FACES: u8 = 6;
+/// The maximum level in the S2 cell decomposition
+pub const K_MAX_LEVEL: u64 = K_MAX_CELL_LEVEL as u64; // Valid levels: 0..K_MAX_LEVEL
+/// The number of bits used to encode the position along the Hilbert curve
+pub const K_POS_BITS: u64 = 2 * K_MAX_LEVEL + 1;
+/// The maximum number of cells in the S2 cell decomposition
+pub const K_MAX_SIZE: u32 = 1 << K_MAX_LEVEL;
+/// The number of bits used to encode the orientation of the Hilbert curve
 pub const K_LOOKUP_BITS: u8 = 4;
 
 /// This is the offset required to wrap around from the beginning of the
@@ -88,10 +94,12 @@ pub struct S2CellId {
     pub id: u64,
 }
 impl S2CellId {
+    /// Construct a cell id from the given 64-bit integer.
     pub fn new(id: u64) -> Self {
         S2CellId { id }
     }
 
+    /// Returns an empty cell id.
     pub fn none() -> Self {
         0_u64.into()
     }
@@ -132,10 +140,12 @@ impl S2CellId {
         Self::from_face_ij(face, i, j, None)
     }
 
+    /// Construct a leaf cell given its face and (u,v) coordinates.
     pub fn from_face_uv(face: u8, u: f64, v: f64) -> Self {
         S2CellId::from_face_st(face, UV_TO_ST(u), UV_TO_ST(v))
     }
 
+    /// Construct a leaf cell given its face and (s,t) coordinates.
     pub fn from_face_st(face: u8, s: f64, t: f64) -> Self {
         let i: u32 = st_to_ij(s);
         let j: u32 = st_to_ij(t);
@@ -192,6 +202,7 @@ impl S2CellId {
         }
     }
 
+    /// Given a distance and optional zoom level, construct a cell ID at that distance
     pub fn from_distance(distance: u64, level: Option<u8>) -> S2CellId {
         let mut level: u64 = level.unwrap_or(K_MAX_LEVEL as u8) as u64;
         level = 2 * (K_MAX_LEVEL - level);
@@ -380,7 +391,7 @@ impl S2CellId {
         (self.id - (3 * new_lsb) + (2 * (position as u64) * new_lsb)).into()
     }
 
-    // Which cube face this cell belongs to, in the range 0..5.
+    /// Which cube face this cell belongs to, in the range 0..5.
     pub fn face(&self) -> u8 {
         (self.id >> K_POS_BITS) as u8
     }
@@ -417,11 +428,13 @@ impl S2CellId {
         (self.id & 1u64) != 0
     }
 
+    /// Convert an S2CellID to an S2Point
     pub fn to_point_raw(&self) -> S2Point {
         let (face, si, ti) = self.get_center_si_ti();
         face_si_ti_to_xyz(face, si, ti)
     }
 
+    /// Convert an S2CellID to an S2Point in normalized vector coordinates
     pub fn to_point(&self) -> S2Point {
         let mut p = self.to_point_raw();
         p.normalize();
@@ -471,6 +484,7 @@ impl S2CellId {
         childs
     }
 
+    /// Given an S2CellID, get the quad children tiles using a face-zoom-ij input
     pub fn children_ij(&self, face: u8, level: u8, i: u32, j: u32) -> [Self; 4] {
         let i = i << 1;
         let j = j << 1;

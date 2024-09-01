@@ -105,67 +105,70 @@ pub const K_LIMIT_IJ: u32 = 1 << K_MAX_CELL_LEVEL; // == S2CellId::kMaxSize
 /// values is [0..kMaxSiTi].
 pub const K_MAX_SI_TI: u32 = 1 << (K_MAX_CELL_LEVEL + 1);
 
-//////////////////   Implementation details follow   ////////////////////
-
-// We have implemented three different projections from cell-space (s,t) to
-// cube-space (u,v): linear, quadratic, and tangent.  They have the following
-// tradeoffs:
-//
-//   Linear - This is the fastest transformation, but also produces the least
-//   uniform cell sizes.  Cell areas vary by a factor of about 5.2, with the
-//   largest cells at the center of each face and the smallest cells in
-//   the corners.
-//
-//   Tangent - Transforming the coordinates via atan() makes the cell sizes
-//   more uniform.  The areas vary by a maximum ratio of 1.4 as opposed to a
-//   maximum ratio of 5.2.  However, each call to atan() is about as expensive
-//   as all of the other calculations combined when converting from points to
-//   cell ids, i.e. it reduces performance by a factor of 3.
-//
-//   Quadratic - This is an approximation of the tangent projection that
-//   is much faster and produces cells that are almost as uniform in size.
-//   It is about 3 times faster than the tangent projection for converting
-//   cell ids to points or vice versa.  Cell areas vary by a maximum ratio of
-//   about 2.1.
-//
-// Here is a table comparing the cell uniformity using each projection.  "Area
-// ratio" is the maximum ratio over all subdivision levels of the largest cell
-// area to the smallest cell area at that level, "edge ratio" is the maximum
-// ratio of the longest edge of any cell to the shortest edge of any cell at
-// the same level, and "diag ratio" is the ratio of the longest diagonal of
-// any cell to the shortest diagonal of any cell at the same level.  "ToPoint"
-// and "FromPoint" are the times in microseconds required to convert cell ids
-// to and from points (unit vectors) respectively.  "ToPointRaw" is the time
-// to convert to a non-unit-length vector, which is all that is needed for
-// some purposes.
-//
-//               Area    Edge    Diag   ToPointRaw  ToPoint  FromPoint
-//              Ratio   Ratio   Ratio             (microseconds)
-// -------------------------------------------------------------------
-// Linear:      5.200   2.117   2.959      0.020     0.087     0.085
-// Tangent:     1.414   1.414   1.704      0.237     0.299     0.258
-// Quadratic:   2.082   1.802   1.932      0.033     0.096     0.108
-//
-// The worst-case cell aspect ratios are about the same with all three
-// projections.  The maximum ratio of the longest edge to the shortest edge
-// within the same cell is about 1.4 and the maximum ratio of the diagonals
-// within the same cell is about 1.7.
-//
-// NOTE: Currently Tan only has 1e-12 accuracy while Quadratic is within 1e-15.
+/// We have implemented three different projections from cell-space (s,t) to
+/// cube-space (u,v): linear, quadratic, and tangent.  They have the following
+/// tradeoffs:
+///
+///   Linear - This is the fastest transformation, but also produces the least
+///   uniform cell sizes.  Cell areas vary by a factor of about 5.2, with the
+///   largest cells at the center of each face and the smallest cells in
+///   the corners.
+///
+///   Tangent - Transforming the coordinates via atan() makes the cell sizes
+///   more uniform.  The areas vary by a maximum ratio of 1.4 as opposed to a
+///   maximum ratio of 5.2.  However, each call to atan() is about as expensive
+///   as all of the other calculations combined when converting from points to
+///   cell ids, i.e. it reduces performance by a factor of 3.
+///
+///   Quadratic - This is an approximation of the tangent projection that
+///   is much faster and produces cells that are almost as uniform in size.
+///   It is about 3 times faster than the tangent projection for converting
+///   cell ids to points or vice versa.  Cell areas vary by a maximum ratio of
+///   about 2.1.
+///
+/// Here is a table comparing the cell uniformity using each projection.  "Area
+/// ratio" is the maximum ratio over all subdivision levels of the largest cell
+/// area to the smallest cell area at that level, "edge ratio" is the maximum
+/// ratio of the longest edge of any cell to the shortest edge of any cell at
+/// the same level, and "diag ratio" is the ratio of the longest diagonal of
+/// any cell to the shortest diagonal of any cell at the same level.  "ToPoint"
+/// and "FromPoint" are the times in microseconds required to convert cell ids
+/// to and from points (unit vectors) respectively.  "ToPointRaw" is the time
+/// to convert to a non-unit-length vector, which is all that is needed for
+/// some purposes.
+///              Area    Edge    Diag   ToPointRaw  ToPoint  FromPoint
+///              Ratio   Ratio   Ratio             (microseconds)
+/// -------------------------------------------------------------------
+/// Linear:      5.200   2.117   2.959      0.020     0.087     0.085
+/// Tangent:     1.414   1.414   1.704      0.237     0.299     0.258
+/// Quadratic:   2.082   1.802   1.932      0.033     0.096     0.108
+///
+/// The worst-case cell aspect ratios are about the same with all three
+/// projections.  The maximum ratio of the longest edge to the shortest edge
+/// within the same cell is about 1.4 and the maximum ratio of the diagonals
+/// within the same cell is about 1.7.
+///
+/// NOTE: Currently Tan only has 1e-12 accuracy while Quadratic is within 1e-15.
 #[derive(Default)]
 pub enum S2Projection {
+    /// Linear projection
     S2LinearProjection,
+    /// Tangent projection
     S2TanProjection,
+    /// Quadratic projection
     #[default]
     S2QuadraticProjection,
 }
 
-// Convert an s- or t-value to the corresponding u- or v-value.  This is
-// a non-linear transformation from [0,1] to [-1,1] that attempts to
-// make the cell sizes more uniform.
+/// Convert an s- or t-value to the corresponding u- or v-value.  This is
+/// a non-linear transformation from [0,1] to [-1,1] that attempts to
+/// make the cell sizes more uniform.
 pub fn st_to_uvlinear(s: f64) -> f64 {
     2. * s - 1.
 }
+/// Convert an s- or t-value to the corresponding u- or v-value.  This is
+/// a non-linear transformation from [0,1] to [-1,1] that attempts to
+/// make the cell sizes more uniform.
 pub fn st_to_uvquadratic(s: f64) -> f64 {
     if s >= 0.5 {
         (1.0 / 3.0) * (4.0 * s * s - 1.0)
@@ -173,6 +176,9 @@ pub fn st_to_uvquadratic(s: f64) -> f64 {
         (1.0 / 3.0) * (1.0 - 4.0 * (1.0 - s) * (1.0 - s))
     }
 }
+/// Convert an s- or t-value to the corresponding u- or v-value.  This is
+/// a non-linear transformation from [0,1] to [-1,1] that attempts to
+/// make the cell sizes more uniform.
 pub fn st_to_uvtan(s_: f64) -> f64 {
     use core::f64::consts::PI;
     // Unfortunately, tan(M_PI_4) is slightly less than 1.0.  This isn't due to
@@ -185,18 +191,23 @@ pub fn st_to_uvtan(s_: f64) -> f64 {
     s + (1.0 / (1_u64 << 53) as f64) * s
 }
 
+/// The default projection is quadratic
 #[cfg(feature = "quadratic")]
 pub const ST_TO_UV: fn(f64) -> f64 = st_to_uvquadratic;
+/// If settings are updated you can use the tangent projection
 #[cfg(all(not(feature = "quadratic"), feature = "tan"))]
 pub const ST_TO_UV: fn(f64) -> f64 = st_to_uvtan;
+/// If settings are updated you can use the linear projection
 #[cfg(all(not(feature = "quadratic"), not(feature = "tan")))]
 pub const ST_TO_UV: fn(f64) -> f64 = st_to_uvlinear;
 
-// The inverse of the STtoUV transformation.  Note that it is not always
-// true that UV_TO_ST(STtoUV(x)) == x due to numerical errors.
+/// The inverse of the STtoUV transformation.  Note that it is not always
+/// true that UV_TO_ST(STtoUV(x)) == x due to numerical errors.
 pub fn uv_to_stlinear(u: f64) -> f64 {
     0.5 * (u + 1.0)
 }
+/// The inverse of the STtoUV transformation.  Note that it is not always
+/// true that UV_TO_ST(STtoUV(x)) == x due to numerical errors.
 pub fn uv_to_st_quadratic(u: f64) -> f64 {
     if u >= 0. {
         0.5 * sqrt(1.0 + 3.0 * u)
@@ -204,15 +215,20 @@ pub fn uv_to_st_quadratic(u: f64) -> f64 {
         1.0 - 0.5 * sqrt(1.0 - 3.0 * u)
     }
 }
+/// The inverse of the STtoUV transformation.  Note that it is not always
+/// true that UV_TO_ST(STtoUV(x)) == x due to numerical errors.
 pub fn uv_to_st_tan(u: f64) -> f64 {
     let a: f64 = atan(u);
     (2.0 * (1.0 / PI)) * (a + (PI / 4.0))
 }
 
+/// The default projection is quadratic
 #[cfg(feature = "quadratic")]
 pub const UV_TO_ST: fn(f64) -> f64 = uv_to_st_quadratic;
+/// If settings are updated you can use the tangent projection
 #[cfg(all(not(feature = "quadratic"), feature = "tan"))]
 pub const UV_TO_ST: fn(f64) -> f64 = uv_to_st_tan;
+/// If settings are updated you can use the linear projection
 #[cfg(all(not(feature = "quadratic"), not(feature = "tan")))]
 pub const UV_TO_ST: fn(f64) -> f64 = uv_to_stlinear;
 
@@ -249,21 +265,29 @@ pub fn st_to_si_ti(s: f64) -> u32 {
     round(s * K_MAX_SI_TI as f64) as u32
 }
 
+/// Convert a direction vector (not necessarily unit length) to an (s,t) point.
 pub struct ST {
+    /// the s coordinate
     pub s: f64,
+    /// the t coordinate
     pub t: f64,
 }
 
-pub fn to_face_st(p: &S2Point, face_: u8) -> ST {
-    let uv = to_face_uv(p, face_);
+/// Convert an S2Point to an (s,t) point.
+pub fn to_face_st(p: &S2Point, face: u8) -> ST {
+    let uv = to_face_uv(p, face);
     ST { s: UV_TO_ST(uv.u), t: UV_TO_ST(uv.v) }
 }
 
+/// A U-V coordinate pair.
 pub struct UV {
+    /// the u coordinate
     pub u: f64,
+    /// the v coordinate
     pub v: f64,
 }
 
+/// Convert an S2Point to an (u,v) point.
 pub fn to_face_uv(p: &S2Point, face: u8) -> UV {
     let (valid, u, v) = face_xyz_to_uv(face, p);
     debug_assert!(valid, "face_xyz_to_uv failed");

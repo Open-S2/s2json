@@ -4,7 +4,6 @@ use core::cmp::Ordering;
 use core::f64::consts::PI;
 use core::ops::{Add, Div, Mul, Neg, Sub};
 
-use crate::rad_to_deg;
 use crate::s2::{S2CellId, S2Point};
 
 /// This class represents a point on the unit sphere as a pair
@@ -26,6 +25,7 @@ impl LonLat {
         LonLat { lon, lat }
     }
 
+    /// Convert a S2CellId to an LonLat
     pub fn from_s2cellid(cellid: &S2CellId) -> LonLat {
         let p = cellid.to_point();
         LonLat::from_s2_point(&p)
@@ -35,7 +35,7 @@ impl LonLat {
     pub fn from_s2_point(p: &S2Point) -> LonLat {
         let lon_rad = atan2(p.y + 0.0, p.x + 0.0);
         let lat_rad = atan2(p.z, sqrt(p.x * p.x + p.y * p.y));
-        let ll = LonLat::new(rad_to_deg(lon_rad), rad_to_deg(lat_rad));
+        let ll = LonLat::new((lon_rad).to_degrees(), (lat_rad).to_degrees());
         if !ll.is_valid() {
             unreachable!();
         }
@@ -101,8 +101,8 @@ impl LonLat {
         if !self.is_valid() {
             unreachable!();
         }
-        let lon: f64 = rad_to_deg(self.lon);
-        let lat: f64 = rad_to_deg(self.lat);
+        let lon: f64 = (self.lon).to_degrees();
+        let lat: f64 = (self.lat).to_degrees();
         S2Point::new(
             cos(lat) * cos(lon), // x
             cos(lat) * sin(lon), // y
@@ -112,8 +112,8 @@ impl LonLat {
 
     /// An alternative to to_point() that returns a GPU compatible vector.
     pub fn to_point_gl(&self) -> S2Point {
-        let lon: f64 = rad_to_deg(self.lon);
-        let lat: f64 = rad_to_deg(self.lat);
+        let lon: f64 = (self.lon).to_degrees();
+        let lat: f64 = (self.lat).to_degrees();
         S2Point::new(
             cos(lat) * sin(lon), // y
             sin(lat),            // z
