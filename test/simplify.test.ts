@@ -1,7 +1,12 @@
 import { buildSqDists, simplify } from '../src/simplify';
 import { expect, test } from 'bun:test';
 
-import type { VectorLineStringGeometry } from '../src';
+import type {
+  VectorLineStringGeometry,
+  VectorMultiLineStringGeometry,
+  VectorMultiPolygonGeometry,
+  VectorPolygonGeometry,
+} from '../src';
 
 const SIMPLIFY_MAXZOOM = 16;
 
@@ -38,6 +43,207 @@ test('LineString', () => {
       { x: 0.75, y: 0.25, t: 0.125 },
       { x: 0.75, y: 0.75, t: 0.25 },
       { x: 0.25, y: 0.75, t: 1 },
+    ],
+    vecBBox: [0.25, 0.25, 0.75, 0.75],
+  });
+});
+
+test('MultiLineString', () => {
+  const multiLineString: VectorMultiLineStringGeometry = {
+    type: 'MultiLineString',
+    coordinates: [
+      [
+        { x: 0.25, y: 0.25 },
+        { x: 0.75, y: 0.25 },
+        { x: 0.75, y: 0.75 },
+        { x: 0.25, y: 0.75 },
+      ],
+      [
+        { x: 0.5, y: 0.5 },
+        { x: 0.5, y: 0.25 },
+        { x: 0.75, y: 0.25 },
+        { x: 0.75, y: 0.5 },
+        { x: 0.5, y: 0.5 },
+      ],
+    ],
+    vecBBox: [0.25, 0.25, 0.75, 0.75],
+  };
+
+  buildSqDists(multiLineString, 3, SIMPLIFY_MAXZOOM);
+
+  expect(multiLineString).toEqual({
+    type: 'MultiLineString',
+    coordinates: [
+      [
+        { x: 0.25, y: 0.25, t: 1 },
+        { x: 0.75, y: 0.25, t: 0.125 },
+        { x: 0.75, y: 0.75, t: 0.25 },
+        { x: 0.25, y: 0.75, t: 1 },
+      ],
+      [
+        { t: 1, x: 0.5, y: 0.5 },
+        { t: 0.03125, x: 0.5, y: 0.25 },
+        { t: 1, x: 0.75, y: 0.25 },
+        { t: 0.03125, x: 0.75, y: 0.5 },
+        { t: 1, x: 0.5, y: 0.5 },
+      ],
+    ],
+    vecBBox: [0.25, 0.25, 0.75, 0.75],
+  });
+
+  simplify(multiLineString, 3, 0, SIMPLIFY_MAXZOOM);
+  expect(multiLineString).toEqual({
+    type: 'MultiLineString',
+    coordinates: [
+      [
+        { x: 0.25, y: 0.25, t: 1 },
+        { x: 0.75, y: 0.25, t: 0.125 },
+        { x: 0.75, y: 0.75, t: 0.25 },
+        { x: 0.25, y: 0.75, t: 1 },
+      ],
+      [
+        { t: 1, x: 0.5, y: 0.5 },
+        { t: 0.03125, x: 0.5, y: 0.25 },
+        { t: 1, x: 0.75, y: 0.25 },
+        { t: 0.03125, x: 0.75, y: 0.5 },
+        { t: 1, x: 0.5, y: 0.5 },
+      ],
+    ],
+    vecBBox: [0.25, 0.25, 0.75, 0.75],
+  });
+});
+
+test('Polygon', () => {
+  const polygon: VectorPolygonGeometry = {
+    type: 'Polygon',
+    coordinates: [
+      [
+        { x: 0.25, y: 0.25 },
+        { x: 0.75, y: 0.25 },
+        { x: 0.75, y: 0.75 },
+        { x: 0.25, y: 0.75 },
+      ],
+      [
+        { x: 0.5, y: 0.5 },
+        { x: 0.5, y: 0.25 },
+        { x: 0.75, y: 0.25 },
+        { x: 0.75, y: 0.5 },
+        { x: 0.5, y: 0.5 },
+      ],
+    ],
+    vecBBox: [0.25, 0.25, 0.75, 0.75],
+  };
+
+  buildSqDists(polygon, 3, SIMPLIFY_MAXZOOM);
+
+  expect(polygon).toEqual({
+    type: 'Polygon',
+    coordinates: [
+      [
+        { x: 0.25, y: 0.25, t: 1 },
+        { x: 0.75, y: 0.25, t: 0.125 },
+        { x: 0.75, y: 0.75, t: 0.25 },
+        { x: 0.25, y: 0.75, t: 1 },
+      ],
+      [
+        { t: 1, x: 0.5, y: 0.5 },
+        { t: 0.03125, x: 0.5, y: 0.25 },
+        { t: 1, x: 0.75, y: 0.25 },
+        { t: 0.03125, x: 0.75, y: 0.5 },
+        { t: 1, x: 0.5, y: 0.5 },
+      ],
+    ],
+    vecBBox: [0.25, 0.25, 0.75, 0.75],
+  });
+
+  simplify(polygon, 3, 0, SIMPLIFY_MAXZOOM);
+  expect(polygon).toEqual({
+    type: 'Polygon',
+    coordinates: [
+      [
+        { x: 0.25, y: 0.25, t: 1 },
+        { x: 0.75, y: 0.25, t: 0.125 },
+        { x: 0.75, y: 0.75, t: 0.25 },
+        { x: 0.25, y: 0.75, t: 1 },
+      ],
+      [
+        { t: 1, x: 0.5, y: 0.5 },
+        { t: 0.03125, x: 0.5, y: 0.25 },
+        { t: 1, x: 0.75, y: 0.25 },
+        { t: 0.03125, x: 0.75, y: 0.5 },
+        { t: 1, x: 0.5, y: 0.5 },
+      ],
+    ],
+    vecBBox: [0.25, 0.25, 0.75, 0.75],
+  });
+});
+
+test('MultiPolygon', () => {
+  const multiPolygon: VectorMultiPolygonGeometry = {
+    type: 'MultiPolygon',
+    coordinates: [
+      [
+        [
+          { x: 0.25, y: 0.25 },
+          { x: 0.75, y: 0.25 },
+          { x: 0.75, y: 0.75 },
+          { x: 0.25, y: 0.75 },
+        ],
+        [
+          { x: 0.5, y: 0.5 },
+          { x: 0.5, y: 0.25 },
+          { x: 0.75, y: 0.25 },
+          { x: 0.75, y: 0.5 },
+          { x: 0.5, y: 0.5 },
+        ],
+      ],
+    ],
+    vecBBox: [0.25, 0.25, 0.75, 0.75],
+  };
+
+  buildSqDists(multiPolygon, 3, SIMPLIFY_MAXZOOM);
+
+  expect(multiPolygon).toEqual({
+    type: 'MultiPolygon',
+    coordinates: [
+      [
+        [
+          { x: 0.25, y: 0.25, t: 1 },
+          { x: 0.75, y: 0.25, t: 0.125 },
+          { x: 0.75, y: 0.75, t: 0.25 },
+          { x: 0.25, y: 0.75, t: 1 },
+        ],
+        [
+          { t: 1, x: 0.5, y: 0.5 },
+          { t: 0.03125, x: 0.5, y: 0.25 },
+          { t: 1, x: 0.75, y: 0.25 },
+          { t: 0.03125, x: 0.75, y: 0.5 },
+          { t: 1, x: 0.5, y: 0.5 },
+        ],
+      ],
+    ],
+    vecBBox: [0.25, 0.25, 0.75, 0.75],
+  });
+
+  simplify(multiPolygon, 3, 0, SIMPLIFY_MAXZOOM);
+  expect(multiPolygon).toEqual({
+    type: 'MultiPolygon',
+    coordinates: [
+      [
+        [
+          { x: 0.25, y: 0.25, t: 1 },
+          { x: 0.75, y: 0.25, t: 0.125 },
+          { x: 0.75, y: 0.75, t: 0.25 },
+          { x: 0.25, y: 0.75, t: 1 },
+        ],
+        [
+          { t: 1, x: 0.5, y: 0.5 },
+          { t: 0.03125, x: 0.5, y: 0.25 },
+          { t: 1, x: 0.75, y: 0.25 },
+          { t: 0.03125, x: 0.75, y: 0.5 },
+          { t: 1, x: 0.5, y: 0.5 },
+        ],
+      ],
     ],
     vecBBox: [0.25, 0.25, 0.75, 0.75],
   });

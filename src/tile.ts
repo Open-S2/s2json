@@ -39,7 +39,7 @@ export class Tile {
    * @param tolerance - tolerance
    * @param maxzoom - max zoom at which to simplify
    */
-  simplify(tolerance = 1, maxzoom = 16) {
+  simplify(tolerance: number, maxzoom?: number) {
     const zoom = level(this.projection, this.id);
 
     for (const layer of Object.values(this.layers)) {
