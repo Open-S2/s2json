@@ -169,14 +169,8 @@ mod tests {
     #[test]
     fn value_serialize() {
         let value: Value = BTreeMap::from([
-            (
-                "type".into(),
-                ValueType::Primitive(PrimitiveValue::String("Point".into())),
-            ),
-            (
-                "coordinates".into(),
-                ValueType::Primitive(PrimitiveValue::F32(1.0)),
-            ),
+            ("type".into(), ValueType::Primitive(PrimitiveValue::String("Point".into()))),
+            ("coordinates".into(), ValueType::Primitive(PrimitiveValue::F32(1.0))),
         ]);
         let serialized = serde_json::to_string(&value).unwrap();
         assert_eq!(serialized, "{\"coordinates\":1.0,\"type\":\"Point\"}");
@@ -198,14 +192,8 @@ mod tests {
         assert_eq!(
             deserialize,
             BTreeMap::from([
-                (
-                    "class".into(),
-                    ValueType::Primitive(PrimitiveValue::String("ocean".into()))
-                ),
-                (
-                    "offset".into(),
-                    ValueType::Primitive(PrimitiveValue::U64(22))
-                ),
+                ("class".into(), ValueType::Primitive(PrimitiveValue::String("ocean".into()))),
+                ("offset".into(), ValueType::Primitive(PrimitiveValue::U64(22))),
                 (
                     "info".into(),
                     ValueType::Nested(BTreeMap::from([
@@ -213,10 +201,7 @@ mod tests {
                             "name".into(),
                             ValueType::Primitive(PrimitiveValue::String("Pacific Ocean".into()))
                         ),
-                        (
-                            "value".into(),
-                            ValueType::Primitive(PrimitiveValue::F32(22.2))
-                        ),
+                        ("value".into(), ValueType::Primitive(PrimitiveValue::F32(22.2))),
                     ]))
                 ),
             ])
