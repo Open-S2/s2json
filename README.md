@@ -12,7 +12,7 @@
   <a href="https://www.npmjs.com/package/s2json-spec">
     <img src="https://img.shields.io/npm/dm/s2json-spec.svg" alt="downloads">
   </a>
-  <a href="https://bundlejs.com/?q=s2json-spec&treeshake=%5B%7B+VectorTile+%7D%5D">
+  <a href="https://bundlejs.com/?q=s2json-spec">
     <img src="https://img.shields.io/bundlejs/size/s2json-spec?exports=VectorTile" alt="bundle">
   </a>
   <a href="https://open-s2.github.io/s2json/">
@@ -58,13 +58,24 @@ Notable features of S2JSON are:
     "name": "Dinagat Islands"
   }
 }
+// GeoJSON Vector example
+{
+  "type": "VectorFeature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": { x: 125.6, y: 10.1 }
+  },
+  "properties": {
+    "name": "Dinagat Islands"
+  }
+}
 // S2JSON example
 {
   "type": "S2Feature",
   "face": 0,
   "geometry": {
     "type": "Point",
-    "coordinates": [0.5, 0.5]
+    "coordinates": { x: 0.5, y: 0.5 }
   },
   "properties": {
     "name": "Null Island"
