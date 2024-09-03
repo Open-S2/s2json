@@ -4,8 +4,7 @@ use core::ops::{Add, Div, Mul, Neg, Sub};
 
 use libm::{fabs, sqrt};
 
-use crate::s2::xyz_to_face_uv;
-use crate::wm::LonLat;
+use crate::{s2::xyz_to_face_uv, wm::LonLat, xyz_to_face_st};
 
 use super::S2CellId;
 
@@ -45,6 +44,11 @@ impl S2Point {
         } else {
             self.z
         }
+    }
+
+    /// Returns a Face-ST representation of this point
+    pub fn to_face_st(&self) -> (u8, f64, f64) {
+        xyz_to_face_st(self)
     }
 
     /// Returns the S2 face assocated with this point

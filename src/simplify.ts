@@ -86,9 +86,9 @@ function _buildSqDist(
   }
 
   if (index !== undefined && maxSqDist > sqTolerance) {
-    if (index - first > 1) buildSqDist(coords, first, index, sqTolerance);
+    if (index - first > 1) _buildSqDist(coords, first, index, sqTolerance);
     coords[index].t = maxSqDist;
-    if (last - index > 1) buildSqDist(coords, index, last, sqTolerance);
+    if (last - index > 1) _buildSqDist(coords, index, last, sqTolerance);
   }
 }
 
@@ -174,8 +174,8 @@ function simplifyLine(
   if (tolerance > 0 && size < (isPolygon ? sqTolerance : tolerance)) return line;
 
   const ring: VectorLineString = [];
-  for (const { x, y, z, t, m } of line) {
-    if (tolerance === 0 || (t ?? 0) > sqTolerance) ring.push({ x, y, z, t, m });
+  for (const point of line) {
+    if (tolerance === 0 || (point.t ?? 0) > sqTolerance) ring.push({ ...point });
   }
   if (isPolygon) rewind(ring, isOuter);
 

@@ -87,7 +87,7 @@ pub const K_WRAP_OFFSET: u64 = (K_NUM_FACES as u64) << K_POS_BITS;
 ///
 /// This class is intended to be copied by value as desired.  It uses
 /// the default copy constructor and assignment operator.
-#[derive(Debug, Copy, Clone, PartialEq, PartialOrd)]
+#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq, Hash)]
 #[repr(C)]
 pub struct S2CellId {
     /// the id contains the face, s, and t components

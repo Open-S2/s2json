@@ -94,5 +94,8 @@ export type FeatureCollections = FeatureCollection | S2FeatureCollection;
 /** Either an S2 or WG Feature */
 export type Features = Feature | VectorFeature | S2Feature;
 
+/** Any Vector Geometry type */
+export type VectorFeatures = VectorFeature | S2Feature;
+
 /** All major S2JSON types */
 export type JSONCollection = FeatureCollection | S2FeatureCollection | Features;

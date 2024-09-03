@@ -262,7 +262,11 @@ export interface VectorBaseGeometry<
 }
 
 /** All possible geometry offsets */
-export type VectorOffsets = VectorLineOffset | VectorMultiLineOffset | VectorPolygonOffset;
+export type VectorOffsets =
+  | VectorLineOffset
+  | VectorMultiLineOffset
+  | VectorPolygonOffset
+  | VectorMultiPolygonOffset;
 
 /** An offset defines how far the starting line is from the original starting point pre-slice */
 export type VectorLineOffset = number;

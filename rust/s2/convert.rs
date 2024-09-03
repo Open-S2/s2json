@@ -1,10 +1,19 @@
-use crate::{Face, LonLat, S2CellId, S2Feature, VectorFeature, VectorGeometry, VectorPoint};
+use crate::{Face, LonLat, S2CellId, VectorFeature, VectorGeometry, VectorPoint};
 
-impl From<&mut S2Feature> for VectorFeature {
-    fn from(feature: &mut S2Feature) -> Self {
-        let mut geometry = feature.geometry.clone();
-        convert_geometry(feature.face, &mut geometry);
-        VectorFeature::new(feature.id, feature.properties.clone(), geometry, feature.metadata)
+impl<M: Clone> VectorFeature<M> {
+    /// Convert an S2 Feature to a GeoJSON Vector Feature
+    pub fn to_wm(&self) -> Self {
+        if self._type == "VectorFeature" {
+            return self.clone();
+        }
+        let mut geometry = self.geometry.clone();
+        convert_geometry(self.face, &mut geometry);
+        VectorFeature::<M>::new_wm(
+            self.id,
+            self.properties.clone(),
+            geometry,
+            self.metadata.clone(),
+        )
     }
 }
 
@@ -12,17 +21,10 @@ impl From<&mut S2Feature> for VectorFeature {
 fn convert_geometry(face: Face, geometry: &mut VectorGeometry) {
     match geometry {
         VectorGeometry::Point(point) => convert_geometry_point(face, &mut point.coordinates),
-        VectorGeometry::MultiPoint(points) => {
+        VectorGeometry::LineString(points) | VectorGeometry::MultiPoint(points) => {
             points.coordinates.iter_mut().for_each(|point| convert_geometry_point(face, point))
         }
-        VectorGeometry::LineString(line) => {
-            line.coordinates.iter_mut().for_each(|point| convert_geometry_point(face, point))
-        }
-        VectorGeometry::MultiLineString(lines) => lines
-            .coordinates
-            .iter_mut()
-            .for_each(|line| line.iter_mut().for_each(|point| convert_geometry_point(face, point))),
-        VectorGeometry::Polygon(polygon) => polygon
+        VectorGeometry::Polygon(lines) | VectorGeometry::MultiLineString(lines) => lines
             .coordinates
             .iter_mut()
             .for_each(|line| line.iter_mut().for_each(|point| convert_geometry_point(face, point))),

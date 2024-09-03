@@ -1,5 +1,5 @@
-import { buildSqDists } from '../';
-import { clipLine } from './clip';
+import { clipLine } from '../clip';
+import { buildSqDists, radToDeg } from '../';
 import { extendBBox, fromPoint, mergeBBoxes } from '../bbox';
 import { fromLonLat, toST } from '../s2/s2Point';
 
@@ -30,13 +30,19 @@ import type {
 /**
  * Convet a GeoJSON Feature to an S2Feature
  * @param data - GeoJSON Feature
+ * @param tolerance - optional tolerance
+ * @param maxzoom - optional maxzoom
  * @returns - S2Feature
  */
-export function toS2(data: Feature | VectorFeature): S2Feature[] {
+export function toS2(
+  data: Feature | VectorFeature,
+  tolerance?: number,
+  maxzoom?: number,
+): S2Feature[] {
   const { id, properties, metadata } = data;
   const res: S2Feature[] = [];
   const vectorGeo = data.type === 'VectorFeature' ? data.geometry : convertGeometry(data.geometry);
-  for (const { geometry, face } of convertVectorGeometry(vectorGeo)) {
+  for (const { geometry, face } of convertVectorGeometry(vectorGeo, tolerance, maxzoom)) {
     res.push({
       id,
       type: 'S2Feature',
@@ -295,6 +301,24 @@ export function toUnitScale(feature: VectorFeature, tolerance?: number, maxzoom?
 }
 
 /**
+ * Reproject GeoJSON geometry coordinates from 0->1 coordinate system to lon-lat in place
+ * @param feature - input GeoJSON
+ */
+export function toLL(feature: VectorFeature): void {
+  const { type, coordinates } = feature.geometry;
+  if (type === 'Point') unprojectPoint(coordinates);
+  else if (type === 'MultiPoint') coordinates.map((p) => unprojectPoint(p));
+  else if (type === 'LineString') coordinates.map((p) => unprojectPoint(p));
+  else if (type === 'MultiLineString') coordinates.map((l) => l.map((p) => unprojectPoint(p)));
+  else if (type === 'Polygon') coordinates.map((l) => l.map((p) => unprojectPoint(p)));
+  else if (type === 'MultiPolygon')
+    coordinates.map((p) => p.map((l) => l.map((p) => unprojectPoint(p))));
+  else {
+    throw new Error('Either the conversion is not yet supported or Invalid S2Geometry type.');
+  }
+}
+
+/**
  * Project a point from lon-lat to a 0->1 coordinate system in place
  * @param input - input point
  * @param geo - input geometry (used to update the bbox)
@@ -307,6 +331,23 @@ function projectPoint(input: VectorPoint, geo: VectorGeometry): void {
   input.y = y2 < 0 ? 0 : y2 > 1 ? 1 : y2;
   // update bbox
   geo.vecBBox = extendBBox(geo.vecBBox, input);
+}
+
+/**
+ * Project a point from 0->1 coordinate space to lon-lat in place
+ * @param input - input vector to mutate
+ */
+function unprojectPoint(input: VectorPoint): void {
+  const { x, y } = input;
+
+  // Revert the x coordinate
+  const lon = (x - 0.5) * 360;
+  // Revert the y coordinate
+  const y2 = 0.5 - y;
+  const lat = radToDeg(Math.atan(Math.sinh(Math.PI * (y2 * 2))));
+
+  input.x = lon;
+  input.y = lat;
 }
 
 /**

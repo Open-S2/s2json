@@ -5,9 +5,22 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use alloc::fmt;
 use alloc::vec::Vec;
 
+use core::f64::consts::PI;
+
+use libm::{atan, log, pow, sin, sinh, sqrt};
+
 /// Importing necessary types (equivalent to importing from 'values')
 use crate::values::*;
 use crate::Face;
+
+/// The axis to apply an operation to
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub enum Axis {
+    /// X axis
+    X = 0,
+    /// Y axis
+    Y = 1,
+}
 
 /// A BBOX is defined in lon-lat space and helps with zooming motion to
 /// see the entire line or polygon
@@ -82,12 +95,12 @@ impl<T> BBox<T> {
     }
 
     /// Clips the bounding box along an axis
-    pub fn clip(&self, axis: bool, k1: T, k2: T) -> BBox<T>
+    pub fn clip(&self, axis: Axis, k1: T, k2: T) -> BBox<T>
     where
         T: PartialOrd + Copy,
     {
         let mut new_bbox = *self;
-        if !axis {
+        if axis == Axis::X {
             new_bbox.left = if new_bbox.left > k1 { new_bbox.left } else { k1 };
             new_bbox.right = if new_bbox.right < k2 { new_bbox.right } else { k2 };
         } else {
@@ -100,12 +113,12 @@ impl<T> BBox<T> {
 }
 impl BBox<f64> {
     /// Creates a new BBox from a point
-    pub fn from_point(point: VectorPoint) -> Self {
+    pub fn from_point(point: &VectorPoint) -> Self {
         BBox::new(point.x, point.y, point.x, point.y)
     }
 
     /// Extends the bounding box with a point
-    pub fn extend_from_point(&mut self, point: VectorPoint) {
+    pub fn extend_from_point(&mut self, point: &VectorPoint) {
         *self = self.merge(&BBox::from_point(point));
     }
 
@@ -276,12 +289,12 @@ impl<T> BBox3D<T> {
     }
 
     /// Clips the bounding box along an axis
-    pub fn clip(&self, axis: bool, k1: T, k2: T) -> BBox3D<T>
+    pub fn clip(&self, axis: Axis, k1: T, k2: T) -> BBox3D<T>
     where
         T: PartialOrd + Copy,
     {
         let mut new_bbox = *self;
-        if !axis {
+        if axis == Axis::X {
             new_bbox.left = if new_bbox.left > k1 { new_bbox.left } else { k1 };
             new_bbox.right = if new_bbox.right < k2 { new_bbox.right } else { k2 };
         } else {
@@ -312,7 +325,7 @@ where
 }
 impl BBox3D<f64> {
     /// Creates a new BBox3D from a point
-    pub fn from_point(point: VectorPoint) -> Self {
+    pub fn from_point(point: &VectorPoint) -> Self {
         BBox3D::new(
             point.x,
             point.y,
@@ -329,7 +342,7 @@ impl BBox3D<f64> {
     }
 
     /// Extends the bounding box with a point
-    pub fn extend_from_point(&mut self, point: VectorPoint) {
+    pub fn extend_from_point(&mut self, point: &VectorPoint) {
         *self = self.merge(&BBox3D::from_point(point));
     }
 
@@ -359,6 +372,11 @@ impl BBox3D<f64> {
             near: 0.,
             far: 1.,
         }
+    }
+}
+impl From<&BBox> for BBox3D<f64> {
+    fn from(bbox: &BBox) -> Self {
+        BBox3D::from_bbox(bbox)
     }
 }
 impl<'de, T> Deserialize<'de> for BBox3D<T>
@@ -422,11 +440,16 @@ impl Default for BBOX {
 /// A Point in S2 Space with a Face
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct STPoint {
-    face: Face,
-    s: f32,
-    t: f32,
-    z: Option<f32>,
-    m: Option<MValue>,
+    /// The face of the point
+    pub face: Face,
+    /// The s coordinate
+    pub s: f64,
+    /// The t coordinate
+    pub t: f64,
+    /// The z coordinate
+    pub z: Option<f64>,
+    /// The m coordinate
+    pub m: Option<MValue>,
 }
 
 /// Enum to represent specific geometry types as strings
@@ -510,25 +533,25 @@ pub enum Geometry {
     /// MultiPoint Shape
     MultiPoint(MultiPointGeometry),
     /// LineString Shape
-    LineString(LineStringGeometry, Option<LineStringMValues>),
+    LineString(LineStringGeometry),
     /// MultiLineString Shape
-    MultiLineString(MultiLineStringGeometry, Option<MultiLineStringMValues>),
+    MultiLineString(MultiLineStringGeometry),
     /// Polygon Shape
-    Polygon(PolygonGeometry, Option<PolygonMValues>),
+    Polygon(PolygonGeometry),
     /// MultiPolygon Shape
-    MultiPolygon(MultiPolygonGeometry, Option<MultiPolygonMValues>),
+    MultiPolygon(MultiPolygonGeometry),
     /// Point3D Shape
     Point3D(Point3DGeometry),
     /// MultiPoint3D Shape
     MultiPoint3D(MultiPoint3DGeometry),
     /// LineString3D Shape
-    LineString3D(LineString3DGeometry, Option<LineStringMValues>),
+    LineString3D(LineString3DGeometry),
     /// MultiLineString3D Shape
-    MultiLineString3D(MultiLineString3DGeometry, Option<MultiLineStringMValues>),
+    MultiLineString3D(MultiLineString3DGeometry),
     /// Polygon3D Shape
-    Polygon3D(Polygon3DGeometry, Option<PolygonMValues>),
+    Polygon3D(Polygon3DGeometry),
     /// MultiPolygon3D Shape
-    MultiPolygon3D(MultiPolygon3DGeometry, Option<MultiPolygonMValues>),
+    MultiPolygon3D(MultiPolygon3DGeometry),
 }
 
 /// BaseGeometry is the a generic geometry type
@@ -604,7 +627,7 @@ impl From<&str> for VectorGeometryType {
 }
 
 /// A Vector Point uses a structure for 2D or 3D points
-#[derive(Serialize, Deserialize, Debug, PartialEq, Copy, Clone)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub struct VectorPoint {
     /// X coordinate
     pub x: f64,
@@ -612,6 +635,9 @@ pub struct VectorPoint {
     pub y: f64,
     /// Z coordinate or "altitude". May be None
     pub z: Option<f64>,
+    /// M-Value
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub m: Option<MValue>,
     /// T for tolerance. A tmp value used for simplification
     #[serde(skip)]
     pub t: Option<f64>,
@@ -619,7 +645,47 @@ pub struct VectorPoint {
 impl VectorPoint {
     /// Create a new point
     pub fn new(x: f64, y: f64, z: Option<f64>) -> Self {
-        Self { x, y, z, t: None }
+        Self { x, y, z, m: None, t: None }
+    }
+
+    /// Project the point into the 0->1 coordinate system
+    pub fn project(&mut self, bbox: &mut Option<BBox3D>) {
+        let y = self.y;
+        let x = self.x;
+        let sin = sin((y * PI) / 180.);
+        let y2 = 0.5 - (0.25 * log((1. + sin) / (1. - sin))) / PI;
+        self.x = x / 360. + 0.5;
+        self.y = y2.clamp(0., 1.);
+
+        match bbox {
+            Some(bbox) => bbox.extend_from_point(self),
+            None => *bbox = Some(BBox3D::from_point(self)),
+        };
+    }
+
+    /// Unproject the point from the 0->1 coordinate system back to a lon-lat coordinate
+    pub fn unproject(&mut self) {
+        let lon = (self.x - 0.5) * 360.;
+        let y2 = 0.5 - self.y;
+        let lat = atan(sinh(PI * (y2 * 2.))).to_degrees();
+
+        self.x = lon;
+        self.y = lat;
+    }
+
+    /// Calculate the distance between two points
+    pub fn distance(&self, other: &VectorPoint) -> f64 {
+        sqrt(pow(other.x - self.x, 2.) + pow(other.y - self.y, 2.))
+    }
+}
+impl From<&Point> for VectorPoint {
+    fn from(p: &Point) -> Self {
+        Self { x: p.0, y: p.1, z: None, m: None, t: None }
+    }
+}
+impl From<&Point3D> for VectorPoint {
+    fn from(p: &Point3D) -> Self {
+        Self { x: p.0, y: p.1, z: Some(p.2), m: None, t: None }
     }
 }
 /// Definition of a Vector MultiPoint
@@ -649,15 +715,31 @@ pub enum VectorGeometry {
     /// MultiPolygon Shape
     MultiPolygon(VectorMultiPolygonGeometry),
 }
+impl VectorGeometry {
+    /// Get the vec_bbox of the geometry
+    pub fn vec_bbox(&self) -> &Option<BBox3D> {
+        match self {
+            VectorGeometry::Point(g) => &g.vec_bbox,
+            VectorGeometry::MultiPoint(g) => &g.vec_bbox,
+            VectorGeometry::LineString(g) => &g.vec_bbox,
+            VectorGeometry::MultiLineString(g) => &g.vec_bbox,
+            VectorGeometry::Polygon(g) => &g.vec_bbox,
+            VectorGeometry::MultiPolygon(g) => &g.vec_bbox,
+        }
+    }
+}
 
 /// BaseGeometry is the a generic geometry type
 #[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq)]
-pub struct VectorBaseGeometry<G = VectorGeometry> {
+pub struct VectorBaseGeometry<G = VectorGeometry, O = VectorOffsets> {
     /// The geometry type
     #[serde(rename = "type")]
     pub _type: VectorGeometryType,
     /// The geometry shape
     pub coordinates: G,
+    /// The geometry offsets if applicable
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub offset: Option<O>,
     /// The BBox shape - always in lon-lat
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bbox: Option<BBox3D>,
@@ -666,18 +748,41 @@ pub struct VectorBaseGeometry<G = VectorGeometry> {
     pub vec_bbox: Option<BBox3D>,
 }
 
+/** All possible geometry offsets */
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+pub enum VectorOffsets {
+    /// LineString offset
+    LineOffset(VectorLineOffset),
+    /// MultiLineString offset
+    MultiLineOffset(VectorMultiLineOffset),
+    /// Polygon offset
+    PolygonOffset(VectorPolygonOffset),
+    /// MultiPolygon offset
+    MultiPolygonOffset(VectorMultiPolygonOffset),
+}
+/** An offset defines how far the starting line is from the original starting point pre-slice */
+pub type VectorLineOffset = f64;
+/** A collection of offsets */
+pub type VectorMultiLineOffset = Vec<VectorLineOffset>;
+/** A collection of offsets */
+pub type VectorPolygonOffset = VectorMultiLineOffset;
+/** A collection of collections of offsets */
+pub type VectorMultiPolygonOffset = Vec<VectorPolygonOffset>;
+
 /// PointGeometry is a point
 pub type VectorPointGeometry = VectorBaseGeometry<VectorPoint>;
 /// MultiPointGeometry contains multiple points
-pub type VectorMultiPointGeometry = VectorBaseGeometry<VectorMultiPoint>;
+pub type VectorMultiPointGeometry = VectorBaseGeometry<VectorMultiPoint, VectorLineOffset>;
 /// LineStringGeometry is a line
-pub type VectorLineStringGeometry = VectorBaseGeometry<VectorLineString>;
+pub type VectorLineStringGeometry = VectorBaseGeometry<VectorLineString, VectorLineOffset>;
 /// MultiLineStringGeometry contains multiple lines
-pub type VectorMultiLineStringGeometry = VectorBaseGeometry<VectorMultiLineString>;
+pub type VectorMultiLineStringGeometry =
+    VectorBaseGeometry<VectorMultiLineString, VectorMultiLineOffset>;
 /// PolygonGeometry is a polygon with potential holes
-pub type VectorPolygonGeometry = VectorBaseGeometry<VectorPolygon>;
+pub type VectorPolygonGeometry = VectorBaseGeometry<VectorPolygon, VectorPolygonOffset>;
 /// MultiPolygonGeometry is a polygon with multiple polygons with their own potential holes
-pub type VectorMultiPolygonGeometry = VectorBaseGeometry<VectorMultiPolygon>;
+pub type VectorMultiPolygonGeometry =
+    VectorBaseGeometry<VectorMultiPolygon, VectorMultiPolygonOffset>;
 
 #[cfg(test)]
 mod tests {

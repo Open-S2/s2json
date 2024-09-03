@@ -1,7 +1,9 @@
 use crate::s2::S2CellId;
 use crate::wm::WMCellId;
+use crate::Projection;
 
 /// Cell ID works with both S2 and WM with a common interface
+#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq, Hash)]
 pub enum CellId {
     /// S2 Cell ID
     S2(S2CellId),
@@ -35,9 +37,9 @@ impl CellId {
 
     /// Return the cell corresponding to a given S2 cube face.
     /// WM returns 0
-    pub fn from_face(face: u8) -> CellId {
-        match face {
-            0 => CellId::S2(S2CellId::from_face(face)),
+    pub fn from_face(face: u8, projection: Projection) -> CellId {
+        match projection {
+            Projection::S2 => CellId::S2(S2CellId::from_face(face)),
             _ => CellId::WM(WMCellId::new(0)),
         }
     }

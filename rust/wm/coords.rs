@@ -123,7 +123,7 @@ pub fn ll_to_tile_px(
 
 /// Convert a bbox of the form `[w, s, e, n]` to a bbox of the form `[w, s, e, n]`
 /// The result can be in lon-lat (WGS84) or WebMercator (900913)
-pub fn convert(bbox: &(f64, f64, f64, f64), source: Source) -> (f64, f64, f64, f64) {
+pub fn convert_bbox(bbox: &(f64, f64, f64, f64), source: Source) -> (f64, f64, f64, f64) {
     let low: (f64, f64);
     let high: (f64, f64);
     match source {

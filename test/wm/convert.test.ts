@@ -1,4 +1,4 @@
-import { toS2, toUnitScale, toVector } from '../../src/wm/convert';
+import { toLL, toS2, toUnitScale, toVector } from '../../src/wm/convert';
 
 import { expect, test } from 'bun:test';
 
@@ -6,7 +6,7 @@ import type { Feature, VectorFeature } from '../../src';
 
 // toUnitScale
 
-test('toUnitScale - Point', () => {
+test('toUnitScale - toLL - Point', () => {
   const point: VectorFeature = {
     type: 'VectorFeature',
     properties: { a: 1 },
@@ -26,9 +26,20 @@ test('toUnitScale - Point', () => {
       coordinates: { x: 0.5, y: 0.5, z: 0, m: { b: 2 } },
     },
   });
+
+  toLL(point);
+  expect(point).toEqual({
+    type: 'VectorFeature',
+    properties: { a: 1 },
+    geometry: {
+      type: 'Point',
+      vecBBox: [0.5, 0.5, 0.5, 0.5, 0, 0],
+      coordinates: { x: 0, y: 0, z: 0, m: { b: 2 } },
+    },
+  });
 });
 
-test('toUnitScale - MultiPoint', () => {
+test('toUnitScale - toLL - MultiPoint', () => {
   const point: VectorFeature = {
     type: 'VectorFeature',
     properties: { a: 1 },
@@ -56,10 +67,25 @@ test('toUnitScale - MultiPoint', () => {
       ],
     },
   });
+
+  toLL(point);
+  expect(point).toEqual({
+    type: 'VectorFeature',
+    properties: { a: 1 },
+    geometry: {
+      type: 'MultiPoint',
+      vecBBox: [0, 0, 1, 1, 0, 0],
+      coordinates: [
+        { x: 0, y: 0, z: 0, m: { b: 2 } },
+        { x: -180, y: -85.05112877980659, z: 0, m: { b: 3 } },
+        { x: 180, y: 85.05112877980659, z: 0, m: { b: 4 } },
+      ],
+    },
+  });
 });
 
-test('toUnitScale - LineString', () => {
-  const point: VectorFeature = {
+test('toUnitScale - toLL - LineString', () => {
+  const linestring: VectorFeature = {
     type: 'VectorFeature',
     properties: { a: 1 },
     geometry: {
@@ -72,8 +98,8 @@ test('toUnitScale - LineString', () => {
     },
   };
 
-  toUnitScale(point);
-  expect(point).toEqual({
+  toUnitScale(linestring);
+  expect(linestring).toEqual({
     type: 'VectorFeature',
     properties: { a: 1 },
     geometry: {
@@ -86,10 +112,25 @@ test('toUnitScale - LineString', () => {
       ],
     },
   });
+
+  toLL(linestring);
+  expect(linestring).toEqual({
+    type: 'VectorFeature',
+    properties: { a: 1 },
+    geometry: {
+      type: 'LineString',
+      vecBBox: [0, 0, 1, 1, 0, 0],
+      coordinates: [
+        { x: 0, y: 0, z: 0, m: { b: 2 } },
+        { x: -180, y: -85.05112877980659, z: 0, m: { b: 3 } },
+        { x: 180, y: 85.05112877980659, z: 0, m: { b: 4 } },
+      ],
+    },
+  });
 });
 
-test('toUnitScale - MultiLineString', () => {
-  const point: VectorFeature = {
+test('toUnitScale - toLL - MultiLineString', () => {
+  const multilinestring: VectorFeature = {
     type: 'VectorFeature',
     properties: { a: 1 },
     geometry: {
@@ -109,8 +150,8 @@ test('toUnitScale - MultiLineString', () => {
     },
   };
 
-  toUnitScale(point);
-  expect(point).toEqual({
+  toUnitScale(multilinestring);
+  expect(multilinestring).toEqual({
     type: 'VectorFeature',
     properties: { a: 1 },
     geometry: {
@@ -130,10 +171,32 @@ test('toUnitScale - MultiLineString', () => {
       ],
     },
   });
+
+  toLL(multilinestring);
+  expect(multilinestring).toEqual({
+    type: 'VectorFeature',
+    properties: { a: 1 },
+    geometry: {
+      type: 'MultiLineString',
+      vecBBox: [0, 0, 1, 1, 0, 0],
+      coordinates: [
+        [
+          { x: 0, y: 0, z: 0, m: { b: 2 } },
+          { x: -180, y: -85.05112877980659, z: 0, m: { b: 3 } },
+          { x: 180, y: 85.05112877980659, z: 0, m: { b: 4 } },
+        ],
+        [
+          { x: 0, y: 0, z: 0, m: { b: 2 } },
+          { x: -90, y: -45, z: 0, m: { b: 3 } },
+          { x: 90, y: 45, z: 0, m: { b: 4 } },
+        ],
+      ],
+    },
+  });
 });
 
-test('toUnitScale - Polygon', () => {
-  const point: VectorFeature = {
+test('toUnitScale - toLL - Polygon', () => {
+  const polygon: VectorFeature = {
     type: 'VectorFeature',
     properties: { a: 1 },
     geometry: {
@@ -153,8 +216,8 @@ test('toUnitScale - Polygon', () => {
     },
   };
 
-  toUnitScale(point);
-  expect(point).toEqual({
+  toUnitScale(polygon);
+  expect(polygon).toEqual({
     type: 'VectorFeature',
     properties: { a: 1 },
     geometry: {
@@ -174,10 +237,32 @@ test('toUnitScale - Polygon', () => {
       ],
     },
   });
+
+  toLL(polygon);
+  expect(polygon).toEqual({
+    type: 'VectorFeature',
+    properties: { a: 1 },
+    geometry: {
+      type: 'Polygon',
+      vecBBox: [0, 0, 1, 1, 0, 0],
+      coordinates: [
+        [
+          { x: 0, y: 0, z: 0, m: { b: 2 } },
+          { x: -180, y: -85.05112877980659, z: 0, m: { b: 3 } },
+          { x: 180, y: 85.05112877980659, z: 0, m: { b: 4 } },
+        ],
+        [
+          { x: 0, y: 0, z: 0, m: { b: 2 } },
+          { x: -90, y: -45, z: 0, m: { b: 3 } },
+          { x: 90, y: 45, z: 0, m: { b: 4 } },
+        ],
+      ],
+    },
+  });
 });
 
-test('toUnitScale - MultiPolygon', () => {
-  const point: VectorFeature = {
+test('toUnitScale - toLL - MultiPolygon', () => {
+  const multiPolygon: VectorFeature = {
     type: 'VectorFeature',
     properties: { a: 1 },
     geometry: {
@@ -199,8 +284,8 @@ test('toUnitScale - MultiPolygon', () => {
     },
   };
 
-  toUnitScale(point);
-  expect(point).toEqual({
+  toUnitScale(multiPolygon);
+  expect(multiPolygon).toEqual({
     type: 'VectorFeature',
     properties: { a: 1 },
     geometry: {
@@ -217,6 +302,30 @@ test('toUnitScale - MultiPolygon', () => {
             { x: 0.5, y: 0.5, z: 0, m: { b: 2 } },
             { x: 0.25, y: 0.640274963084795, z: 0, m: { b: 3 } },
             { x: 0.75, y: 0.35972503691520497, z: 0, m: { b: 4 } },
+          ],
+        ],
+      ],
+    },
+  });
+
+  toLL(multiPolygon);
+  expect(multiPolygon).toEqual({
+    type: 'VectorFeature',
+    properties: { a: 1 },
+    geometry: {
+      type: 'MultiPolygon',
+      vecBBox: [0, 0, 1, 1, 0, 0],
+      coordinates: [
+        [
+          [
+            { x: 0, y: 0, z: 0, m: { b: 2 } },
+            { x: -180, y: -85.05112877980659, z: 0, m: { b: 3 } },
+            { x: 180, y: 85.05112877980659, z: 0, m: { b: 4 } },
+          ],
+          [
+            { x: 0, y: 0, z: 0, m: { b: 2 } },
+            { x: -90, y: -45, z: 0, m: { b: 3 } },
+            { x: 90, y: 45, z: 0, m: { b: 4 } },
           ],
         ],
       ],
@@ -699,7 +808,7 @@ test('toS2 - LineString', () => {
           { x: 0.5, y: 0.5 },
           { x: 0.7231719544476624, y: 0.7351848576118168 },
           { x: 0.8264458251405347, y: 0.8660254037844386 },
-          { x: 0.6953495465482081, y: 1.0625 },
+          { x: 0.6953495465482081, y: 1.0625, t: 1 },
         ],
         offset: 0,
         vecBBox: [0.5, 0.5, 0.8264458251405347, 1.0625],
@@ -759,7 +868,7 @@ test('toS2 - MultiLineString', () => {
           { x: 0.5, y: 0.5 },
           { x: 0.7231719544476624, y: 0.7351848576118168 },
           { x: 0.8264458251405347, y: 0.8660254037844386 },
-          { x: 0.6953495465482081, y: 1.0625 },
+          { x: 0.6953495465482081, y: 1.0625, t: 1 },
         ],
         offset: 0,
         vecBBox: [0.5, 0.5, 0.8264458251405347, 1.0625],
@@ -790,7 +899,7 @@ test('toS2 - MultiLineString', () => {
         coordinates: [
           { x: 0.8660254037844386, y: 0.17355417485946534 },
           { x: 1.0332000398839454, y: 0.0919618222017129 },
-          { x: 1.0625, y: 0.1016957300340185 },
+          { x: 1.0625, y: 0.1016957300340185, t: 1 },
         ],
         offset: 0,
         vecBBox: [0.8660254037844386, 0.0919618222017129, 1.0625, 0.17355417485946534],
@@ -864,8 +973,8 @@ test('toS2 - Polygon', () => {
             { x: 0.7231719544476624, y: 0.5 },
             { x: 0.9377231592442196, y: 0.5 },
             { x: 0.9377231592442196, y: 0.7786828928924201 },
-            { x: 0.7356879031193608, y: 1.0625 },
-            { x: 0.6583568237637192, y: 1.0625 },
+            { x: 0.7356879031193608, y: 1.0625, t: 1 },
+            { x: 0.6583568237637192, y: 1.0625, t: 1 },
             { x: 0.7231719544476622, y: 0.9590168832161913 },
             { x: 0.5, y: 0.9377231592442196 },
             { x: 0.5, y: 0.7231719544476624 },
@@ -899,7 +1008,7 @@ test('toS2 - Polygon', () => {
             { x: -0.0625, y: 0.19165525141383033 },
             { x: 0.033200039883945376, y: 0.091961822201713 },
             { x: -0.0625, y: 0.15284249599867805 },
-            { x: -0.0625, y: 0.19165525141383033 },
+            { x: -0.0625, y: 0.19165525141383033, t: 1 },
           ],
         ],
         offset: [1.7505894300567113],
@@ -959,8 +1068,8 @@ test('toS2 - MultiPolygon', () => {
             { x: 0.7231719544476624, y: 0.5 },
             { x: 0.9377231592442196, y: 0.5 },
             { x: 0.9377231592442196, y: 0.7786828928924201 },
-            { x: 0.7356879031193608, y: 1.0625 },
-            { x: 0.6583568237637192, y: 1.0625 },
+            { x: 0.7356879031193608, y: 1.0625, t: 1 },
+            { x: 0.6583568237637192, y: 1.0625, t: 1 },
             { x: 0.7231719544476622, y: 0.9590168832161913 },
             { x: 0.5, y: 0.9377231592442196 },
             { x: 0.5, y: 0.7231719544476624 },
@@ -994,7 +1103,7 @@ test('toS2 - MultiPolygon', () => {
             { x: -0.0625, y: 0.19165525141383033 },
             { x: 0.033200039883945376, y: 0.091961822201713 },
             { x: -0.0625, y: 0.15284249599867805 },
-            { x: -0.0625, y: 0.19165525141383033 },
+            { x: -0.0625, y: 0.19165525141383033, t: 1 },
           ],
         ],
         offset: [1.7505894300567113],
@@ -1020,6 +1129,10 @@ test('toS2 - Error', () => {
     },
   };
   expect(() => toS2(err)).toThrowError(
+    'Either the conversion is not yet supported or Invalid S2Geometry type.',
+  );
+
+  expect(() => toLL(err)).toThrowError(
     'Either the conversion is not yet supported or Invalid S2Geometry type.',
   );
 });
