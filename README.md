@@ -21,6 +21,9 @@
   <a href="https://docs.rs/s2json">
     <img src="https://img.shields.io/badge/docs-rust-yellow.svg" alt="docs-rust">
   </a>
+  <a href="https://coveralls.io/github/Open-S2/s2json?branch=master">
+    <img src="https://coveralls.io/repos/github/Open-S2/s2json/badge.svg?branch=master" alt="code-coverage">
+  </a>
   <a href="https://discord.opens2.com">
     <img src="https://img.shields.io/discord/953563031701426206?logo=discord&logoColor=white" alt="Discord">
   </a>
@@ -34,7 +37,10 @@ Notable features of S2JSON are:
 
 * Properties data is clearly defined on how it can be shaped.
 * 🧊 Support for 3D geometries.
+* 🏷️ Support for metadata.
 * ♏ Support for M-Values for each geometry point.
+* 📦 Support for bounding boxes
+* 🔨 Tools for converting between GeoJSON, S2JSON, and quad-tree Tile structures
 * 🪩 Support for `S2Feature` and `S2FeatureCollection` types based upon the S2 Geometry *spherical projection*.
 * ♻️ Feature Properties & M-Values are defined in scope to ensure they can be easily processed by lower level languages as structures, but also adds value to other projects down the line.
 * 🛑 GeoJSON no longer supports `GeometryCollection`.
