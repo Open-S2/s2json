@@ -4,6 +4,7 @@
   "oneOf": [
     { "$ref": "#/definitions/FeatureCollection" },
     { "$ref": "#/definitions/Feature" },
+    { "$ref": "#/definitions/VectorFeature" },
     { "$ref": "#/definitions/S2FeatureCollection" },
     { "$ref": "#/definitions/S2Feature" }
   ],
@@ -14,9 +15,9 @@
         "type": { "type": "string", "enum": ["FeatureCollection"] },
         "features": {
           "type": "array",
-          "items": { "$ref": "#/definitions/Feature" }
+          "items": { "oneOf": [{ "$ref": "#/definitions/Feature" }, { "$ref": "#/definitions/VectorFeature" }] }
         },
-        "bbox": { "type": "array", "items": { "type": "number" }, "minItems": 4, "maxItems": 4 }
+        "bbox": { "$ref": "#/definitions/bbox2D" }
       },
       "required": ["type", "features"],
       "additionalProperties": false
@@ -29,7 +30,7 @@
           "type": "array",
           "items": { "$ref": "#/definitions/S2Feature" }
         },
-        "bbox": { "type": "array", "items": { "type": "number" }, "minItems": 4, "maxItems": 4 },
+        "bbox": { "$ref": "#/definitions/bbox2D" },
         "faces": { "type": "array", "items": { "type": "number", "enum": [0, 1, 2, 3, 4, 5] }, "uniqueItems": true, "maxItems": 6 }
       },
       "required": ["type", "features", "faces"],
@@ -41,7 +42,19 @@
         "id": { "type": "number", "minimum": 0 },
         "type": { "type": "string", "enum": ["Feature"] },
         "geometry": { "$ref": "#/definitions/geometry" },
-        "properties": { "type": "object" },
+        "properties": { "$ref": "#/definitions/properties" },
+        "metadata": { "type": "object" }
+      },
+      "required": ["type", "geometry", "properties"],
+      "additionalProperties": false
+    },
+    "VectorFeature": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "number", "minimum": 0 },
+        "type": { "type": "string", "enum": ["VectorFeature"] },
+        "geometry": { "$ref": "#/definitions/vectorGeometry" },
+        "properties": { "$ref": "#/definitions/properties" },
         "metadata": { "type": "object" }
       },
       "required": ["type", "geometry", "properties"],
@@ -52,7 +65,7 @@
       "properties": {
         "id": { "type": "number", "minimum": 0 },
         "type": { "type": "string", "enum": ["S2Feature"] },
-        "geometry": { "$ref": "#/definitions/geometry" },
+        "geometry": { "$ref": "#/definitions/vectorGeometry" },
         "properties": { "$ref": "#/definitions/properties" },
         "face": { "type": "number", "enum": [0, 1, 2, 3, 4, 5] },
         "metadata": { "type": "object" }
@@ -113,6 +126,18 @@
         { "$ref": "#/definitions/MultiPolygon3DGeometry" }
       ]
     },
+    "vectorGeometry": {
+      "oneOf": [
+        { "$ref": "#/definitions/VectorPointGeometry" },
+        { "$ref": "#/definitions/VectorMultiPointGeometry" },
+        { "$ref": "#/definitions/VectorLineStringGeometry" },
+        { "$ref": "#/definitions/VectorMultiLineStringGeometry" },
+        { "$ref": "#/definitions/VectorPolygonGeometry" },
+        { "$ref": "#/definitions/VectorMultiPolygonGeometry" }
+      ]
+    },
+    "bbox2D": { "type": "array", "items": { "type": "number" }, "minItems": 4, "maxItems": 4 },
+    "bbox3D": { "type": "array", "items": { "type": "number" }, "minItems": 6, "maxItems": 6 },
     "point": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
     "point3D": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
     "multiPoint": { "type": "array", "items": { "$ref": "#/definitions/point" } },
@@ -135,7 +160,7 @@
       "properties": {
         "type": { "type": "string", "enum": ["Point"] },
         "coordinates": { "$ref": "#/definitions/point" },
-        "bbox": { "type": "array", "items": { "type": "number" }, "minItems": 4, "maxItems": 4 },
+        "bbox": { "$ref": "#/definitions/bbox2D" },
         "mValues": { "$ref": "#/definitions/mValue" }
       },
       "required": ["type", "coordinates"],
@@ -146,7 +171,7 @@
       "properties": {
         "type": { "type": "string", "enum": ["MultiPoint"] },
         "coordinates": { "$ref": "#/definitions/multiPoint" },
-        "bbox": { "type": "array", "items": { "type": "number" }, "minItems": 4, "maxItems": 4 },
+        "bbox": { "$ref": "#/definitions/bbox2D" },
         "mValues": { "$ref": "#/definitions/mValueMultiPoint" }
       },
       "required": ["type", "coordinates"],
@@ -157,7 +182,7 @@
       "properties": {
         "type": { "type": "string", "enum": ["LineString"] },
         "coordinates": { "$ref": "#/definitions/line" },
-        "bbox": { "type": "array", "items": { "type": "number" }, "minItems": 4, "maxItems": 4 },
+        "bbox": { "$ref": "#/definitions/bbox2D" },
         "mValues": { "$ref": "#/definitions/mValueLine" }
       },
       "required": ["type", "coordinates"],
@@ -168,7 +193,7 @@
       "properties": {
         "type": { "type": "string", "enum": ["MultiLineString"] },
         "coordinates": { "$ref": "#/definitions/multiLine" },
-        "bbox": { "type": "array", "items": { "type": "number" }, "minItems": 4, "maxItems": 4 },
+        "bbox": { "$ref": "#/definitions/bbox2D" },
         "mValues": { "$ref": "#/definitions/mValueMultiLine" }
       },
       "required": ["type", "coordinates"],
@@ -179,7 +204,7 @@
       "properties": {
         "type": { "type": "string", "enum": ["Polygon"] },
         "coordinates": { "$ref": "#/definitions/polygon" },
-        "bbox": { "type": "array", "items": { "type": "number" }, "minItems": 4, "maxItems": 4 },
+        "bbox": { "$ref": "#/definitions/bbox2D" },
         "mValues": { "$ref": "#/definitions/mValuePolygon" }
       },
       "required": ["type", "coordinates"],
@@ -190,7 +215,7 @@
       "properties": {
         "type": { "type": "string", "enum": ["MultiPolygon"] },
         "coordinates": { "$ref": "#/definitions/multiPolygon" },
-        "bbox": { "type": "array", "items": { "type": "number" }, "minItems": 4, "maxItems": 4 },
+        "bbox": { "$ref": "#/definitions/bbox2D" },
         "mValues": { "$ref": "#/definitions/mValueMultiPolygon" }
       },
       "required": ["type", "coordinates"],
@@ -201,7 +226,7 @@
       "properties": {
         "type": { "type": "string", "enum": ["Point3D"] },
         "coordinates": { "$ref": "#/definitions/point3D" },
-        "bbox": { "type": "array", "items": { "type": "number" }, "minItems": 6, "maxItems": 6 },
+        "bbox": { "$ref": "#/definitions/bbox3D" },
         "mValues": { "$ref": "#/definitions/mValue" }
       },
       "required": ["type", "coordinates"],
@@ -212,7 +237,7 @@
       "properties": {
         "type": { "type": "string", "enum": ["MultiPoint3D"] },
         "coordinates": { "$ref": "#/definitions/multiPoint3D" },
-        "bbox": { "type": "array", "items": { "type": "number" }, "minItems": 6, "maxItems": 6 },
+        "bbox": { "$ref": "#/definitions/bbox3D" },
         "mValues": { "$ref": "#/definitions/mValueMultiPoint" }
       },
       "required": ["type", "coordinates"],
@@ -223,7 +248,7 @@
       "properties": {
         "type": { "type": "string", "enum": ["LineString3D"] },
         "coordinates": { "$ref": "#/definitions/line3D" },
-        "bbox": { "type": "array", "items": { "type": "number" }, "minItems": 6, "maxItems": 6 },
+        "bbox": { "$ref": "#/definitions/bbox3D" },
         "mValues": { "$ref": "#/definitions/mValueLine" }
       },
       "required": ["type", "coordinates"],
@@ -234,7 +259,7 @@
       "properties": {
         "type": { "type": "string", "enum": ["MultiLineString3D"] },
         "coordinates": { "$ref": "#/definitions/multiLine3D" },
-        "bbox": { "type": "array", "items": { "type": "number" }, "minItems": 6, "maxItems": 6 },
+        "bbox": { "$ref": "#/definitions/bbox3D" },
         "mValues": { "$ref": "#/definitions/mValueMultiLine" }
       },
       "required": ["type", "coordinates"],
@@ -245,7 +270,7 @@
       "properties": {
         "type": { "type": "string", "enum": ["Polygon3D"] },
         "coordinates": { "$ref": "#/definitions/polygon3D" },
-        "bbox": { "type": "array", "items": { "type": "number" }, "minItems": 6, "maxItems": 6 },
+        "bbox": { "$ref": "#/definitions/bbox3D" },
         "mValues": { "$ref": "#/definitions/mValuePolygon" }
       },
       "required": ["type", "coordinates"],
@@ -256,8 +281,99 @@
       "properties": {
         "type": { "type": "string", "enum": ["MultiPolygon3D"] },
         "coordinates": { "$ref": "#/definitions/multiPolygon3D" },
-        "bbox": { "type": "array", "items": { "type": "number" }, "minItems": 6, "maxItems": 6 },
+        "bbox": { "$ref": "#/definitions/bbox3D" },
         "mValues": { "$ref": "#/definitions/mValueMultiPoint" }
+      },
+      "required": ["type", "coordinates"],
+      "additionalProperties": false
+    },
+    "vectorLineOffset": { "type": "number" },
+    "vectorMultiLineOffset": { "type": "array", "items": { "$ref": "#/definitions/vectorLineOffset" } },
+    "vectorPolygonOffset": { "type": "array", "items": { "$ref": "#/definitions/vectorLineOffset" } },
+    "vectorMultiPolygonOffset": { "type": "array", "items": { "$ref": "#/definitions/vectorPolygonOffset" } },
+    "vectorPoint": {
+      "type": "object",
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "z": { "type": "number" },
+        "m": { "$ref": "#/definitions/mValue" },
+        "t": { "type": "number" }
+      },
+      "required": ["x", "y"],
+      "additionalProperties": false
+    },
+    "vectorMultiPoint": { "type": "array", "items": { "$ref": "#/definitions/vectorPoint" } },
+    "vectorLine": { "type": "array", "items": { "$ref": "#/definitions/vectorPoint" } },
+    "vectorMultiLine": { "type": "array", "items": { "$ref": "#/definitions/vectorLine" } },
+    "vectorPolygon": { "type": "array", "items": { "$ref": "#/definitions/vectorLine" } },
+    "vectorMultiPolygon": { "type": "array", "items": { "$ref": "#/definitions/vectorPolygon" } },
+    "VectorPointGeometry": {
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "enum": ["Point"] },
+        "coordinates": { "$ref": "#/definitions/vectorPoint" },
+        "bbox": { "oneOf": [{ "$ref": "#/definitions/bbox2D" }, { "$ref": "#/definitions/bbox3D" }] },
+        "vecBBox": { "oneOf": [{ "$ref": "#/definitions/bbox2D" }, { "$ref": "#/definitions/bbox3D" }] }
+      },
+      "required": ["type", "coordinates"],
+      "additionalProperties": false
+    },
+    "VectorMultiPointGeometry": {
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "enum": ["MultiPoint"] },
+        "coordinates": { "$ref": "#/definitions/vectorMultiPoint" },
+        "bbox": { "oneOf": [{ "$ref": "#/definitions/bbox2D" }, { "$ref": "#/definitions/bbox3D" }] },
+        "vecBBox": { "oneOf": [{ "$ref": "#/definitions/bbox2D" }, { "$ref": "#/definitions/bbox3D" }] }
+      },
+      "required": ["type", "coordinates"],
+      "additionalProperties": false
+    },
+    "VectorLineStringGeometry": {
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "enum": ["LineString"] },
+        "coordinates": { "$ref": "#/definitions/vectorLine" },
+        "bbox": { "oneOf": [{ "$ref": "#/definitions/bbox2D" }, { "$ref": "#/definitions/bbox3D" }] },
+        "vecBBox": { "oneOf": [{ "$ref": "#/definitions/bbox2D" }, { "$ref": "#/definitions/bbox3D" }] },
+        "offset": { "$ref": "#/definitions/vectorLineOffset" }
+      },
+      "required": ["type", "coordinates"],
+      "additionalProperties": false
+    },
+    "VectorMultiLineStringGeometry": {
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "enum": ["MultiLineString"] },
+        "coordinates": { "$ref": "#/definitions/vectorMultiLine" },
+        "bbox": { "oneOf": [{ "$ref": "#/definitions/bbox2D" }, { "$ref": "#/definitions/bbox3D" }] },
+        "vecBBox": { "oneOf": [{ "$ref": "#/definitions/bbox2D" }, { "$ref": "#/definitions/bbox3D" }] },
+        "offset": { "$ref": "#/definitions/vectorMultiLineOffset" }
+      },
+      "required": ["type", "coordinates"],
+      "additionalProperties": false
+    },
+    "VectorPolygonGeometry": {
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "enum": ["Polygon"] },
+        "coordinates": { "$ref": "#/definitions/vectorPolygon" },
+        "bbox": { "oneOf": [{ "$ref": "#/definitions/bbox2D" }, { "$ref": "#/definitions/bbox3D" }] },
+        "vecBBox": { "oneOf": [{ "$ref": "#/definitions/bbox2D" }, { "$ref": "#/definitions/bbox3D" }] },
+        "offset": { "$ref": "#/definitions/vectorPolygonOffset" }
+      },
+      "required": ["type", "coordinates"],
+      "additionalProperties": false
+    },
+    "VectorMultiPolygonGeometry": {
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "enum": ["MultiPolygon"] },
+        "coordinates": { "$ref": "#/definitions/vectorMultiPolygon" },
+        "bbox": { "oneOf": [{ "$ref": "#/definitions/bbox2D" }, { "$ref": "#/definitions/bbox3D" }] },
+        "vecBBox": { "oneOf": [{ "$ref": "#/definitions/bbox2D" }, { "$ref": "#/definitions/bbox3D" }] },
+        "offset": { "$ref": "#/definitions/vectorMultiPolygonOffset" }
       },
       "required": ["type", "coordinates"],
       "additionalProperties": false

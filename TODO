@@ -1,5 +1,4 @@
 # TODO
 
 [ ] - Write more tests coverage to ensure validation is working as expected
-[ ] - update validation to work with Vectored data
 [ ] - update the spec to include vectored data and a Tile concept

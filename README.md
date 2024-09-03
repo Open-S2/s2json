@@ -13,7 +13,7 @@
     <img src="https://img.shields.io/npm/dm/s2json-spec.svg" alt="downloads">
   </a>
   <a href="https://bundlejs.com/?q=s2json-spec">
-    <img src="https://img.shields.io/bundlejs/size/s2json-spec?exports=VectorTile" alt="bundle">
+    <img src="https://img.shields.io/bundlejs/size/s2json-spec" alt="bundle">
   </a>
   <a href="https://open-s2.github.io/s2json/">
     <img src="https://img.shields.io/badge/docs-typescript-yellow.svg" alt="docs-ts">
