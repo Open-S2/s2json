@@ -99,7 +99,7 @@ impl<M: Clone> VectorFeature<M> {
 }
 
 /// Convert a GeoJSON Geometry to an Vector Geometry
-fn convert_geometry(geometry: &Geometry, build_bbox: bool) -> VectorGeometry {
+fn convert_geometry(geometry: &Geometry, _build_bbox: bool) -> VectorGeometry {
     // TODO: build a bbox if user wants it
     match geometry {
         Geometry::Point(geo) => {
