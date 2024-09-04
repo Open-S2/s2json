@@ -305,11 +305,11 @@ export type VectorMultiLineStringGeometry = VectorBaseGeometry<
 export interface VectorPolygonGeometry
   extends VectorBaseGeometry<'Polygon', VectorPolygon, VectorPolygonOffset, BBOX> {
   indices?: number[];
-  tesselation?: VectorPoint[];
+  tesselation?: number[];
 }
 /** MultiPolygonGeometry is a polygon with multiple polygons with their own potential holes */
 export interface VectorMultiPolygonGeometry
   extends VectorBaseGeometry<'MultiPolygon', VectorMultiPolygon, VectorMultiPolygonOffset, BBOX> {
   indices?: number[];
-  tesselation?: VectorPoint[];
+  tesselation?: number[];
 }

@@ -753,7 +753,7 @@ pub struct VectorBaseGeometry<G = VectorGeometry, O = VectorOffsets> {
     /// Polygon and MultiPolygon specific property
     pub indices: Option<Vec<u32>>,
     /// Polygon and MultiPolygon specific property
-    pub tesselation: Option<VectorPoint>,
+    pub tesselation: Option<f64>,
 }
 
 /** All possible geometry offsets */
