@@ -46,7 +46,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Open-S2/s2json.git"
+    "url": "git+https://github.com/Open-S2/s2json.git"
   },
   "author": "Craig OConnor",
   "license": "MIT",
@@ -87,26 +87,51 @@
     "languages": [
       {
         "id": "s2json",
-        "aliases": ["S2JSON", "s2json"],
-        "extensions": [".s2json", ".s2geojson"],
+        "aliases": [
+          "S2JSON",
+          "s2json"
+        ],
+        "extensions": [
+          ".s2json",
+          ".s2geojson"
+        ],
         "configuration": "./language-configuration.json"
       },
       {
         "id": "geojson",
-        "aliases": ["GeoJSON", "geojson"],
-        "extensions": [".geojson", ".geojsonl", ".geojsonld"],
+        "aliases": [
+          "GeoJSON",
+          "geojson"
+        ],
+        "extensions": [
+          ".geojson",
+          ".geojsonl",
+          ".geojsonld"
+        ],
         "configuration": "./language-configuration.json"
       },
       {
         "id": "s2jsonl",
-        "aliases": ["S2JSON", "s2json"],
-        "extensions": [".s2jsonl", ".s2jsonld"],
+        "aliases": [
+          "S2JSON",
+          "s2json"
+        ],
+        "extensions": [
+          ".s2jsonl",
+          ".s2jsonld"
+        ],
         "configuration": "./language-configuration.json"
       },
       {
         "id": "geojsonl",
-        "aliases": ["GeoJSON", "geojson"],
-        "extensions": [".geojsonl", ".geojsonld"],
+        "aliases": [
+          "GeoJSON",
+          "geojson"
+        ],
+        "extensions": [
+          ".geojsonl",
+          ".geojsonld"
+        ],
         "configuration": "./language-configuration.json"
       }
     ],
