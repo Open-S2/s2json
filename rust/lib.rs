@@ -1,4 +1,4 @@
-// #![no_std]
+#![no_std]
 #![deny(missing_docs)]
 
 //! The `s2json` Rust crate provides functionalities to read and write S2JSON Spec data structures.
@@ -41,6 +41,7 @@ use serde::{Deserialize, Serialize};
 
 use alloc::collections::BTreeMap;
 use alloc::string::String;
+use alloc::string::ToString;
 use alloc::vec::Vec;
 
 /// All projections that can be used

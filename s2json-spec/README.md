@@ -4,6 +4,7 @@ A specification for encoding tiled vector data.
 
 ## Implementations & Use Cases
 
+* [s2json](https://github.com/Open-S2/s2json) (Rust and Typescript)
 * [s2-tools](https://github.com/Open-S2/s2-tools) (Rust and Typescript)
 * [s2-vector-tile](https://github.com/Open-S2/s2-vector-tile) (Rust and Typescript)
 

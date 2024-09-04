@@ -1,3 +1,4 @@
+use alloc::string::ToString;
 use alloc::vec;
 use alloc::vec::Vec;
 
@@ -204,7 +205,7 @@ fn clip_line_string(
     k1: f64,
     k2: f64,
 ) -> Option<VectorGeometry> {
-    let VectorLineStringGeometry { coordinates: line, bbox, vec_bbox, .. } = geometry;
+    let VectorLineStringGeometry { is_3d, coordinates: line, bbox, vec_bbox, .. } = geometry;
     let init_o = geometry.offset.unwrap_or(0.);
     let mut new_offsets: VectorMultiLineOffset = vec![];
     let mut new_lines: VectorMultiLineString = vec![];
@@ -219,10 +220,12 @@ fn clip_line_string(
     } else {
         Some(VectorGeometry::MultiLineString(VectorMultiLineStringGeometry {
             _type: VectorGeometryType::MultiLineString,
+            is_3d: *is_3d,
             coordinates: new_lines,
             bbox: *bbox,
             offset: Some(new_offsets),
             vec_bbox: Some(vec_bbox.unwrap_or_default().clip(axis, k1, k2)),
+            ..Default::default()
         }))
     }
 }
@@ -235,7 +238,7 @@ fn clip_multi_line_string(
     k2: f64,
     is_polygon: bool,
 ) -> Option<VectorGeometry> {
-    let VectorMultiLineStringGeometry { coordinates, bbox, vec_bbox, .. } = geometry;
+    let VectorMultiLineStringGeometry { is_3d, coordinates, bbox, vec_bbox, .. } = geometry;
     let init_o =
         geometry.offset.clone().unwrap_or_else(|| coordinates.iter().map(|_| 0.).collect());
     let mut new_offsets: VectorMultiLineOffset = vec![];
@@ -258,18 +261,22 @@ fn clip_multi_line_string(
     } else if !is_polygon {
         Some(VectorGeometry::MultiLineString(VectorMultiLineStringGeometry {
             _type: VectorGeometryType::MultiLineString,
+            is_3d: *is_3d,
             coordinates: new_lines,
             bbox: *bbox,
             offset: Some(new_offsets),
             vec_bbox: Some(vec_bbox),
+            ..Default::default()
         }))
     } else {
         Some(VectorGeometry::Polygon(VectorPolygonGeometry {
             _type: VectorGeometryType::Polygon,
+            is_3d: *is_3d,
             coordinates: new_lines,
             bbox: *bbox,
             offset: Some(new_offsets),
             vec_bbox: Some(vec_bbox),
+            ..Default::default()
         }))
     }
 }
@@ -291,7 +298,7 @@ fn clip_multi_polygon(
     k1: f64,
     k2: f64,
 ) -> Option<VectorGeometry> {
-    let VectorMultiPolygonGeometry { coordinates, bbox, vec_bbox, .. } = geometry;
+    let VectorMultiPolygonGeometry { is_3d, coordinates, bbox, vec_bbox, .. } = geometry;
     let init_o = geometry
         .offset
         .clone()
@@ -302,10 +309,10 @@ fn clip_multi_polygon(
         let new_polygon = clip_polygon(
             &VectorPolygonGeometry {
                 _type: VectorGeometryType::Polygon,
+                is_3d: *is_3d,
                 coordinates: polygon.to_vec(),
-                bbox: None,
                 offset: Some(init_o[p].clone()),
-                vec_bbox: None,
+                ..Default::default()
             },
             axis,
             k1,
@@ -324,10 +331,12 @@ fn clip_multi_polygon(
     } else {
         Some(VectorGeometry::MultiPolygon(VectorMultiPolygonGeometry {
             _type: VectorGeometryType::MultiPolygon,
+            is_3d: *is_3d,
             coordinates: new_coordinates,
             bbox: *bbox,
             offset: Some(new_offsets),
             vec_bbox: Some(vec_bbox.unwrap_or_default().clip(axis, k1, k2)),
+            ..Default::default()
         }))
     }
 }

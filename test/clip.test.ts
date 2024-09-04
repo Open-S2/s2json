@@ -8,6 +8,7 @@ import type { BBox, VectorFeature, VectorLineString, VectorPointGeometry } from 
 test('clipPoint', () => {
   const point: VectorPointGeometry = {
     type: 'Point',
+    is3D: false,
     coordinates: { x: 0.5, y: 0.5 },
   };
   const res = clipPoint(point, 0, 0, 1);
@@ -245,6 +246,7 @@ describe('splitTile', () => {
         properties: { a: 2 },
         geometry: {
           type: 'Point',
+          is3D: false,
           coordinates: { x: 0.25, y: 0.25 },
           vecBBox: [0.25, 0.25, 0.25, 0.25],
         },
@@ -254,6 +256,7 @@ describe('splitTile', () => {
         properties: { a: 2 },
         geometry: {
           type: 'Point',
+          is3D: false,
           coordinates: { x: 0.75, y: 0.75 },
           vecBBox: [0.75, 0.75, 0.75, 0.75],
         },
@@ -263,6 +266,7 @@ describe('splitTile', () => {
         properties: { a: 2 },
         geometry: {
           type: 'Point',
+          is3D: false,
           coordinates: { x: 0.75, y: 0.25 },
           vecBBox: [0.75, 0.25, 0.75, 0.25],
         },
@@ -272,6 +276,7 @@ describe('splitTile', () => {
         properties: { a: 2 },
         geometry: {
           type: 'Point',
+          is3D: false,
           coordinates: { x: 0.25, y: 0.75 },
           vecBBox: [0.25, 0.75, 0.25, 0.75],
         },
@@ -294,6 +299,7 @@ describe('splitTile', () => {
                     x: 0.25,
                     y: 0.25,
                   },
+                  is3D: false,
                   type: 'Point',
                   vecBBox: [0.25, 0.25, 0.25, 0.25],
                 },
@@ -320,6 +326,7 @@ describe('splitTile', () => {
                     x: 0.75,
                     y: 0.25,
                   },
+                  is3D: false,
                   type: 'Point',
                   vecBBox: [0.75, 0.25, 0.75, 0.25],
                 },
@@ -346,6 +353,7 @@ describe('splitTile', () => {
                     x: 0.25,
                     y: 0.75,
                   },
+                  is3D: false,
                   type: 'Point',
                   vecBBox: [0.25, 0.75, 0.25, 0.75],
                 },
@@ -372,6 +380,7 @@ describe('splitTile', () => {
                     x: 0.75,
                     y: 0.75,
                   },
+                  is3D: false,
                   type: 'Point',
                   vecBBox: [0.75, 0.75, 0.75, 0.75],
                 },
@@ -397,6 +406,7 @@ describe('splitTile', () => {
         properties: { a: 2 },
         geometry: {
           type: 'MultiPoint',
+          is3D: false,
           coordinates: [
             { x: 0.25, y: 0.25 },
             { x: 0.75, y: 0.75 },
@@ -423,6 +433,7 @@ describe('splitTile', () => {
                   bbox: undefined,
                   coordinates: [{ x: 0.25, y: 0.25 }],
                   type: 'MultiPoint',
+                  is3D: false,
                   vecBBox: [0.25, 0.25, 0.25, 0.25],
                 },
                 properties: {
@@ -447,6 +458,7 @@ describe('splitTile', () => {
                   bbox: undefined,
                   coordinates: [{ x: 0.75, y: 0.25 }],
                   type: 'MultiPoint',
+                  is3D: false,
                   vecBBox: [0.75, 0.25, 0.75, 0.25],
                 },
                 properties: {
@@ -471,6 +483,7 @@ describe('splitTile', () => {
                   bbox: undefined,
                   coordinates: [{ x: 0.25, y: 0.75 }],
                   type: 'MultiPoint',
+                  is3D: false,
                   vecBBox: [0.25, 0.75, 0.25, 0.75],
                 },
                 properties: {
@@ -495,6 +508,7 @@ describe('splitTile', () => {
                   bbox: undefined,
                   coordinates: [{ x: 0.75, y: 0.75 }],
                   type: 'MultiPoint',
+                  is3D: false,
                   vecBBox: [0.75, 0.75, 0.75, 0.75],
                 },
                 properties: {
@@ -542,6 +556,7 @@ describe('splitTile', () => {
                   bbox: undefined,
                   coordinates: [{ x: 0.75, y: 0.75 }],
                   type: 'MultiPoint',
+                  is3D: false,
                   vecBBox: [0.75, 0.75, 0.75, 0.75],
                 },
                 properties: {
@@ -567,6 +582,7 @@ describe('splitTile', () => {
         properties: { a: 2 },
         geometry: {
           type: 'LineString',
+          is3D: false,
           coordinates: [
             { x: 0.25, y: 0.25 },
             { x: 0.75, y: 0.75 },
@@ -603,6 +619,7 @@ describe('splitTile', () => {
                   ],
                   offset: [0, 1.4722718241315027],
                   type: 'MultiLineString',
+                  is3D: false,
                   vecBBox: [0.25, 0.25, 0.5625, 0.5625],
                 },
                 properties: {
@@ -638,6 +655,7 @@ describe('splitTile', () => {
                   ],
                   offset: [0.2651650429449553, 0.8946067811865475],
                   type: 'MultiLineString',
+                  is3D: false,
                   vecBBox: [0.4375, 0.25, 0.75, 0.5625],
                 },
                 properties: {
@@ -672,6 +690,7 @@ describe('splitTile', () => {
                   ],
                   offset: [0.2651650429449553, 1.4722718241315027],
                   type: 'MultiLineString',
+                  is3D: false,
                   vecBBox: [0.25, 0.4375, 0.5625, 0.75],
                 },
                 properties: {
@@ -707,6 +726,7 @@ describe('splitTile', () => {
                   ],
                   offset: [0.2651650429449553, 1.4722718241315027],
                   type: 'MultiLineString',
+                  is3D: false,
                   vecBBox: [0.4375, 0.4375, 0.75, 0.75],
                 },
                 properties: {
@@ -732,6 +752,7 @@ describe('splitTile', () => {
         properties: { a: 2 },
         geometry: {
           type: 'MultiLineString',
+          is3D: false,
           coordinates: [
             [
               { x: 0.25, y: 0.25 },
@@ -776,6 +797,7 @@ describe('splitTile', () => {
                   ],
                   offset: [0, 0],
                   type: 'MultiLineString',
+                  is3D: false,
                   vecBBox: [0.25, 0.25, 0.5625, 0.5625],
                 },
                 properties: {
@@ -812,6 +834,7 @@ describe('splitTile', () => {
                   ],
                   offset: [0.1875, 0.03749999999999998],
                   type: 'MultiLineString',
+                  is3D: false,
                   vecBBox: [0.4375, 0.25, 0.75, 0.5625],
                 },
                 properties: {
@@ -846,6 +869,7 @@ describe('splitTile', () => {
                   ],
                   offset: [1.1875, 0.4374999999999999],
                   type: 'MultiLineString',
+                  is3D: false,
                   vecBBox: [0.25, 0.4375, 0.5625, 0.75],
                 },
                 properties: {
@@ -882,6 +906,7 @@ describe('splitTile', () => {
                   ],
                   offset: [0.6875, 0.23749999999999993],
                   type: 'MultiLineString',
+                  is3D: false,
                   vecBBox: [0.4375, 0.4375, 0.75, 0.75],
                 },
                 properties: {
@@ -907,6 +932,7 @@ describe('splitTile', () => {
         properties: { a: 2 },
         geometry: {
           type: 'Polygon',
+          is3D: false,
           coordinates: [
             [
               { x: 0.25, y: 0.25 },
@@ -957,6 +983,7 @@ describe('splitTile', () => {
                   ],
                   offset: [2.5, 0.6374999999999998],
                   type: 'Polygon',
+                  is3D: false,
                   vecBBox: [0.25, 0.25, 0.5625, 0.5625],
                 },
                 properties: {
@@ -997,6 +1024,7 @@ describe('splitTile', () => {
                   ],
                   offset: [1.5, 0.23749999999999993],
                   type: 'Polygon',
+                  is3D: false,
                   vecBBox: [0.4375, 0.25, 0.75, 0.5625],
                 },
                 properties: {
@@ -1037,6 +1065,7 @@ describe('splitTile', () => {
                   ],
                   offset: [1.6875, 0.9999999999999998],
                   type: 'Polygon',
+                  is3D: false,
                   vecBBox: [0.25, 0.4375, 0.5625, 0.75],
                 },
                 properties: {
@@ -1077,6 +1106,7 @@ describe('splitTile', () => {
                   ],
                   offset: [0.6875, 0.5999999999999999],
                   type: 'Polygon',
+                  is3D: false,
                   vecBBox: [0.4375, 0.4375, 0.75, 0.75],
                 },
                 properties: {
@@ -1102,6 +1132,7 @@ describe('splitTile', () => {
         properties: { a: 2 },
         geometry: {
           type: 'MultiPolygon',
+          is3D: false,
           coordinates: [
             [
               [
@@ -1156,6 +1187,7 @@ describe('splitTile', () => {
                   ],
                   offset: [[2.5, 0.6374999999999998]],
                   type: 'MultiPolygon',
+                  is3D: false,
                   vecBBox: [0.25, 0.25, 0.5625, 0.5625],
                 },
                 properties: {
@@ -1198,6 +1230,7 @@ describe('splitTile', () => {
                   ],
                   offset: [[1.5, 0.23749999999999993]],
                   type: 'MultiPolygon',
+                  is3D: false,
                   vecBBox: [0.4375, 0.25, 0.75, 0.5625],
                 },
                 properties: {
@@ -1240,6 +1273,7 @@ describe('splitTile', () => {
                   ],
                   offset: [[1.6875, 0.9999999999999998]],
                   type: 'MultiPolygon',
+                  is3D: false,
                   vecBBox: [0.25, 0.4375, 0.5625, 0.75],
                 },
                 properties: {
@@ -1282,6 +1316,7 @@ describe('splitTile', () => {
                   ],
                   offset: [[0.6875, 0.5999999999999999]],
                   type: 'MultiPolygon',
+                  is3D: false,
                   vecBBox: [0.4375, 0.4375, 0.75, 0.75],
                 },
                 properties: {

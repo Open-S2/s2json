@@ -597,9 +597,10 @@ pub type Polygon3DGeometry = BaseGeometry<Polygon3D, PolygonMValues, BBox3D>;
 pub type MultiPolygon3DGeometry = BaseGeometry<MultiPolygon3D, MultiPolygonMValues, BBox3D>;
 
 /// Enum to represent specific vector geometry types as strings
-#[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Default)]
 pub enum VectorGeometryType {
     /// Point
+    #[default]
     Point,
     /// MultiPoint
     MultiPoint,
@@ -730,11 +731,14 @@ impl VectorGeometry {
 }
 
 /// BaseGeometry is the a generic geometry type
-#[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
 pub struct VectorBaseGeometry<G = VectorGeometry, O = VectorOffsets> {
     /// The geometry type
     #[serde(rename = "type")]
     pub _type: VectorGeometryType,
+    /// Specifies if the geometry is 3D or 2D
+    #[serde(rename = "is3D")]
+    pub is_3d: bool,
     /// The geometry shape
     pub coordinates: G,
     /// The geometry offsets if applicable
@@ -743,9 +747,13 @@ pub struct VectorBaseGeometry<G = VectorGeometry, O = VectorOffsets> {
     /// The BBox shape - always in lon-lat
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bbox: Option<BBox3D>,
-    /// temoporary bbox to track 0->1 clipping
+    /// temporary bbox to track 0->1 clipping
     #[serde(skip)]
     pub vec_bbox: Option<BBox3D>,
+    /// Polygon and MultiPolygon specific property
+    pub indices: Option<Vec<u32>>,
+    /// Polygon and MultiPolygon specific property
+    pub tesselation: Option<VectorPoint>,
 }
 
 /** All possible geometry offsets */

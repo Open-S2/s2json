@@ -12,6 +12,7 @@ test('toUnitScale - toLL - Point', () => {
     properties: { a: 1 },
     geometry: {
       type: 'Point',
+      is3D: true,
       coordinates: { x: 0, y: 0, z: 0, m: { b: 2 } },
     },
   };
@@ -22,6 +23,7 @@ test('toUnitScale - toLL - Point', () => {
     properties: { a: 1 },
     geometry: {
       type: 'Point',
+      is3D: true,
       vecBBox: [0.5, 0.5, 0.5, 0.5, 0, 0],
       coordinates: { x: 0.5, y: 0.5, z: 0, m: { b: 2 } },
     },
@@ -33,6 +35,7 @@ test('toUnitScale - toLL - Point', () => {
     properties: { a: 1 },
     geometry: {
       type: 'Point',
+      is3D: true,
       vecBBox: [0.5, 0.5, 0.5, 0.5, 0, 0],
       coordinates: { x: 0, y: 0, z: 0, m: { b: 2 } },
     },
@@ -45,6 +48,7 @@ test('toUnitScale - toLL - MultiPoint', () => {
     properties: { a: 1 },
     geometry: {
       type: 'MultiPoint',
+      is3D: true,
       coordinates: [
         { x: 0, y: 0, z: 0, m: { b: 2 } },
         { x: -180, y: -90, z: 0, m: { b: 3 } },
@@ -59,6 +63,7 @@ test('toUnitScale - toLL - MultiPoint', () => {
     properties: { a: 1 },
     geometry: {
       type: 'MultiPoint',
+      is3D: true,
       vecBBox: [0, 0, 1, 1, 0, 0],
       coordinates: [
         { x: 0.5, y: 0.5, z: 0, m: { b: 2 } },
@@ -74,6 +79,7 @@ test('toUnitScale - toLL - MultiPoint', () => {
     properties: { a: 1 },
     geometry: {
       type: 'MultiPoint',
+      is3D: true,
       vecBBox: [0, 0, 1, 1, 0, 0],
       coordinates: [
         { x: 0, y: 0, z: 0, m: { b: 2 } },
@@ -90,6 +96,7 @@ test('toUnitScale - toLL - LineString', () => {
     properties: { a: 1 },
     geometry: {
       type: 'LineString',
+      is3D: true,
       coordinates: [
         { x: 0, y: 0, z: 0, m: { b: 2 } },
         { x: -180, y: -90, z: 0, m: { b: 3 } },
@@ -104,6 +111,7 @@ test('toUnitScale - toLL - LineString', () => {
     properties: { a: 1 },
     geometry: {
       type: 'LineString',
+      is3D: true,
       vecBBox: [0, 0, 1, 1, 0, 0],
       coordinates: [
         { x: 0.5, y: 0.5, z: 0, m: { b: 2 } },
@@ -119,6 +127,7 @@ test('toUnitScale - toLL - LineString', () => {
     properties: { a: 1 },
     geometry: {
       type: 'LineString',
+      is3D: true,
       vecBBox: [0, 0, 1, 1, 0, 0],
       coordinates: [
         { x: 0, y: 0, z: 0, m: { b: 2 } },
@@ -135,6 +144,7 @@ test('toUnitScale - toLL - MultiLineString', () => {
     properties: { a: 1 },
     geometry: {
       type: 'MultiLineString',
+      is3D: true,
       coordinates: [
         [
           { x: 0, y: 0, z: 0, m: { b: 2 } },
@@ -156,6 +166,7 @@ test('toUnitScale - toLL - MultiLineString', () => {
     properties: { a: 1 },
     geometry: {
       type: 'MultiLineString',
+      is3D: true,
       vecBBox: [0, 0, 1, 1, 0, 0],
       coordinates: [
         [
@@ -178,6 +189,7 @@ test('toUnitScale - toLL - MultiLineString', () => {
     properties: { a: 1 },
     geometry: {
       type: 'MultiLineString',
+      is3D: true,
       vecBBox: [0, 0, 1, 1, 0, 0],
       coordinates: [
         [
@@ -201,6 +213,7 @@ test('toUnitScale - toLL - Polygon', () => {
     properties: { a: 1 },
     geometry: {
       type: 'Polygon',
+      is3D: true,
       coordinates: [
         [
           { x: 0, y: 0, z: 0, m: { b: 2 } },
@@ -222,6 +235,7 @@ test('toUnitScale - toLL - Polygon', () => {
     properties: { a: 1 },
     geometry: {
       type: 'Polygon',
+      is3D: true,
       vecBBox: [0, 0, 1, 1, 0, 0],
       coordinates: [
         [
@@ -244,6 +258,7 @@ test('toUnitScale - toLL - Polygon', () => {
     properties: { a: 1 },
     geometry: {
       type: 'Polygon',
+      is3D: true,
       vecBBox: [0, 0, 1, 1, 0, 0],
       coordinates: [
         [
@@ -267,6 +282,7 @@ test('toUnitScale - toLL - MultiPolygon', () => {
     properties: { a: 1 },
     geometry: {
       type: 'MultiPolygon',
+      is3D: true,
       coordinates: [
         [
           [
@@ -290,6 +306,7 @@ test('toUnitScale - toLL - MultiPolygon', () => {
     properties: { a: 1 },
     geometry: {
       type: 'MultiPolygon',
+      is3D: true,
       vecBBox: [0, 0, 1, 1, 0, 0],
       coordinates: [
         [
@@ -314,6 +331,7 @@ test('toUnitScale - toLL - MultiPolygon', () => {
     properties: { a: 1 },
     geometry: {
       type: 'MultiPolygon',
+      is3D: true,
       vecBBox: [0, 0, 1, 1, 0, 0],
       coordinates: [
         [
@@ -344,7 +362,7 @@ test('toVector - Point', () => {
   expect(toVector(point)).toEqual({
     type: 'VectorFeature',
     properties: { a: 1 },
-    geometry: { type: 'Point', coordinates: { x: 0, y: 0 } },
+    geometry: { type: 'Point', is3D: false, coordinates: { x: 0, y: 0 } },
   });
 });
 
@@ -359,7 +377,7 @@ test('toVector - Point3D', () => {
     id: 1,
     type: 'VectorFeature',
     properties: { a: 1 },
-    geometry: { type: 'Point', coordinates: { x: 1, y: 1, z: 1 } },
+    geometry: { type: 'Point', is3D: true, coordinates: { x: 1, y: 1, z: 1 } },
   });
 });
 
@@ -380,6 +398,7 @@ test('toVector - MultiPoint', () => {
     properties: { a: 1 },
     geometry: {
       type: 'MultiPoint',
+      is3D: false,
       coordinates: [
         { x: 0, y: 0 },
         { x: 1, y: 1 },
@@ -405,6 +424,7 @@ test('toVector - MultiPoint3D', () => {
     properties: { a: 1 },
     geometry: {
       type: 'MultiPoint',
+      is3D: true,
       coordinates: [
         { x: 0, y: 0, z: 0 },
         { x: 1, y: 1, z: 1 },
@@ -430,6 +450,7 @@ test('toVector - LineString', () => {
     properties: { a: 1 },
     geometry: {
       type: 'LineString',
+      is3D: false,
       coordinates: [
         { x: 0, y: 0 },
         { x: 1, y: 1 },
@@ -455,6 +476,7 @@ test('toVector - LineString3D', () => {
     properties: { a: 1 },
     geometry: {
       type: 'LineString',
+      is3D: true,
       coordinates: [
         { x: 0, y: 0, z: 0 },
         { x: 1, y: 1, z: 1 },
@@ -486,6 +508,7 @@ test('toVector - MultiLineString', () => {
     properties: { a: 1 },
     geometry: {
       type: 'MultiLineString',
+      is3D: false,
       coordinates: [
         [
           { x: 0, y: 0 },
@@ -523,6 +546,7 @@ test('toVector - MultiLineString3D', () => {
     properties: { a: 1 },
     geometry: {
       type: 'MultiLineString',
+      is3D: true,
       coordinates: [
         [
           { x: 0, y: 0, z: 0 },
@@ -560,6 +584,7 @@ test('toVector - Polygon', () => {
     properties: { a: 1 },
     geometry: {
       type: 'Polygon',
+      is3D: false,
       coordinates: [
         [
           { x: 0, y: 0 },
@@ -597,6 +622,7 @@ test('toVector - Polygon3D', () => {
     properties: { a: 1 },
     geometry: {
       type: 'Polygon',
+      is3D: true,
       coordinates: [
         [
           { x: 0, y: 0, z: 0 },
@@ -636,6 +662,7 @@ test('toVector - MultiPolygon', () => {
     properties: { a: 1 },
     geometry: {
       type: 'MultiPolygon',
+      is3D: false,
       coordinates: [
         [
           [
@@ -677,6 +704,7 @@ test('toVector - MultiPolygon3D', () => {
     properties: { a: 1 },
     geometry: {
       type: 'MultiPolygon',
+      is3D: true,
       coordinates: [
         [
           [
@@ -715,6 +743,7 @@ test('toS2 - Point', () => {
     properties: { a: 1 },
     geometry: {
       type: 'Point',
+      is3D: false,
       coordinates: { x: 0, y: 0 },
     },
   };
@@ -726,6 +755,7 @@ test('toS2 - Point', () => {
       properties: { a: 1 },
       geometry: {
         type: 'Point',
+        is3D: false,
         coordinates: { x: 0.5, y: 0.5 },
         vecBBox: [0.5, 0.5, 0.5, 0.5],
       },
@@ -740,6 +770,7 @@ test('toS2 - MultiPoint', () => {
     properties: { a: 1 },
     geometry: {
       type: 'MultiPoint',
+      is3D: false,
       coordinates: [
         { x: 0, y: 0 },
         { x: -180, y: -90 },
@@ -755,6 +786,7 @@ test('toS2 - MultiPoint', () => {
       properties: { a: 1 },
       geometry: {
         type: 'Point',
+        is3D: false,
         coordinates: { x: 0.5, y: 0.5 },
         vecBBox: [0.5, 0.5, 0.5, 0.5],
       },
@@ -766,6 +798,7 @@ test('toS2 - MultiPoint', () => {
       properties: { a: 1 },
       geometry: {
         type: 'Point',
+        is3D: false,
         coordinates: { x: 0.5, y: 0.5 },
         vecBBox: [0.5, 0.5, 0.5, 0.5],
       },
@@ -777,6 +810,7 @@ test('toS2 - MultiPoint', () => {
       properties: { a: 1 },
       geometry: {
         type: 'Point',
+        is3D: false,
         coordinates: { x: 0.5, y: 0.5 },
         vecBBox: [0.5, 0.5, 0.5, 0.5],
       },
@@ -791,6 +825,7 @@ test('toS2 - LineString', () => {
     properties: { a: 1 },
     geometry: {
       type: 'LineString',
+      is3D: false,
       coordinates: [
         { x: 0, y: 0 },
         { x: 20, y: 20 },
@@ -804,6 +839,7 @@ test('toS2 - LineString', () => {
     {
       face: 0,
       geometry: {
+        is3D: false,
         coordinates: [
           { x: 0.5, y: 0.5 },
           { x: 0.7231719544476624, y: 0.7351848576118168 },
@@ -821,6 +857,7 @@ test('toS2 - LineString', () => {
     {
       face: 2,
       geometry: {
+        is3D: false,
         coordinates: [
           { x: -0.0625, y: 0.17012925937810885 },
           { x: 0.033200039883945376, y: 0.091961822201713 },
@@ -842,6 +879,7 @@ test('toS2 - MultiLineString', () => {
     type: 'VectorFeature',
     properties: { a: 1 },
     geometry: {
+      is3D: false,
       type: 'MultiLineString',
       coordinates: [
         [
@@ -864,6 +902,7 @@ test('toS2 - MultiLineString', () => {
     {
       face: 0,
       geometry: {
+        is3D: false,
         coordinates: [
           { x: 0.5, y: 0.5 },
           { x: 0.7231719544476624, y: 0.7351848576118168 },
@@ -881,6 +920,7 @@ test('toS2 - MultiLineString', () => {
     {
       face: 2,
       geometry: {
+        is3D: false,
         coordinates: [
           { x: -0.0625, y: 0.17012925937810885 },
           { x: 0.033200039883945376, y: 0.091961822201713 },
@@ -896,6 +936,7 @@ test('toS2 - MultiLineString', () => {
     {
       face: 4,
       geometry: {
+        is3D: false,
         coordinates: [
           { x: 0.8660254037844386, y: 0.17355417485946534 },
           { x: 1.0332000398839454, y: 0.0919618222017129 },
@@ -912,6 +953,7 @@ test('toS2 - MultiLineString', () => {
     {
       face: 5,
       geometry: {
+        is3D: false,
         coordinates: [
           { x: -0.0625, y: 0.13866981323286479 },
           { x: 0.033200039883945376, y: 0.0919618222017129 },
@@ -935,6 +977,7 @@ test('toS2 - Polygon', () => {
     type: 'VectorFeature',
     properties: { a: 1 },
     geometry: {
+      is3D: false,
       type: 'Polygon',
       coordinates: [
         [
@@ -967,6 +1010,7 @@ test('toS2 - Polygon', () => {
     {
       face: 0,
       geometry: {
+        is3D: false,
         coordinates: [
           [
             { x: 0.5, y: 0.5 },
@@ -1003,6 +1047,7 @@ test('toS2 - Polygon', () => {
     {
       face: 2,
       geometry: {
+        is3D: false,
         coordinates: [
           [
             { x: -0.0625, y: 0.19165525141383033 },
@@ -1028,6 +1073,7 @@ test('toS2 - MultiPolygon', () => {
     type: 'VectorFeature',
     properties: { a: 1 },
     geometry: {
+      is3D: false,
       type: 'MultiPolygon',
       coordinates: [
         [
@@ -1062,6 +1108,7 @@ test('toS2 - MultiPolygon', () => {
     {
       face: 0,
       geometry: {
+        is3D: false,
         coordinates: [
           [
             { x: 0.5, y: 0.5 },
@@ -1109,6 +1156,7 @@ test('toS2 - MultiPolygon', () => {
         offset: [1.7505894300567113],
         vecBBox: [-0.0625, 0.091961822201713, 0.033200039883945376, 0.19165525141383033],
         type: 'Polygon',
+        is3D: false,
       },
       id: 1337,
       properties: { a: 1 },

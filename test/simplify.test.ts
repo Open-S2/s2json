@@ -13,6 +13,7 @@ const SIMPLIFY_MAXZOOM = 16;
 test('LineString', () => {
   const lineString: VectorLineStringGeometry = {
     type: 'LineString',
+    is3D: false,
     coordinates: [
       { x: 0.25, y: 0.25 },
       { x: 0.75, y: 0.25 },
@@ -26,6 +27,7 @@ test('LineString', () => {
 
   expect(lineString).toEqual({
     type: 'LineString',
+    is3D: false,
     coordinates: [
       { x: 0.25, y: 0.25, t: 1 },
       { x: 0.75, y: 0.25, t: 0.125 },
@@ -38,6 +40,7 @@ test('LineString', () => {
   simplify(lineString, 3, 0, SIMPLIFY_MAXZOOM);
   expect(lineString).toEqual({
     type: 'LineString',
+    is3D: false,
     coordinates: [
       { x: 0.25, y: 0.25, t: 1 },
       { x: 0.75, y: 0.25, t: 0.125 },
@@ -51,6 +54,7 @@ test('LineString', () => {
 test('MultiLineString', () => {
   const multiLineString: VectorMultiLineStringGeometry = {
     type: 'MultiLineString',
+    is3D: false,
     coordinates: [
       [
         { x: 0.25, y: 0.25 },
@@ -73,6 +77,7 @@ test('MultiLineString', () => {
 
   expect(multiLineString).toEqual({
     type: 'MultiLineString',
+    is3D: false,
     coordinates: [
       [
         { x: 0.25, y: 0.25, t: 1 },
@@ -94,6 +99,7 @@ test('MultiLineString', () => {
   simplify(multiLineString, 3, 0, SIMPLIFY_MAXZOOM);
   expect(multiLineString).toEqual({
     type: 'MultiLineString',
+    is3D: false,
     coordinates: [
       [
         { x: 0.25, y: 0.25, t: 1 },
@@ -116,6 +122,7 @@ test('MultiLineString', () => {
 test('Polygon', () => {
   const polygon: VectorPolygonGeometry = {
     type: 'Polygon',
+    is3D: false,
     coordinates: [
       [
         { x: 0.25, y: 0.25 },
@@ -138,6 +145,7 @@ test('Polygon', () => {
 
   expect(polygon).toEqual({
     type: 'Polygon',
+    is3D: false,
     coordinates: [
       [
         { x: 0.25, y: 0.25, t: 1 },
@@ -159,6 +167,7 @@ test('Polygon', () => {
   simplify(polygon, 3, 0, SIMPLIFY_MAXZOOM);
   expect(polygon).toEqual({
     type: 'Polygon',
+    is3D: false,
     coordinates: [
       [
         { x: 0.25, y: 0.25, t: 1 },
@@ -181,6 +190,7 @@ test('Polygon', () => {
 test('MultiPolygon', () => {
   const multiPolygon: VectorMultiPolygonGeometry = {
     type: 'MultiPolygon',
+    is3D: false,
     coordinates: [
       [
         [
@@ -205,6 +215,7 @@ test('MultiPolygon', () => {
 
   expect(multiPolygon).toEqual({
     type: 'MultiPolygon',
+    is3D: false,
     coordinates: [
       [
         [
@@ -228,6 +239,7 @@ test('MultiPolygon', () => {
   simplify(multiPolygon, 3, 0, SIMPLIFY_MAXZOOM);
   expect(multiPolygon).toEqual({
     type: 'MultiPolygon',
+    is3D: false,
     coordinates: [
       [
         [

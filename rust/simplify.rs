@@ -2,6 +2,8 @@ use crate::{VectorGeometry, VectorLineString, VectorPoint};
 
 use libm::pow;
 
+use alloc::vec;
+
 impl VectorGeometry {
     /// Build sqdistances for a vector geometry
     pub fn build_sq_dists(&mut self, tolerance: f64, maxzoom: Option<u8>) {

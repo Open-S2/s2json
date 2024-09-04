@@ -12,6 +12,7 @@ pub fn convert<M: Clone>(
     data: &JSONCollection<M>,
     tolerance: Option<f64>,
     maxzoom: Option<u8>,
+    build_bbox: Option<bool>,
 ) -> Vec<VectorFeature<M>> {
     let mut res: Vec<VectorFeature<M>> = vec![];
 
@@ -20,7 +21,9 @@ pub fn convert<M: Clone>(
             for feature in &feature_collection.features {
                 match &feature {
                     WMFeature::Feature(feature) => {
-                        res.extend(convert_feature(projection, feature, tolerance, maxzoom));
+                        res.extend(convert_feature(
+                            projection, feature, tolerance, maxzoom, build_bbox,
+                        ));
                     }
                     WMFeature::VectorFeature(feature) => {
                         res.extend(convert_vector_feature(projection, feature, tolerance, maxzoom))
@@ -34,7 +37,7 @@ pub fn convert<M: Clone>(
             }
         }
         JSONCollection::Feature(feature) => {
-            res.extend(convert_feature(projection, feature, tolerance, maxzoom));
+            res.extend(convert_feature(projection, feature, tolerance, maxzoom, build_bbox));
         }
         JSONCollection::VectorFeature(feature) => {
             res.extend(convert_vector_feature(projection, feature, tolerance, maxzoom));
@@ -50,8 +53,9 @@ fn convert_feature<M: Clone>(
     data: &Feature<M>,
     tolerance: Option<f64>,
     maxzoom: Option<u8>,
+    build_bbox: Option<bool>,
 ) -> Vec<VectorFeature<M>> {
-    let mut vf: VectorFeature<M> = Feature::<M>::to_vector(data);
+    let mut vf: VectorFeature<M> = Feature::<M>::to_vector(data, build_bbox);
     match projection {
         Projection::S2 => vf.to_s2(tolerance, maxzoom),
         Projection::WM => {

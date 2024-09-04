@@ -15,6 +15,7 @@ import type {
  * @param data - the data to convert
  * @param tolerance - optionally specify a tolerance to prepare for future simplification
  * @param maxzoom - optionally specify a maxzoom to prepare for future simplification
+ * @param buildBBox - optional - build a bbox for the feature if desired
  * @returns - the converted data
  */
 export function convert(
@@ -22,17 +23,18 @@ export function convert(
   data: JSONCollection,
   tolerance?: number,
   maxzoom?: number,
+  buildBBox?: boolean,
 ): VectorFeatures[] {
   const res: VectorFeatures[] = [];
 
   if (data.type === 'Feature') {
-    res.push(...convertFeature(projection, data, tolerance, maxzoom));
+    res.push(...convertFeature(projection, data, tolerance, maxzoom, buildBBox));
   } else if (data.type === 'VectorFeature') {
     res.push(...convertVectorFeature(projection, data, tolerance, maxzoom));
   } else if (data.type === 'FeatureCollection') {
     for (const feature of data.features) {
       if (feature.type === 'Feature')
-        res.push(...convertFeature(projection, feature, tolerance, maxzoom));
+        res.push(...convertFeature(projection, feature, tolerance, maxzoom, buildBBox));
       else res.push(...convertVectorFeature(projection, feature, tolerance, maxzoom));
     }
   } else if (data.type === 'S2Feature') {
@@ -51,6 +53,7 @@ export function convert(
  * @param data - input feature data
  * @param tolerance - optionally specify a tolerance to prepare for future simplification
  * @param maxzoom - optionally specify a maxzoom to prepare for future simplification
+ * @param buildBBox - optional - build a bbox for the feature if desired
  * @returns - converted feature
  */
 function convertFeature(
@@ -58,13 +61,14 @@ function convertFeature(
   data: Feature,
   tolerance?: number,
   maxzoom?: number,
+  buildBBox?: boolean,
 ): VectorFeatures[] {
   if (projection === 'WM') {
-    const vf = toVector(data);
+    const vf = toVector(data, buildBBox);
     toUnitScale(vf, tolerance, maxzoom);
     return [vf];
   } else {
-    return toS2(data, tolerance, maxzoom);
+    return toS2(data, tolerance, maxzoom, buildBBox);
   }
 }
 

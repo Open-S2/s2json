@@ -138,6 +138,7 @@ describe('vector feature', () => {
       type: 'VectorFeature',
       geometry: {
         type: 'Point',
+        is3D: false,
         coordinates: { x: -75.165222, y: 39.952583 },
       },
       properties: {},
@@ -149,6 +150,7 @@ describe('vector feature', () => {
       type: 'VectorFeature',
       geometry: {
         type: 'Point',
+        is3D: false,
         coordinates: { x: -75.165222, y: 39.952583, m: { a: 1 } },
         bbox: [-75.165222, 39.952583, -75.165222, 39.952583],
       },
@@ -163,6 +165,7 @@ describe('vector feature', () => {
       type: 'VectorFeature',
       geometry: {
         type: 'Point',
+        is3D: false,
         coordinates: { x: -75.165222, y: 39.952583 },
       },
       properties: {},
@@ -174,6 +177,7 @@ describe('vector feature', () => {
       type: 'VectorFeature',
       geometry: {
         type: 'Point',
+        is3D: false,
         coordinates: { x: -75.165222, y: 39.952583 },
       },
     };
@@ -190,6 +194,7 @@ describe('vector feature', () => {
     const noType: VectorFeature = {
       geometry: {
         type: 'Point',
+        is3D: false,
         coordinates: { x: -75.165222, y: 39.952583 },
       },
       properties: {},
@@ -201,6 +206,7 @@ describe('vector feature', () => {
       type: 'Point',
       geometry: {
         type: 'Point',
+        is3D: false,
         coordinates: { x: -75.165222, y: 39.952583 },
       },
       properties: {},
@@ -261,6 +267,7 @@ describe('s2 feature', () => {
       face: 0,
       geometry: {
         type: 'Point',
+        is3D: false,
         coordinates: { x: -75.165222, y: 39.952583 },
       },
       properties: {},
@@ -273,6 +280,7 @@ describe('s2 feature', () => {
       type: 'S2Feature',
       geometry: {
         type: 'Point',
+        is3D: false,
         coordinates: { x: -75.165222, y: 39.952583, m: { a: 1 } },
         bbox: [-75.165222, 39.952583, -75.165222, 39.952583],
       },
@@ -289,6 +297,7 @@ describe('s2 feature', () => {
       type: 'S2Feature',
       geometry: {
         type: 'Point',
+        is3D: false,
         coordinates: { x: -75.165222, y: 39.952583 },
       },
       properties: {},
@@ -300,6 +309,7 @@ describe('s2 feature', () => {
       type: 'S2Feature',
       geometry: {
         type: 'Point',
+        is3D: false,
         coordinates: { x: -75.165222, y: 39.952583 },
       },
     };
@@ -316,6 +326,7 @@ describe('s2 feature', () => {
     const noType: S2Feature = {
       geometry: {
         type: 'Point',
+        is3D: false,
         coordinates: { x: -75.165222, y: 39.952583 },
       },
       properties: {},
@@ -327,6 +338,7 @@ describe('s2 feature', () => {
       type: 'Point',
       geometry: {
         type: 'Point',
+        is3D: false,
         coordinates: { x: -75.165222, y: 39.952583 },
       },
       properties: {},
@@ -359,6 +371,7 @@ describe('s2 feature', () => {
       type: 'S2Feature',
       geometry: {
         type: 'Point',
+        is3D: false,
         coordinates: { x: -75.165222, y: 39.952583 },
         // @ts-expect-error - bad bounding box
         bbox: [-75.165222, 39.952583, -75.165222, 39.952583, -75.165222],
@@ -372,6 +385,7 @@ describe('s2 feature', () => {
       face: 0,
       geometry: {
         type: 'Point',
+        is3D: false,
         // @ts-expect-error - bad m-value
         coordinates: { x: -75.165222, y: 39.952583, m: [{ a: 1 }] },
       },
@@ -386,6 +400,7 @@ describe('s2 feature', () => {
       type: 'S2Feature',
       geometry: {
         type: 'Point',
+        is3D: false,
         coordinates: { x: -75.165222, y: 39.952583 },
       },
       properties: {},

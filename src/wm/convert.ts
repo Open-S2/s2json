@@ -32,16 +32,19 @@ import type {
  * @param data - GeoJSON Feature
  * @param tolerance - optional tolerance
  * @param maxzoom - optional maxzoom
+ * @param buildBBox - optional - build a bbox for the feature if desired
  * @returns - S2Feature
  */
 export function toS2(
   data: Feature | VectorFeature,
   tolerance?: number,
   maxzoom?: number,
+  buildBBox?: boolean,
 ): S2Feature[] {
   const { id, properties, metadata } = data;
   const res: S2Feature[] = [];
-  const vectorGeo = data.type === 'VectorFeature' ? data.geometry : convertGeometry(data.geometry);
+  const vectorGeo =
+    data.type === 'VectorFeature' ? data.geometry : convertGeometry(data.geometry, buildBBox);
   for (const { geometry, face } of convertVectorGeometry(vectorGeo, tolerance, maxzoom)) {
     res.push({
       id,
@@ -59,11 +62,12 @@ export function toS2(
 /**
  * Convert a GeoJSON Feature to a GeoJSON Vector Feature
  * @param data - GeoJSON Feature
+ * @param buildBBox - optional - build a bbox for the feature if desired
  * @returns - GeoJson Vector Feature
  */
-export function toVector(data: Feature): VectorFeature {
+export function toVector(data: Feature, buildBBox?: boolean): VectorFeature {
   const { id, properties, metadata } = data;
-  const vectorGeo = convertGeometry(data.geometry);
+  const vectorGeo = convertGeometry(data.geometry, buildBBox);
   return {
     id,
     type: 'VectorFeature',
@@ -77,43 +81,55 @@ export function toVector(data: Feature): VectorFeature {
  * Mutate a GeoJSON Point to a GeoJson Vector Point
  * @param point - GeoJSON flat Point
  * @param m - optional m-value
+ * @param bbox - if bbox is provided, we will extend the bbox
  * @returns - GeoJson Vector Point
  */
-function convertPoint(point: Point | Point3D, m?: MValue): VectorPoint {
-  return { x: point[0], y: point[1], z: point[2], m };
+function convertPoint(point: Point | Point3D, m?: MValue, bbox?: BBOX): VectorPoint {
+  const newPoint: VectorPoint = { x: point[0], y: point[1], z: point[2], m };
+  if (bbox !== undefined) {
+    const newBBox = extendBBox(bbox, newPoint);
+    for (let i = 0; i < newBBox.length; i++) bbox[i] = newBBox[i];
+  }
+  return newPoint;
 }
 
 /**
  * Convert a GeoJSON Geometry to an Vector Geometry
  * @param geometry - GeoJSON Geometry
+ * @param buildBBox - optional - build a bbox for the feature if desired
  * @returns - GeoJson Vector Geometry
  */
-function convertGeometry(geometry: Geometry): VectorGeometry {
+function convertGeometry(geometry: Geometry, buildBBox?: boolean): VectorGeometry {
   const { type, coordinates: coords, mValues, bbox } = geometry;
+  const newBBox: BBOX | undefined =
+    buildBBox && bbox === undefined ? ([] as unknown as BBOX) : undefined;
 
   let coordinates: VectorCoordinates;
-  if (type === 'Point' || type === 'Point3D') coordinates = convertPoint(coords, mValues);
+  if (type === 'Point' || type === 'Point3D') coordinates = convertPoint(coords, mValues, newBBox);
   else if (type === 'MultiPoint' || type === 'MultiPoint3D')
-    coordinates = coords.map((point, i) => convertPoint(point, mValues?.[i]));
+    coordinates = coords.map((point, i) => convertPoint(point, mValues?.[i], newBBox));
   else if (type === 'LineString' || type === 'LineString3D')
-    coordinates = coords.map((point, i) => convertPoint(point, mValues?.[i]));
+    coordinates = coords.map((point, i) => convertPoint(point, mValues?.[i], newBBox));
   else if (type === 'MultiLineString' || type === 'MultiLineString3D')
     coordinates = coords.map((line, i) =>
-      line.map((point, j) => convertPoint(point, mValues?.[i]?.[j])),
+      line.map((point, j) => convertPoint(point, mValues?.[i]?.[j], newBBox)),
     );
   else if (type === 'Polygon' || type === 'Polygon3D')
     coordinates = coords.map((line, i) =>
-      line.map((point, j) => convertPoint(point, mValues?.[i]?.[j])),
+      line.map((point, j) => convertPoint(point, mValues?.[i]?.[j], newBBox)),
     );
   else if (type === 'MultiPolygon' || type === 'MultiPolygon3D')
     coordinates = coords.map((polygon, i) =>
-      polygon.map((line, j) => line.map((point, k) => convertPoint(point, mValues?.[i]?.[j]?.[k]))),
+      polygon.map((line, j) =>
+        line.map((point, k) => convertPoint(point, mValues?.[i]?.[j]?.[k], newBBox)),
+      ),
     );
   else {
     throw new Error('Invalid GeoJSON type');
   }
-  /// @ts-expect-error - coordinates complains, but the way this is all written is simpler
-  return { type: type.replace('3D', ''), coordinates, bbox };
+  const is3D = type.slice(-2) === '3D';
+  // @ts-expect-error - coordinates complains, but the way this is all written is simpler
+  return { type: type.replace('3D', ''), is3D, coordinates, bbox: newBBox ?? bbox };
 }
 
 /** The resultant geometry after conversion */
@@ -152,11 +168,11 @@ function convertVectorGeometry(
  * @returns - S2 PointGeometry
  */
 function convertGeometryPoint(geometry: VectorPointGeometry): ConvertedGeometry {
-  const { type, coordinates, bbox } = geometry;
+  const { type, is3D, coordinates, bbox } = geometry;
   const { x: lon, y: lat, z, m } = coordinates;
   const [face, s, t] = toST(fromLonLat(lon, lat));
   const vecBBox = fromPoint({ x: s, y: t, z });
-  return [{ face, geometry: { type, coordinates: { x: s, y: t, z, m }, bbox, vecBBox } }];
+  return [{ face, geometry: { type, is3D, coordinates: { x: s, y: t, z, m }, bbox, vecBBox } }];
 }
 
 /**
@@ -164,9 +180,9 @@ function convertGeometryPoint(geometry: VectorPointGeometry): ConvertedGeometry 
  * @returns - S2 PointGeometry
  */
 function convertGeometryMultiPoint(geometry: VectorMultiPointGeometry): ConvertedGeometry {
-  const { coordinates, bbox } = geometry;
+  const { is3D, coordinates, bbox } = geometry;
   return coordinates.flatMap((coordinates) =>
-    convertGeometryPoint({ type: 'Point', coordinates, bbox }),
+    convertGeometryPoint({ type: 'Point', is3D, coordinates, bbox }),
   );
 }
 
@@ -175,10 +191,10 @@ function convertGeometryMultiPoint(geometry: VectorMultiPointGeometry): Converte
  * @returns - S2 LineStringGeometry
  */
 function convertGeometryLineString(geometry: VectorLineStringGeometry): ConvertedGeometry {
-  const { type, coordinates, bbox } = geometry;
+  const { type, is3D, coordinates, bbox } = geometry;
 
   return convertLineString(coordinates, false).map(({ face, line, offset, vecBBox }) => {
-    return { face, geometry: { type, coordinates: line, bbox, offset, vecBBox } };
+    return { face, geometry: { type, is3D, coordinates: line, bbox, offset, vecBBox } };
   });
 }
 
@@ -189,12 +205,12 @@ function convertGeometryLineString(geometry: VectorLineStringGeometry): Converte
 function convertGeometryMultiLineString(
   geometry: VectorMultiLineStringGeometry,
 ): ConvertedGeometry {
-  const { coordinates, bbox } = geometry;
+  const { coordinates, is3D, bbox } = geometry;
   return coordinates
     .flatMap((line) => convertLineString(line, false))
     .map(({ face, line, offset, vecBBox }) => ({
       face,
-      geometry: { type: 'LineString', coordinates: line, bbox, offset, vecBBox },
+      geometry: { type: 'LineString', is3D, coordinates: line, bbox, offset, vecBBox },
     }));
 }
 
@@ -203,7 +219,7 @@ function convertGeometryMultiLineString(
  * @returns - S2 PolygonGeometry
  */
 function convertGeometryPolygon(geometry: VectorPolygonGeometry): ConvertedGeometry {
-  const { type, coordinates, bbox } = geometry;
+  const { type, is3D, coordinates, bbox } = geometry;
   const res: ConvertedGeometry = [];
 
   // conver all lines
@@ -224,7 +240,14 @@ function convertGeometryPolygon(geometry: VectorPolygonGeometry): ConvertedGeome
 
     res.push({
       face,
-      geometry: { type, coordinates: polygon, bbox, offset: polygonOffsets, vecBBox: polyBBox },
+      geometry: {
+        type,
+        coordinates: polygon,
+        is3D,
+        bbox,
+        offset: polygonOffsets,
+        vecBBox: polyBBox,
+      },
     });
   }
 
@@ -236,9 +259,15 @@ function convertGeometryPolygon(geometry: VectorPolygonGeometry): ConvertedGeome
  * @returns - S2 MultiPolygonGeometry
  */
 function convertGeometryMultiPolygon(geometry: VectorMultiPolygonGeometry): ConvertedGeometry {
-  const { coordinates, bbox, offset } = geometry;
+  const { is3D, coordinates, bbox, offset } = geometry;
   return coordinates.flatMap((polygon, i) =>
-    convertGeometryPolygon({ type: 'Polygon', coordinates: polygon, bbox, offset: offset?.[i] }),
+    convertGeometryPolygon({
+      type: 'Polygon',
+      is3D,
+      coordinates: polygon,
+      bbox,
+      offset: offset?.[i],
+    }),
   );
 }
 

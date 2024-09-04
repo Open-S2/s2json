@@ -1,5 +1,6 @@
 use alloc::collections::{BTreeMap, BTreeSet};
 use alloc::string::String;
+use alloc::string::ToString;
 use alloc::vec;
 use alloc::vec::Vec;
 
@@ -163,6 +164,7 @@ impl<M: HasLayer + Clone> TileStore<M> {
             &data,
             Some(tile_store.tolerance),
             Some(tile_store.maxzoom),
+            None,
         );
         features.into_iter().for_each(|feature| tile_store.add_feature(feature));
         for i in 0..6 {

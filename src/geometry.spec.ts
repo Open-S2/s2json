@@ -253,6 +253,7 @@ export interface VectorBaseGeometry<
 > {
   type: T;
   coordinates: C;
+  is3D: boolean;
   offset?: O;
   // always a [lon-min, lat-min, lon-max, lat-max] regardless of projection.
   // Used for visualization tools
@@ -301,16 +302,14 @@ export type VectorMultiLineStringGeometry = VectorBaseGeometry<
   BBOX
 >;
 /** PolygonGeometry is a polygon with potential holes */
-export type VectorPolygonGeometry = VectorBaseGeometry<
-  'Polygon',
-  VectorPolygon,
-  VectorPolygonOffset,
-  BBOX
->;
+export interface VectorPolygonGeometry
+  extends VectorBaseGeometry<'Polygon', VectorPolygon, VectorPolygonOffset, BBOX> {
+  indices?: number[];
+  tesselation?: VectorPoint[];
+}
 /** MultiPolygonGeometry is a polygon with multiple polygons with their own potential holes */
-export type VectorMultiPolygonGeometry = VectorBaseGeometry<
-  'MultiPolygon',
-  VectorMultiPolygon,
-  VectorMultiPolygonOffset,
-  BBOX
->;
+export interface VectorMultiPolygonGeometry
+  extends VectorBaseGeometry<'MultiPolygon', VectorMultiPolygon, VectorMultiPolygonOffset, BBOX> {
+  indices?: number[];
+  tesselation?: VectorPoint[];
+}

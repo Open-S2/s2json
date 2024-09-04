@@ -138,9 +138,10 @@ export function clipPoint(
   k1: number,
   k2: number,
 ): VectorPointGeometry | undefined {
-  const { type, coordinates, bbox, vecBBox } = geometry;
+  const { type, is3D, coordinates, bbox, vecBBox } = geometry;
   const value = axis === 0 ? coordinates.x : coordinates.y;
-  if (value >= k1 && value < k2) return { type, coordinates: { ...coordinates }, bbox, vecBBox };
+  if (value >= k1 && value < k2)
+    return { type, is3D, coordinates: { ...coordinates }, bbox, vecBBox };
 }
 
 /**
@@ -156,7 +157,7 @@ function clipMultiPoint(
   k1: number,
   k2: number,
 ): VectorMultiPointGeometry | undefined {
-  const { type, coordinates, bbox } = geometry;
+  const { type, is3D, coordinates, bbox } = geometry;
   let vecBBox: BBOX | undefined = undefined;
   const points = coordinates
     .filter((point) => {
@@ -166,7 +167,7 @@ function clipMultiPoint(
     .map((p) => ({ ...p }));
   points.forEach((p) => (vecBBox = extendBBox(vecBBox, p)));
 
-  if (points.length > 0) return { type, coordinates: points, bbox, vecBBox };
+  if (points.length > 0) return { type, is3D, coordinates: points, bbox, vecBBox };
 }
 
 /**
@@ -182,7 +183,7 @@ function clipLineString(
   k1: number,
   k2: number,
 ): VectorMultiLineStringGeometry | undefined {
-  const { coordinates: line, bbox, vecBBox } = geometry;
+  const { is3D, coordinates: line, bbox, vecBBox } = geometry;
   const initO = geometry.offset ?? 0;
   const newOffsets: VectorMultiLineOffset = [];
   const newLines: VectorLineString[] = [];
@@ -191,7 +192,14 @@ function clipLineString(
     newLines.push(clip.line);
   }
   if (newLines.length === 0) return undefined;
-  return { type: 'MultiLineString', coordinates: newLines, bbox, offset: newOffsets, vecBBox };
+  return {
+    type: 'MultiLineString',
+    is3D,
+    coordinates: newLines,
+    bbox,
+    offset: newOffsets,
+    vecBBox,
+  };
 }
 
 /**
@@ -209,7 +217,7 @@ function clipMultiLineString(
   k2: number,
   isPolygon = false,
 ): VectorMultiLineStringGeometry | VectorPolygonGeometry | undefined {
-  const { coordinates, bbox, vecBBox } = geometry;
+  const { is3D, coordinates, bbox, vecBBox } = geometry;
   const initO = geometry.offset ?? coordinates.map((_) => 0);
   const newOffsets: VectorMultiLineOffset = [];
   const newLines: VectorLineString[] = [];
@@ -222,6 +230,7 @@ function clipMultiLineString(
   if (newLines.length === 0 || (isPolygon && newLines[0].length === 0)) return undefined;
   return {
     type: isPolygon ? 'Polygon' : 'MultiLineString',
+    is3D,
     coordinates: newLines,
     bbox,
     offset: newOffsets,
@@ -258,13 +267,13 @@ function clipMultiPolygon(
   k1: number,
   k2: number,
 ): VectorMultiPolygonGeometry | undefined {
-  const { coordinates, bbox, vecBBox } = geometry;
+  const { is3D, coordinates, bbox, vecBBox } = geometry;
   const initO = geometry.offset ?? coordinates.map((l) => l.map(() => 0));
   const newCoordinates: VectorPolygon[] = [];
   const newOffsets: VectorMultiPolygonOffset = [];
   coordinates.forEach((polygon, p) => {
     const newPolygon = clipPolygon(
-      { type: 'Polygon', coordinates: polygon, bbox, offset: initO[p] },
+      { type: 'Polygon', is3D, coordinates: polygon, bbox, offset: initO[p] },
       axis,
       k1,
       k2,
@@ -275,7 +284,14 @@ function clipMultiPolygon(
     }
   });
   if (newCoordinates.length === 0) return undefined;
-  return { type: 'MultiPolygon', coordinates: newCoordinates, bbox, vecBBox, offset: newOffsets };
+  return {
+    type: 'MultiPolygon',
+    is3D,
+    coordinates: newCoordinates,
+    bbox,
+    vecBBox,
+    offset: newOffsets,
+  };
 }
 
 /**

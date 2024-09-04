@@ -60,10 +60,10 @@ export function extendBBox(bbox: BBOX | undefined, point: VectorPoint): BBOX {
  */
 export function mergeBBoxes(b1: BBOX, b2: BBOX): BBOX {
   const { min, max } = Math;
-  b1[0] = min(b1[0], b2[0]);
-  b1[1] = min(b1[1], b2[1]);
-  b1[2] = max(b1[2], b2[2]);
-  b1[3] = max(b1[3], b2[3]);
+  b1[0] = min(b1[0] ?? b2[0], b2[0]);
+  b1[1] = min(b1[1] ?? b2[1], b2[1]);
+  b1[2] = max(b1[2] ?? b2[2], b2[2]);
+  b1[3] = max(b1[3] ?? b2[3], b2[3]);
   if (b1.length > 4 || b2.length > 4) {
     b1[4] = min(b1[4] ?? 0, b2[4] ?? 0);
     b1[5] = max(b1[5] ?? 0, b2[5] ?? 0);

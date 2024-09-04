@@ -2,3 +2,4 @@
 
 [ ] - Write more tests coverage to ensure validation is working as expected
 [ ] - update the spec to include vectored data and a Tile concept
+[ ] - add a "addBBox" to a conversion so user can add a bounding box if desired

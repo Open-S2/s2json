@@ -12,6 +12,7 @@ describe('toWM', () => {
       properties: { name: 'test' },
       geometry: {
         type: 'Point',
+        is3D: false,
         coordinates: { x: 0.5, y: 0.5, m: { a: 0.5 } },
         bbox: [0, 0, 0.5, 1],
       },
@@ -23,6 +24,7 @@ describe('toWM', () => {
       properties: { name: 'test' },
       geometry: {
         type: 'Point',
+        is3D: false,
         coordinates: { x: 0, y: 0, m: { a: 0.5 } },
         bbox: [0, 0, 0.5, 1],
       },
@@ -57,6 +59,7 @@ describe('toWM', () => {
       properties: { name: 'test' },
       geometry: {
         type: 'MultiPoint',
+        is3D: false,
         coordinates: [
           { x: 0.5, y: 0.5, m: { a: 0.5 } },
           { x: 1.0, y: 1.0, m: { a: 2.5 } },
@@ -71,6 +74,7 @@ describe('toWM', () => {
       properties: { name: 'test' },
       geometry: {
         type: 'MultiPoint',
+        is3D: false,
         coordinates: [
           { x: 0, y: 0, m: { a: 0.5 } },
           { x: 45, y: 35.264389682754654, m: { a: 2.5 } },
@@ -89,6 +93,7 @@ describe('toWM', () => {
       properties: { name: 'test' },
       geometry: {
         type: 'LineString',
+        is3D: false,
         coordinates: [
           { x: 0.5, y: 0.5, m: { a: 0.5 } },
           { x: 1.0, y: 1.0, m: { a: 2.5 } },
@@ -104,6 +109,7 @@ describe('toWM', () => {
       properties: { name: 'test' },
       geometry: {
         type: 'LineString',
+        is3D: false,
         coordinates: [
           { x: 0, y: 0, m: { a: 0.5 } },
           { x: 45, y: 35.264389682754654, m: { a: 2.5 } },
@@ -123,6 +129,7 @@ describe('toWM', () => {
       properties: { name: 'test' },
       geometry: {
         type: 'MultiLineString',
+        is3D: false,
         coordinates: [
           [
             { x: 0.5, y: 0.5, m: { a: 0.5 } },
@@ -144,6 +151,7 @@ describe('toWM', () => {
       properties: { name: 'test' },
       geometry: {
         type: 'MultiLineString',
+        is3D: false,
         coordinates: [
           [
             { x: 0, y: 0, m: { a: 0.5 } },
@@ -169,6 +177,7 @@ describe('toWM', () => {
       properties: { name: 'test' },
       geometry: {
         type: 'Polygon',
+        is3D: false,
         coordinates: [
           [
             { x: 0.5, y: 0.5, m: { a: 0.5 } },
@@ -190,6 +199,7 @@ describe('toWM', () => {
       properties: { name: 'test' },
       geometry: {
         type: 'Polygon',
+        is3D: false,
         coordinates: [
           [
             { x: 0, y: 0, m: { a: 0.5 } },
@@ -215,6 +225,7 @@ describe('toWM', () => {
       properties: { name: 'test' },
       geometry: {
         type: 'MultiPolygon',
+        is3D: false,
         coordinates: [
           [
             [
@@ -238,6 +249,7 @@ describe('toWM', () => {
       properties: { name: 'test' },
       geometry: {
         type: 'MultiPolygon',
+        is3D: false,
         coordinates: [
           [
             [
