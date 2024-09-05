@@ -1,4 +1,4 @@
-import * as S2CellID from './s2CellID';
+import * as S2CellID from '../id';
 import {
   IJtoST,
   STtoIJ,

@@ -70,7 +70,7 @@ impl<M: HasLayer + Clone> Tile<M> {
         if self.transformed {
             return;
         }
-        let (_, zoom, i, j) = self.id.to_face_zoom_xy();
+        let (zoom, i, j) = self.id.to_zoom_ij(None);
 
         for layer in self.layers.values_mut() {
             for feature in layer.features.iter_mut() {
@@ -168,7 +168,7 @@ impl<M: HasLayer + Clone> TileStore<M> {
         );
         features.into_iter().for_each(|feature| tile_store.add_feature(feature));
         for i in 0..6 {
-            tile_store.split_tile(CellId::from_face(i, tile_store.projection), None, None);
+            tile_store.split_tile(CellId::from_face(i), None, None);
         }
 
         tile_store
@@ -177,11 +177,10 @@ impl<M: HasLayer + Clone> TileStore<M> {
     /// Add a feature to the tile store
     pub fn add_feature(&mut self, feature: VectorFeature<M>) {
         let face: u8 = feature.face.into();
-        let tile =
-            self.tiles.entry(CellId::from_face(face, self.projection)).or_insert_with(|| {
-                self.faces.insert(feature.face);
-                Tile::new(CellId::from_face(face, self.projection))
-            });
+        let tile = self.tiles.entry(CellId::from_face(face)).or_insert_with(|| {
+            self.faces.insert(feature.face);
+            Tile::new(CellId::from_face(face))
+        });
 
         tile.add_feature(feature, None);
     }
@@ -249,7 +248,7 @@ impl<M: HasLayer + Clone> TileStore<M> {
         // we want to find the closest tile to the data.
         let mut p_id = id;
         while !self.tiles.contains_key(&p_id) && !p_id.is_face() {
-            p_id = p_id.parent();
+            p_id = p_id.parent(None);
         }
         // split as necessary, the algorithm will know if the tile is already split
         self.split_tile(p_id, Some(id), Some(zoom));

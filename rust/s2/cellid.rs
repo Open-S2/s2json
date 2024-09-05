@@ -11,6 +11,9 @@ use crate::{
 
 use super::LOOKUP_IJ;
 
+/// Cell ID works with both S2 and WM with a common interface
+pub type CellId = S2CellId;
+
 // The following lookup tables are used to convert efficiently between an
 // (i,j) cell index and the corresponding position along the Hilbert curve.
 // "lookupPos" maps 4 bits of "i", 4 bits of "j", and 2 bits representing the

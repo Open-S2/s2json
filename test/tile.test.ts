@@ -6,10 +6,9 @@ import { type FeatureCollection, childrenIJ, fromFace } from '../src';
 const SIMPLIFY_MAXZOOM = 16;
 
 test('Tile', () => {
-  const tile = new Tile(0n, 'WM');
+  const tile = new Tile(0n);
   expect(tile).toEqual({
     id: 0n,
-    projection: 'WM',
     layers: {},
     transformed: false,
   } as Tile);
@@ -32,7 +31,6 @@ test('Tile', () => {
 
   expect(tile).toEqual({
     id: 0n,
-    projection: 'WM',
     transformed: true,
     layers: {
       default: {
@@ -100,11 +98,11 @@ test('TileStore - points', () => {
 
   const store = new TileStore(featureCollection, { projection: 'WM' });
 
-  const faceID = fromFace('WM', 0);
+  const faceID = fromFace(0);
   const faceTile = store.getTile(faceID);
 
   expect(faceTile).toEqual({
-    id: 0n,
+    id: 1152921504606846976n,
     layers: {
       default: {
         features: [
@@ -208,11 +206,10 @@ test('TileStore - points', () => {
         name: 'default',
       },
     },
-    projection: 'WM',
     transformed: true,
   } as unknown as Tile);
 
-  const [childID] = childrenIJ('WM', 0, 0, 0, 0);
+  const [childID] = childrenIJ(0, 0, 0, 0);
   const childTile = store.getTile(childID);
   expect(childTile).toEqual({
     id: 288230376151711744n,
@@ -267,7 +264,6 @@ test('TileStore - points', () => {
         name: 'default',
       },
     },
-    projection: 'WM',
     transformed: true,
   } as unknown as Tile);
 });

@@ -38,7 +38,8 @@ impl<M: HasLayer + Clone> Tile<M> {
  */
 pub fn split_tile<M: HasLayer + Clone>(tile: &mut Tile<M>, buffer: Option<f64>) -> TileChildren<M> {
     let buffer = buffer.unwrap_or(0.0625);
-    let (face, zoom, i, j) = tile.id.to_face_zoom_xy();
+    let face = tile.id.face();
+    let (zoom, i, j) = tile.id.to_zoom_ij(None);
     let [bl_id, br_id, tl_id, tr_id] = tile.id.children_ij(face, zoom, i, j);
     let mut children = TileChildren {
         bottom_left: Tile::new(bl_id),

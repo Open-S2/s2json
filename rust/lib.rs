@@ -12,8 +12,6 @@ extern crate alloc;
 pub mod convert;
 /// All geometry types and structs
 pub mod geometry;
-/// Conjoined CellID System
-pub mod id;
 /// All S2 tooling
 pub mod s2;
 /// All simplify tooling
@@ -29,7 +27,6 @@ pub mod wm;
 
 pub use convert::*;
 pub use geometry::*;
-pub use id::*;
 pub use s2::*;
 pub use simplify::*;
 pub use tile::*;

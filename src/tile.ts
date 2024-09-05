@@ -4,11 +4,11 @@ import { splitTile } from './clip';
 import {
   contains,
   fromFace,
-  fromID,
   face as getFace,
   isFace,
   level,
   parent as parentID,
+  toFaceIJ,
 } from './id';
 
 import type {
@@ -24,13 +24,11 @@ import type {
 export class Tile {
   /**
    * @param id - the tile id
-   * @param projection - WM or S2
    * @param layers - the tile's layers
    * @param transformed - whether the tile feature geometry has been transformed to tile coordinates
    */
   constructor(
     public id: bigint,
-    public projection: Projection,
     public layers: Record<string, Layer> = {},
     public transformed = false,
   ) {}
@@ -66,10 +64,11 @@ export class Tile {
    * @param maxzoom - max zoom at which to simplify
    */
   transform(tolerance: number, maxzoom?: number) {
-    if (this.transformed) return;
-    const [, zoom, i, j] = fromID(this.projection, this.id);
+    const { transformed, id, layers } = this;
+    if (transformed) return;
+    const [, zoom, i, j] = toFaceIJ(id);
 
-    for (const layer of Object.values(this.layers)) {
+    for (const layer of Object.values(layers)) {
       for (const feature of layer.features) {
         simplify(feature.geometry, tolerance, zoom, maxzoom);
         _transform(feature.geometry, zoom, i, j);
@@ -171,7 +170,7 @@ export class TileStore {
     const features: VectorFeatures[] = convert(this.projection, data);
     for (const feature of features) this.addFeature(feature);
     for (let face = 0; face < 6; face++) {
-      const id = fromFace(this.projection, face as Face);
+      const id = fromFace(face as Face);
       this.splitTile(id);
     }
   }
@@ -181,13 +180,13 @@ export class TileStore {
    * @param feature - the feature to store to a face tile. Creates the tile if it doesn't exist
    */
   addFeature(feature: VectorFeatures): void {
-    const { faces, tiles, projection } = this;
+    const { faces, tiles } = this;
     const face = feature.face ?? 0;
-    const id = fromFace(projection, face);
+    const id = fromFace(face);
     let tile = tiles.get(id);
     if (tile === undefined) {
       faces.add(face);
-      tile = new Tile(id, projection);
+      tile = new Tile(id);
       tiles.set(id, tile);
     }
     tile?.addFeature(feature);
@@ -200,7 +199,7 @@ export class TileStore {
    * @param endZoom - stop tiling at this zoom
    */
   splitTile(startID: bigint, endID?: bigint, endZoom: number = this.maxzoom): void {
-    const { buffer, tiles, tolerance, maxzoom, projection, indexMaxzoom } = this;
+    const { buffer, tiles, tolerance, maxzoom, indexMaxzoom } = this;
     const stack: bigint[] = [startID];
     // avoid recursion by using a processing queue
     while (stack.length > 0) {
@@ -210,14 +209,14 @@ export class TileStore {
       const tile = tiles.get(stackID);
       // if the tile we need does not exist, is empty, or already transformed, skip it
       if (tile === undefined || tile.isEmpty() || tile.transformed) continue;
-      const tileZoom = level(projection, tile.id);
+      const tileZoom = level(tile.id);
       // 1: stop tiling if we reached a defined end
       // 2: stop tiling if it's the first-pass tiling, and we reached max zoom for indexing
       // 3: stop at currently needed maxzoom OR current tile does not include child
       if (
         tileZoom >= maxzoom || // 1
         (endID === undefined && tileZoom >= indexMaxzoom) || // 2
-        (endID !== undefined && (tileZoom > endZoom || !contains(projection, tile.id, endID))) // 3
+        (endID !== undefined && (tileZoom > endZoom || !contains(tile.id, endID))) // 3
       )
         continue;
 
@@ -239,16 +238,16 @@ export class TileStore {
    * @returns - the tile if it exists
    */
   getTile(id: bigint): undefined | Tile {
-    const { tiles, projection, faces } = this;
-    const zoom = level(projection, id);
-    const face = getFace(projection, id);
+    const { tiles, faces } = this;
+    const zoom = level(id);
+    const face = getFace(id);
     // If the zoom is out of bounds, return nothing
     if (zoom < 0 || zoom > 20 || !faces.has(face)) return;
 
     // we want to find the closest tile to the data.
     let pID = id;
-    while (!tiles.has(pID) && !isFace(projection, pID)) {
-      pID = parentID(projection, pID);
+    while (!tiles.has(pID) && !isFace(pID)) {
+      pID = parentID(pID);
     }
     // split as necessary, the algorithm will know if the tile is already split
     this.splitTile(pID, id, zoom);

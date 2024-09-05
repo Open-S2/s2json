@@ -1,5 +1,5 @@
 import { Tile } from '.';
-import { childrenIJ, fromID } from './id';
+import { childrenIJ, toFaceIJ } from './id';
 import { clipBBox, extendBBox } from './bbox';
 
 import type {
@@ -35,15 +35,10 @@ export type TileChildren = [
  * @returns - the tile's children split into 4 sub-tiles
  */
 export function splitTile(tile: Tile, buffer: number = 0.0625): TileChildren {
-  const { projection, id } = tile;
-  const [face, zoom, i, j] = fromID(projection, id);
-  const [blID, brID, tlID, trID] = childrenIJ(projection, face, zoom, i, j);
-  const children: TileChildren = [
-    new Tile(blID, projection),
-    new Tile(brID, projection),
-    new Tile(tlID, projection),
-    new Tile(trID, projection),
-  ];
+  const { id } = tile;
+  const [face, zoom, i, j] = toFaceIJ(id);
+  const [blID, brID, tlID, trID] = childrenIJ(face, zoom, i, j);
+  const children: TileChildren = [new Tile(blID), new Tile(brID), new Tile(tlID), new Tile(trID)];
   const scale = 1 << zoom;
   const k1 = 0;
   const k2 = 0.5;

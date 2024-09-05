@@ -239,7 +239,7 @@ test('clipLine - passes through the x axis from left to right, then again right 
 
 describe('splitTile', () => {
   it('Point', () => {
-    const faceID = fromFace('WM', 0);
+    const faceID = fromFace(0);
     const features: VectorFeature[] = [
       {
         type: 'VectorFeature',
@@ -283,7 +283,7 @@ describe('splitTile', () => {
       },
     ];
 
-    const tile = new Tile(faceID, 'WM');
+    const tile = new Tile(faceID);
     for (const feature of features) tile.addFeature(feature);
 
     const res = splitTile(tile);
@@ -312,11 +312,10 @@ describe('splitTile', () => {
             name: 'default',
           },
         },
-        projection: 'WM',
         transformed: false,
       } as unknown as Tile,
       {
-        id: 288230376688582656n,
+        id: 2017612633061982208n,
         layers: {
           default: {
             features: [
@@ -339,11 +338,10 @@ describe('splitTile', () => {
             name: 'default',
           },
         },
-        projection: 'WM',
         transformed: false,
       } as unknown as Tile,
       {
-        id: 288230376151711745n,
+        id: 864691128455135232n,
         layers: {
           default: {
             features: [
@@ -366,11 +364,10 @@ describe('splitTile', () => {
             name: 'default',
           },
         },
-        projection: 'WM',
         transformed: false,
       } as unknown as Tile,
       {
-        id: 288230376688582657n,
+        id: 1441151880758558720n,
         layers: {
           default: {
             features: [
@@ -393,13 +390,12 @@ describe('splitTile', () => {
             name: 'default',
           },
         },
-        projection: 'WM',
         transformed: false,
       } as unknown as Tile,
     ]);
   });
   it('MultiPoint', () => {
-    const faceID = fromFace('WM', 0);
+    const faceID = fromFace(0);
     const features: VectorFeature[] = [
       {
         type: 'VectorFeature',
@@ -418,7 +414,7 @@ describe('splitTile', () => {
       },
     ];
 
-    const tile = new Tile(faceID, 'WM');
+    const tile = new Tile(faceID);
     for (const feature of features) tile.addFeature(feature);
 
     const res = splitTile(tile);
@@ -445,11 +441,10 @@ describe('splitTile', () => {
             name: 'default',
           },
         },
-        projection: 'WM',
         transformed: false,
       } as unknown as Tile,
       {
-        id: 288230376688582656n,
+        id: 2017612633061982208n,
         layers: {
           default: {
             features: [
@@ -470,11 +465,10 @@ describe('splitTile', () => {
             name: 'default',
           },
         },
-        projection: 'WM',
         transformed: false,
       } as unknown as Tile,
       {
-        id: 288230376151711745n,
+        id: 864691128455135232n,
         layers: {
           default: {
             features: [
@@ -495,11 +489,10 @@ describe('splitTile', () => {
             name: 'default',
           },
         },
-        projection: 'WM',
         transformed: false,
       } as unknown as Tile,
       {
-        id: 288230376688582657n,
+        id: 1441151880758558720n,
         layers: {
           default: {
             features: [
@@ -520,7 +513,6 @@ describe('splitTile', () => {
             name: 'default',
           },
         },
-        projection: 'WM',
         transformed: false,
       } as unknown as Tile,
     ]);
@@ -529,25 +521,22 @@ describe('splitTile', () => {
 
     expect(splitAgain).toEqual([
       {
-        id: 576460753377165314n,
+        id: 1224979098644774912n,
         layers: {},
-        projection: 'WM',
         transformed: false,
       } as unknown as Tile,
       {
-        id: 576460753914036226n,
+        id: 1657324662872342528n,
         layers: {},
-        projection: 'WM',
         transformed: false,
       } as unknown as Tile,
       {
-        id: 576460753377165315n,
+        id: 1369094286720630784n,
         layers: {},
-        projection: 'WM',
         transformed: false,
       } as unknown as Tile,
       {
-        id: 576460753914036227n,
+        id: 1513209474796486656n,
         layers: {
           default: {
             features: [
@@ -568,14 +557,13 @@ describe('splitTile', () => {
             name: 'default',
           },
         },
-        projection: 'WM',
         transformed: false,
       } as unknown as Tile,
     ]);
   });
 
   it('LineString', () => {
-    const faceID = fromFace('WM', 0);
+    const faceID = fromFace(0);
     const features: VectorFeature[] = [
       {
         type: 'VectorFeature',
@@ -594,7 +582,7 @@ describe('splitTile', () => {
       },
     ];
 
-    const tile = new Tile(faceID, 'WM');
+    const tile = new Tile(faceID);
     for (const feature of features) tile.addFeature(feature);
 
     const res = splitTile(tile);
@@ -631,11 +619,10 @@ describe('splitTile', () => {
             name: 'default',
           },
         },
-        projection: 'WM',
         transformed: false,
       } as unknown as Tile,
       {
-        id: 288230376688582656n,
+        id: 2017612633061982208n,
         layers: {
           default: {
             features: [
@@ -667,11 +654,10 @@ describe('splitTile', () => {
             name: 'default',
           },
         },
-        projection: 'WM',
         transformed: false,
       } as unknown as Tile,
       {
-        id: 288230376151711745n,
+        id: 864691128455135232n,
         layers: {
           default: {
             features: [
@@ -702,11 +688,10 @@ describe('splitTile', () => {
             name: 'default',
           },
         },
-        projection: 'WM',
         transformed: false,
       } as unknown as Tile,
       {
-        id: 288230376688582657n,
+        id: 1441151880758558720n,
         layers: {
           default: {
             features: [
@@ -738,14 +723,13 @@ describe('splitTile', () => {
             name: 'default',
           },
         },
-        projection: 'WM',
         transformed: false,
       } as unknown as Tile,
     ]);
   });
 
   it('MultiLineString', () => {
-    const faceID = fromFace('WM', 0);
+    const faceID = fromFace(0);
     const features: VectorFeature[] = [
       {
         type: 'VectorFeature',
@@ -772,7 +756,7 @@ describe('splitTile', () => {
       },
     ];
 
-    const tile = new Tile(faceID, 'WM');
+    const tile = new Tile(faceID);
     for (const feature of features) tile.addFeature(feature);
 
     const res = splitTile(tile);
@@ -809,11 +793,10 @@ describe('splitTile', () => {
             name: 'default',
           },
         },
-        projection: 'WM',
         transformed: false,
       } as unknown as Tile,
       {
-        id: 288230376688582656n,
+        id: 2017612633061982208n,
         layers: {
           default: {
             features: [
@@ -846,11 +829,10 @@ describe('splitTile', () => {
             name: 'default',
           },
         },
-        projection: 'WM',
         transformed: false,
       } as unknown as Tile,
       {
-        id: 288230376151711745n,
+        id: 864691128455135232n,
         layers: {
           default: {
             features: [
@@ -881,11 +863,10 @@ describe('splitTile', () => {
             name: 'default',
           },
         },
-        projection: 'WM',
         transformed: false,
       } as unknown as Tile,
       {
-        id: 288230376688582657n,
+        id: 1441151880758558720n,
         layers: {
           default: {
             features: [
@@ -918,14 +899,13 @@ describe('splitTile', () => {
             name: 'default',
           },
         },
-        projection: 'WM',
         transformed: false,
       } as unknown as Tile,
     ]);
   });
 
   it('Polygon', () => {
-    const faceID = fromFace('WM', 0);
+    const faceID = fromFace(0);
     const features: VectorFeature[] = [
       {
         type: 'VectorFeature',
@@ -952,7 +932,7 @@ describe('splitTile', () => {
       },
     ];
 
-    const tile = new Tile(faceID, 'WM');
+    const tile = new Tile(faceID);
     for (const feature of features) tile.addFeature(feature);
 
     const res = splitTile(tile);
@@ -995,11 +975,10 @@ describe('splitTile', () => {
             name: 'default',
           },
         },
-        projection: 'WM',
         transformed: false,
       } as unknown as Tile,
       {
-        id: 288230376688582656n,
+        id: 2017612633061982208n,
         layers: {
           default: {
             features: [
@@ -1036,11 +1015,10 @@ describe('splitTile', () => {
             name: 'default',
           },
         },
-        projection: 'WM',
         transformed: false,
       } as unknown as Tile,
       {
-        id: 288230376151711745n,
+        id: 864691128455135232n,
         layers: {
           default: {
             features: [
@@ -1077,11 +1055,10 @@ describe('splitTile', () => {
             name: 'default',
           },
         },
-        projection: 'WM',
         transformed: false,
       } as unknown as Tile,
       {
-        id: 288230376688582657n,
+        id: 1441151880758558720n,
         layers: {
           default: {
             features: [
@@ -1118,14 +1095,13 @@ describe('splitTile', () => {
             name: 'default',
           },
         },
-        projection: 'WM',
         transformed: false,
       } as unknown as Tile,
     ]);
   });
 
   it('MultiPolygon', () => {
-    const faceID = fromFace('WM', 0);
+    const faceID = fromFace(0);
     const features: VectorFeature[] = [
       {
         type: 'VectorFeature',
@@ -1154,7 +1130,7 @@ describe('splitTile', () => {
       },
     ];
 
-    const tile = new Tile(faceID, 'WM');
+    const tile = new Tile(faceID);
     for (const feature of features) tile.addFeature(feature);
 
     const res = splitTile(tile);
@@ -1199,11 +1175,10 @@ describe('splitTile', () => {
             name: 'default',
           },
         },
-        projection: 'WM',
         transformed: false,
       } as unknown as Tile,
       {
-        id: 288230376688582656n,
+        id: 2017612633061982208n,
         layers: {
           default: {
             features: [
@@ -1242,11 +1217,10 @@ describe('splitTile', () => {
             name: 'default',
           },
         },
-        projection: 'WM',
         transformed: false,
       } as unknown as Tile,
       {
-        id: 288230376151711745n,
+        id: 864691128455135232n,
         layers: {
           default: {
             features: [
@@ -1285,11 +1259,10 @@ describe('splitTile', () => {
             name: 'default',
           },
         },
-        projection: 'WM',
         transformed: false,
       } as unknown as Tile,
       {
-        id: 288230376688582657n,
+        id: 1441151880758558720n,
         layers: {
           default: {
             features: [
@@ -1328,7 +1301,6 @@ describe('splitTile', () => {
             name: 'default',
           },
         },
-        projection: 'WM',
         transformed: false,
       } as unknown as Tile,
     ]);
