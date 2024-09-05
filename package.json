@@ -25,8 +25,8 @@
   "main": "./dist/index.js",
   "exports": {
     ".": "./dist/index.js",
-    "./s2": "./dist/s2/index.js",
-    "./wm": "./dist/wm/index.js",
+    "./s2": "./dist/s2/",
+    "./wm": "./dist/wm/",
     "./MercPoint": "./dist/wm/mercCoords.js",
     "./MercID": "./dist/wm/mercID.js",
     "./S2CellID": "./dist/s2/s2CellID.js",
