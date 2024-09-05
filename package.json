@@ -1,7 +1,7 @@
 {
   "name": "s2json-spec",
   "publisher": "OpenS2",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "description": "S2JSON is a specification for encoding a variety of geographic data structures",
   "keywords": [
     "vector",
@@ -24,7 +24,13 @@
   },
   "main": "./dist/index.js",
   "exports": {
-    ".": "./dist/index.js"
+    ".": "./dist/index.js",
+    "./s2": "./dist/s2/index.js",
+    "./wm": "./dist/wm/index.js",
+    "./MercPoint": "./dist/wm/mercCoords.js",
+    "./MercID": "./dist/wm/mercID.js",
+    "./S2CellID": "./dist/s2/s2CellID.js",
+    "./S2Point": "./dist/s2/s2Point.js"
   },
   "scripts": {
     "lint+build+docs+test": "bun run lint && bun run build && bun run docs && bun run test",
