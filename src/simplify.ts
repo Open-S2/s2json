@@ -7,6 +7,7 @@ import {
 } from '.';
 
 /**
+ * Builds squared distances for the vector geometry using the Douglas-Peucker algorithm.
  * @param geometry - input vector geometry
  * @param tolerance - simplification tolerance
  * @param maxzoom - max zoom level to simplify
@@ -132,6 +133,7 @@ function getSqSegDist(
 }
 
 /**
+ * Simplifies the vector geometry based on zoom level and tolerance.
  * @param geometry - input vector geometry
  * @param tolerance - simplification tolerance
  * @param zoom - curent zoom

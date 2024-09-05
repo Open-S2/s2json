@@ -57,6 +57,7 @@ export interface BaseFeature<
 > {
   type: T;
   id?: number;
+  face?: Face;
   properties: P;
   geometry: G;
   metadata?: Record<string, unknown>;

@@ -44,6 +44,7 @@ export class Tile {
   }
 
   /**
+   * Add a vector feature to the tile, optionally to a specific layer to store it in. Defaults to "default".
    * @param feature - Vector Feature
    * @param layer - layer to store the feature to
    */
@@ -99,6 +100,7 @@ function _transform(geometry: VectorGeometry, zoom: number, ti: number, tj: numb
 }
 
 /**
+ * Mutates the point in place to a tile coordinate
  * @param vp - input vector point that we are mutating in place
  * @param zoom - current zoom
  * @param ti - x translation
@@ -175,11 +177,12 @@ export class TileStore {
   }
 
   /**
+   * Stores a feature to a tile, creating the tile if it doesn't exist and tracking the faces we use
    * @param feature - the feature to store to a face tile. Creates the tile if it doesn't exist
    */
   addFeature(feature: VectorFeatures): void {
     const { faces, tiles, projection } = this;
-    const face = 'face' in feature ? feature.face : 0;
+    const face = feature.face ?? 0;
     const id = fromFace(projection, face);
     let tile = tiles.get(id);
     if (tile === undefined) {
@@ -191,6 +194,7 @@ export class TileStore {
   }
 
   /**
+   * Splits a tile into smaller tiles given a start and end range, stopping at maxzoom
    * @param startID - where to start tiling
    * @param endID - where to stop tiling
    * @param endZoom - stop tiling at this zoom

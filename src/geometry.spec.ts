@@ -30,13 +30,18 @@ export type BBox3D = [
 export type BBOX = BBox | BBox3D;
 
 /** A Point in S2 Space with a Face */
-export type STPoint = {
+export interface STPoint {
+  /** The face of the point */
   face: Face;
+  /** The S coordinates of the point */
   s: number;
+  /** The T coordinates of the point */
   t: number;
+  /** The Z coordinates of the point */
   z?: number;
+  /** The M coordinates of the point */
   m?: MValue;
-};
+}
 
 /** Definition of a Point. May represent WebMercator Lon-Lat or S2Geometry S-T */
 export type Point = [x: number, y: number];

@@ -96,44 +96,38 @@ describe('bboxToXYZBounds', () => {
   it('World extents converted to proper tile ranges.', () => {
     expect(
       bboxToXYZBounds([-180, -85.05112877980659, 180, 85.0511287798066], 0, true, 'WGS84', 256),
-    ).toEqual({ minX: 0, minY: 0, maxX: 0, maxY: 0 });
+    ).toEqual([0, 0, 0, 0]);
   });
 
   it('World extents converted to proper tile ranges. source=900913', () => {
     expect(
       bboxToXYZBounds([-180, -85.05112877980659, 180, 85.0511287798066], 0, true, '900913', 256),
-    ).toEqual({ minX: 0, minY: -1, maxX: 0, maxY: 0 });
+    ).toEqual([0, -1, 0, 0]);
   });
 
   it('SW converted to proper tile ranges.', () => {
-    expect(bboxToXYZBounds([-180, -85.05112877980659, 0, 0], 1, true, 'WGS84', 256)).toEqual({
-      minX: 0,
-      minY: 0,
-      maxX: 0,
-      maxY: 0,
-    });
+    expect(bboxToXYZBounds([-180, -85.05112877980659, 0, 0], 1, true, 'WGS84', 256)).toEqual([
+      0, 0, 0, 0,
+    ]);
   });
 
   it('SW converted to proper tile ranges. source=900913', () => {
-    expect(bboxToXYZBounds([-180, -85.05112877980659, 0, 0], 1, true, '900913', 256)).toEqual({
-      minX: 0,
-      minY: 0,
-      maxX: 0,
-      maxY: 1,
-    });
+    expect(bboxToXYZBounds([-180, -85.05112877980659, 0, 0], 1, true, '900913', 256)).toEqual([
+      0, 0, 0, 1,
+    ]);
   });
 
   it('broken case', () => {
     const extent: BBox = [-0.087891, 40.95703, 0.087891, 41.044916];
     const xyz = bboxToXYZBounds(extent, 3, true, 'WGS84', 256);
-    expect(xyz.minX <= xyz.maxX).toBe(true);
-    expect(xyz.minY <= xyz.maxY).toBe(true);
+    expect(xyz[0] <= xyz[2]).toBe(true);
+    expect(xyz[1] <= xyz[3]).toBe(true);
   });
 
   it('negative case', () => {
     const extent: BBox = [-112.5, 85.0511, -112.5, 85.0511];
     const xyz = bboxToXYZBounds(extent, 0, true, 'WGS84', 256);
-    expect(xyz.minY).toBe(0);
+    expect(xyz[1]).toBe(0);
   });
 
   it('fuzz', () => {
@@ -144,8 +138,8 @@ describe('bboxToXYZBounds', () => {
       const z = Math.floor(22 * Math.random());
       const extent: BBox = [min(...x), min(...y), max(...x), max(...y)];
       const xyz = bboxToXYZBounds(extent, z, true, 'WGS84', 256);
-      expect(xyz.minX <= xyz.maxX).toBe(true);
-      expect(xyz.minY <= xyz.maxY).toBe(true);
+      expect(xyz[0] <= xyz[2]).toBe(true);
+      expect(xyz[1] <= xyz[3]).toBe(true);
     }
   });
 });
@@ -174,12 +168,7 @@ describe('convert', () => {
       -20037508.342789244, -20037508.342789244, 20037508.342789244, 20037508.342789244,
     ]);
 
-    expect(bboxToXYZBounds([-240, -90, 240, 90], 4, true, 'WGS84', 256)).toEqual({
-      minX: 0,
-      minY: 0,
-      maxX: 15,
-      maxY: 15,
-    });
+    expect(bboxToXYZBounds([-240, -90, 240, 90], 4, true, 'WGS84', 256)).toEqual([0, 0, 15, 15]);
   });
 });
 

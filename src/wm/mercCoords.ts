@@ -210,7 +210,7 @@ export function xyzToBBOX(
  * @param tmsStyle - if true, the y is inverted
  * @param source - the source
  * @param tileSize - in pixels
- * @returns - the tile's bounding box
+ * @returns - the tile's bounding box [minX, minY, maxX, maxY]
  */
 export function bboxToXYZBounds(
   bbox: BBox,
@@ -218,7 +218,7 @@ export function bboxToXYZBounds(
   tmsStyle = true,
   source: Sources = '900913',
   tileSize = 512,
-): { minX: number; maxX: number; minY: number; maxY: number } {
+): BBox {
   const { min, max, pow, floor } = Math;
   let bl: Point = [bbox[0], bbox[1]]; // bottom left
   let tr: Point = [bbox[2], bbox[3]]; // top right
@@ -234,18 +234,18 @@ export function bboxToXYZBounds(
   const x = [floor(pxBL[0] / tileSize), floor((pxTR[0] - 1) / tileSize)];
   const y = [floor(pxTR[1] / tileSize), floor((pxBL[1] - 1) / tileSize)];
 
-  const bounds = {
-    minX: min(...x) < 0 ? 0 : min(...x),
-    minY: min(...y) < 0 ? 0 : min(...y),
-    maxX: max(...x),
-    maxY: max(...y),
-  };
+  const bounds: BBox = [
+    min(...x) < 0 ? 0 : min(...x),
+    min(...y) < 0 ? 0 : min(...y),
+    max(...x),
+    max(...y),
+  ];
 
   if (tmsStyle) {
-    const tmsMinY = pow(2, zoom) - 1 - bounds.maxY;
-    const tmsMaxY = pow(2, zoom) - 1 - bounds.minY;
-    bounds.minY = tmsMinY;
-    bounds.maxY = tmsMaxY;
+    const tmsMinY = pow(2, zoom) - 1 - bounds[3];
+    const tmsMaxY = pow(2, zoom) - 1 - bounds[1];
+    bounds[1] = tmsMinY;
+    bounds[3] = tmsMaxY;
   }
 
   return bounds;

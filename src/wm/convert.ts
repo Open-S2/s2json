@@ -133,7 +133,14 @@ function convertGeometry(geometry: Geometry, buildBBox?: boolean): VectorGeometr
 }
 
 /** The resultant geometry after conversion */
-export type ConvertedGeometry = { geometry: VectorGeometry; face: Face }[];
+export interface ConvertedGeometry {
+  /** The vector geometry that was converted */
+  geometry: VectorGeometry;
+  /** The face of the vector geometry that was converted */
+  face: Face;
+}
+/** A list of converted geometries */
+export type ConvertedGeometryList = ConvertedGeometry[];
 
 /**
  * Underlying conversion mechanic to move GeoJSON Geometry to S2Geometry
@@ -146,9 +153,9 @@ function convertVectorGeometry(
   geometry: VectorGeometry,
   tolerance?: number,
   maxzoom?: number,
-): ConvertedGeometry {
+): ConvertedGeometryList {
   const { type } = geometry;
-  let cGeo: ConvertedGeometry;
+  let cGeo: ConvertedGeometryList;
   if (type === 'Point') cGeo = convertGeometryPoint(geometry);
   else if (type === 'MultiPoint') cGeo = convertGeometryMultiPoint(geometry);
   else if (type === 'LineString') cGeo = convertGeometryLineString(geometry);
@@ -167,7 +174,7 @@ function convertVectorGeometry(
  * @param geometry - GeoJSON PointGeometry
  * @returns - S2 PointGeometry
  */
-function convertGeometryPoint(geometry: VectorPointGeometry): ConvertedGeometry {
+function convertGeometryPoint(geometry: VectorPointGeometry): ConvertedGeometryList {
   const { type, is3D, coordinates, bbox } = geometry;
   const { x: lon, y: lat, z, m } = coordinates;
   const [face, s, t] = toST(fromLonLat(lon, lat));
@@ -179,7 +186,7 @@ function convertGeometryPoint(geometry: VectorPointGeometry): ConvertedGeometry 
  * @param geometry - GeoJSON PointGeometry
  * @returns - S2 PointGeometry
  */
-function convertGeometryMultiPoint(geometry: VectorMultiPointGeometry): ConvertedGeometry {
+function convertGeometryMultiPoint(geometry: VectorMultiPointGeometry): ConvertedGeometryList {
   const { is3D, coordinates, bbox } = geometry;
   return coordinates.flatMap((coordinates) =>
     convertGeometryPoint({ type: 'Point', is3D, coordinates, bbox }),
@@ -190,7 +197,7 @@ function convertGeometryMultiPoint(geometry: VectorMultiPointGeometry): Converte
  * @param geometry - GeoJSON LineStringGeometry
  * @returns - S2 LineStringGeometry
  */
-function convertGeometryLineString(geometry: VectorLineStringGeometry): ConvertedGeometry {
+function convertGeometryLineString(geometry: VectorLineStringGeometry): ConvertedGeometryList {
   const { type, is3D, coordinates, bbox } = geometry;
 
   return convertLineString(coordinates, false).map(({ face, line, offset, vecBBox }) => {
@@ -204,7 +211,7 @@ function convertGeometryLineString(geometry: VectorLineStringGeometry): Converte
  */
 function convertGeometryMultiLineString(
   geometry: VectorMultiLineStringGeometry,
-): ConvertedGeometry {
+): ConvertedGeometryList {
   const { coordinates, is3D, bbox } = geometry;
   return coordinates
     .flatMap((line) => convertLineString(line, false))
@@ -218,9 +225,9 @@ function convertGeometryMultiLineString(
  * @param geometry - GeoJSON PolygonGeometry
  * @returns - S2 PolygonGeometry
  */
-function convertGeometryPolygon(geometry: VectorPolygonGeometry): ConvertedGeometry {
+function convertGeometryPolygon(geometry: VectorPolygonGeometry): ConvertedGeometryList {
   const { type, is3D, coordinates, bbox } = geometry;
-  const res: ConvertedGeometry = [];
+  const res: ConvertedGeometryList = [];
 
   // conver all lines
   const outerRing = convertLineString(coordinates[0], true);
@@ -258,7 +265,7 @@ function convertGeometryPolygon(geometry: VectorPolygonGeometry): ConvertedGeome
  * @param geometry - GeoJSON MultiPolygonGeometry
  * @returns - S2 MultiPolygonGeometry
  */
-function convertGeometryMultiPolygon(geometry: VectorMultiPolygonGeometry): ConvertedGeometry {
+function convertGeometryMultiPolygon(geometry: VectorMultiPolygonGeometry): ConvertedGeometryList {
   const { is3D, coordinates, bbox, offset } = geometry;
   return coordinates.flatMap((polygon, i) =>
     convertGeometryPolygon({
