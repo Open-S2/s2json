@@ -1,7 +1,7 @@
 {
   "name": "s2json-spec",
   "publisher": "OpenS2",
-  "version": "1.5.4",
+  "version": "1.5.5",
   "description": "S2JSON is a specification for encoding a variety of geographic data structures",
   "keywords": [
     "vector",
@@ -36,7 +36,7 @@
     "prettier": "bunx prettier src tools benchmarks --check",
     "prettier:fix": "bunx prettier -- --write",
     "format": "bunx prettier:fix && bun run lint:fix",
-    "build": "tsc -p ./",
+    "build": "rm -rf dist && mkdir dist && rm -f -- tsconfig.tsbuildinfo && tsc -p ./",
     "test:dev": "bun test --watch --coverage",
     "test": "bun test",
     "test:watch": "bun test --watch",
