@@ -1,4 +1,4 @@
-name: pages-workflow
+name: Generate and Deploy Docs
 
 on:
   push:
@@ -31,7 +31,7 @@ jobs:
       run: bun run docs
     
     - name: Upload artifacts
-      uses: actions/upload-pages-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         path: ./docs  # Path to the docs folder
   
@@ -41,7 +41,14 @@ jobs:
     permissions:
       pages: write  # Needed to deploy to GitHub Pages
       id-token: write  # Needed for authentication
+      actions: read
+    
+    # Deploy to the github-pages environment
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: Deploy to GitHub Pages
+        id: deployment
         uses: actions/deploy-pages@v4
