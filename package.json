@@ -43,7 +43,7 @@
     "types:bundle": "bun run types:build && node scripts/types.mjs",
     "prepublishOnly": "bun run lint+build+docs+test",
     "package-check": "package-check",
-    "docs": "typedoc",
+    "docs": "bunx typedoc",
     "vscode:prepublish": "bun run prepublishOnly",
     "watch": "tsc -watch -p ./"
   },
