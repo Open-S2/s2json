@@ -52,7 +52,7 @@ export type LineString = Point[];
 /** Definition of a MultiLineString */
 export type MultiLineString = LineString[];
 /** Definition of a Polygon */
-export type Polygon = Point[][];
+export type Polygon = LineString[];
 /** Definition of a MultiPolygon */
 export type MultiPolygon = Polygon[];
 /** Definition of a 3D Point. May represent WebMercator Lon-Lat or S2Geometry S-T with a z-value */
@@ -204,33 +204,33 @@ export type MultiPolygon3DGeometry<M extends MValue = MValue> = BaseGeometry<
 /// Vector Types
 
 /** Definition of a Vector Point */
-export interface VectorPoint {
+export interface VectorPoint<M extends MValue = MValue> {
   x: number;
   y: number;
   z?: number;
-  m?: MValue;
+  m?: M;
   // t for tolerance. A tmp value used for simplification
   t?: number;
 }
 /** Definition of a Vector MultiPoint */
-export type VectorMultiPoint = VectorPoint[];
+export type VectorMultiPoint<M extends MValue = MValue> = VectorPoint<M>[];
 /** Definition of a Vector LineString */
-export type VectorLineString = VectorPoint[];
+export type VectorLineString<M extends MValue = MValue> = VectorPoint<M>[];
 /** Definition of a Vector MultiLineString */
-export type VectorMultiLineString = VectorLineString[];
+export type VectorMultiLineString<M extends MValue = MValue> = VectorLineString<M>[];
 /** Definition of a Vector Polygon */
-export type VectorPolygon = VectorLineString[];
+export type VectorPolygon<M extends MValue = MValue> = VectorLineString<M>[];
 /** Definition of a Vector MultiPolygon */
-export type VectorMultiPolygon = VectorPolygon[];
+export type VectorMultiPolygon<M extends MValue = MValue> = VectorPolygon<M>[];
 
 /** All possible geometry coordinates */
-export type VectorCoordinates =
-  | VectorPoint
-  | VectorMultiPoint
-  | VectorLineString
-  | VectorMultiLineString
-  | VectorPolygon
-  | VectorMultiPolygon;
+export type VectorCoordinates<M extends MValue = MValue> =
+  | VectorPoint<M>
+  | VectorMultiPoint<M>
+  | VectorLineString<M>
+  | VectorMultiLineString<M>
+  | VectorPolygon<M>
+  | VectorMultiPolygon<M>;
 
 /** All possible geometry types */
 export type VectorGeometryType =
@@ -241,9 +241,9 @@ export type VectorGeometryType =
   | 'Polygon'
   | 'MultiPolygon';
 /** All possible geometry shapes */
-export type VectorGeometry =
-  | VectorPointGeometry
-  | VectorMultiPointGeometry
+export type VectorGeometry<M extends MValue = MValue> =
+  | VectorPointGeometry<M>
+  | VectorMultiPointGeometry<M>
   | VectorLineStringGeometry
   | VectorMultiLineStringGeometry
   | VectorPolygonGeometry
@@ -284,37 +284,47 @@ export type VectorPolygonOffset = VectorLineOffset[];
 export type VectorMultiPolygonOffset = VectorPolygonOffset[];
 
 /** PointGeometry is a point */
-export type VectorPointGeometry = VectorBaseGeometry<'Point', VectorPoint, undefined, BBOX>;
+export type VectorPointGeometry<M extends MValue = MValue> = VectorBaseGeometry<
+  'Point',
+  VectorPoint<M>,
+  undefined,
+  BBOX
+>;
 /** MultiPointGeometry contains multiple points */
-export type VectorMultiPointGeometry = VectorBaseGeometry<
+export type VectorMultiPointGeometry<M extends MValue = MValue> = VectorBaseGeometry<
   'MultiPoint',
-  VectorMultiPoint,
+  VectorMultiPoint<M>,
   undefined,
   BBOX
 >;
 /** LineStringGeometry is a line */
-export type VectorLineStringGeometry = VectorBaseGeometry<
+export type VectorLineStringGeometry<M extends MValue = MValue> = VectorBaseGeometry<
   'LineString',
-  VectorLineString,
+  VectorLineString<M>,
   VectorLineOffset,
   BBOX
 >;
 /** MultiLineStringGeometry contians multiple lines */
-export type VectorMultiLineStringGeometry = VectorBaseGeometry<
+export type VectorMultiLineStringGeometry<M extends MValue = MValue> = VectorBaseGeometry<
   'MultiLineString',
-  VectorMultiLineString,
+  VectorMultiLineString<M>,
   VectorMultiLineOffset,
   BBOX
 >;
 /** PolygonGeometry is a polygon with potential holes */
-export interface VectorPolygonGeometry
-  extends VectorBaseGeometry<'Polygon', VectorPolygon, VectorPolygonOffset, BBOX> {
+export interface VectorPolygonGeometry<M extends MValue = MValue>
+  extends VectorBaseGeometry<'Polygon', VectorPolygon<M>, VectorPolygonOffset, BBOX> {
   indices?: number[];
   tesselation?: number[];
 }
 /** MultiPolygonGeometry is a polygon with multiple polygons with their own potential holes */
-export interface VectorMultiPolygonGeometry
-  extends VectorBaseGeometry<'MultiPolygon', VectorMultiPolygon, VectorMultiPolygonOffset, BBOX> {
+export interface VectorMultiPolygonGeometry<M extends MValue = MValue>
+  extends VectorBaseGeometry<
+    'MultiPolygon',
+    VectorMultiPolygon<M>,
+    VectorMultiPolygonOffset,
+    BBOX
+  > {
   indices?: number[];
   tesselation?: number[];
 }

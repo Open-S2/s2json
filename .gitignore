@@ -12,3 +12,4 @@ server/out/**
 coverage/**
 *.profraw
 cobertura.xml
+docs/
