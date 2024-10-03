@@ -8,31 +8,13 @@
 
 extern crate alloc;
 
-/// Global conversion tool
-pub mod convert;
 /// All geometry types and structs
 pub mod geometry;
-/// All S2 tooling
-pub mod s2;
-/// All simplify tooling
-pub mod simplify;
-/// Tile Structure
-pub mod tile;
-/// All utility tools
-pub mod util;
 /// All values types and structs
 pub mod values;
-/// All WM tooling
-pub mod wm;
 
-pub use convert::*;
 pub use geometry::*;
-pub use s2::*;
-pub use simplify::*;
-pub use tile::*;
-pub use util::*;
 pub use values::*;
-pub use wm::*;
 
 use serde::{Deserialize, Serialize};
 
