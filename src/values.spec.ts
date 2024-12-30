@@ -1,12 +1,21 @@
 /** Primitive types supported by Properties */
 export type Primitive = string | number | boolean | null | undefined;
 
+/** ValueArray Objects are limited to primitives */
+export interface ValueArrayObject {
+  [key: string]: Primitive;
+}
+
 /**
  * When an array is used, it must be an array of the same type.
  * Arrays are also limited to primitives and objects of primitives
  */
-export type ValueArray =
-  Array<Primitive | { [key: string]: Primitive }> extends (infer U)[] ? U[] : never;
+export type ValueArray = (Primitive | ValueArrayObject)[] extends (infer U)[] ? U[] : never;
+
+/** Values can have nested objects */
+export interface ValueObject {
+  [key: string]: Value;
+}
 
 /**
  * Supports primitive types `string`, `number`, `boolean`, `null`
@@ -14,7 +23,7 @@ export type ValueArray =
  * Object keys are always strings, values can be any basic type, an array, or a nested object.
  * Array values must all be the same type.
  */
-export type Value = Primitive | ValueArray | { [key: string]: Value };
+export type Value = Primitive | ValueArray | ValueObject;
 
 /**
  * Shape of a features properties object
