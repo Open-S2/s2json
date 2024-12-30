@@ -1,5 +1,5 @@
 /** Primitive types supported by Properties */
-export type Primitive = string | number | boolean | null;
+export type Primitive = string | number | boolean | null | undefined;
 
 /**
  * When an array is used, it must be an array of the same type.
@@ -16,7 +16,11 @@ export type ValueArray =
  */
 export type Value = Primitive | ValueArray | { [key: string]: Value };
 
-/** Shape of a features properties object */
+/**
+ * Shape of a features properties object
+ * NOTE: When designing an interface, you MAY have undefined properties like: { a?: string },
+ * but know that they will probably be serialized as null
+ */
 export type Properties = Record<string, Value>;
 /** Shape of a feature's M-Values object */
 export type MValue = Properties;
