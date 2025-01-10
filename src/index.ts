@@ -34,14 +34,21 @@ export type FeatureCollection<
   M = Record<string, unknown>,
   D extends MValue = MValue,
   P extends Properties = Properties,
-  G = Geometries<D>,
-> = BaseFeatureCollection<'FeatureCollection', Feature<M, D, P, G> | VectorFeature<M, D, P, G>>;
+  G extends Geometry<D> = Geometry<D>,
+> = BaseFeatureCollection<'FeatureCollection', Feature<M, D, P, G>>;
+/** WG Vector FeatureCollection */
+export type VectorFeatureCollection<
+  M = Record<string, unknown>,
+  D extends MValue = MValue,
+  P extends Properties = Properties,
+  G extends VectorGeometry<D> = VectorGeometry<D>,
+> = BaseFeatureCollection<'FeatureCollection', VectorFeature<M, D, P, G>>;
 /** S2 FeatureCollection */
 export interface S2FeatureCollection<
   M = Record<string, unknown>,
   D extends MValue = MValue,
   P extends Properties = Properties,
-  G = VectorGeometry<D>,
+  G extends VectorGeometry<D> = VectorGeometry<D>,
 > extends BaseFeatureCollection<'S2FeatureCollection', S2Feature<M, D, P, G>> {
   faces: Face[];
 }
@@ -77,14 +84,14 @@ export type VectorFeature<
   M = Record<string, unknown>,
   D extends MValue = MValue,
   P extends Properties = Properties,
-  G = VectorGeometry<D>,
+  G extends VectorGeometry<D> = VectorGeometry<D>,
 > = BaseFeature<'VectorFeature', M, D, P, G>;
 /** S2 Feature */
 export interface S2Feature<
   M = Record<string, unknown>,
   D extends MValue = MValue,
   P extends Properties = Properties,
-  G = VectorGeometry<D>,
+  G extends VectorGeometry<D> = VectorGeometry<D>,
 > extends BaseFeature<'S2Feature', M, D, P, G> {
   face: Face;
 }
@@ -98,36 +105,34 @@ export interface S2Feature<
  */
 export type Attributions = Record<string, string>;
 
-/** Either an S2 or WG FeatureCollection */
+/** Either an S2, Vector WG or WG FeatureCollection */
 export type FeatureCollections<
   M = Record<string, unknown>,
   D extends MValue = MValue,
   P extends Properties = Properties,
-  G = Geometries<D>,
-> = FeatureCollection<M, D, P, G> | S2FeatureCollection<M, D, P, G>;
+> = FeatureCollection<M, D, P> | VectorFeatureCollection<M, D, P> | S2FeatureCollection<M, D, P>;
 
 /** Either an S2 or WG FeatureCollection where its known it's only Vector Geometry */
 export type VectorFeatureCollections<
   M = Record<string, unknown>,
   D extends MValue = MValue,
   P extends Properties = Properties,
-  G = VectorGeometry<D>,
-> = FeatureCollection<M, D, P, G> | S2FeatureCollection<M, D, P, G>;
+  G extends VectorGeometry<D> = VectorGeometry<D>,
+> = VectorFeatureCollection<M, D, P, G> | S2FeatureCollection<M, D, P, G>;
 
-/** Either an S2 or WG Feature */
+/** Either an S2, Vector WG or WG Feature */
 export type Features<
   M = Record<string, unknown>,
   D extends MValue = MValue,
   P extends Properties = Properties,
-  G = Geometries<D>,
-> = Feature<M, D, P, G> | VectorFeature<M, D, P, G> | S2Feature<M, D, P, G>;
+> = Feature<M, D, P> | VectorFeature<M, D, P> | S2Feature<M, D, P>;
 
 /** Any Vector Geometry type */
 export type VectorFeatures<
   M = Record<string, unknown>,
   D extends MValue = MValue,
   P extends Properties = Properties,
-  G = VectorGeometry<D>,
+  G extends VectorGeometry<D> = VectorGeometry<D>,
 > = VectorFeature<M, D, P, G> | S2Feature<M, D, P, G>;
 
 /** All major S2JSON types */
@@ -135,5 +140,4 @@ export type JSONCollection<
   M = Record<string, unknown>,
   D extends MValue = MValue,
   P extends Properties = Properties,
-  G = Geometries<D>,
-> = FeatureCollection<M, D, P, G> | S2FeatureCollection<M, D, P, G> | Features<M, D, P, G>;
+> = FeatureCollections<M, D, P> | Features<M, D, P>;
