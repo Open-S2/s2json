@@ -30,7 +30,7 @@ export type BBox3D = [
 export type BBOX = BBox | BBox3D;
 
 /** A Point in S2 Space with a Face */
-export interface STPoint {
+export interface STPoint<M extends MValue = MValue> {
   /** The face of the point */
   face: Face;
   /** The S coordinates of the point */
@@ -40,7 +40,7 @@ export interface STPoint {
   /** The Z coordinates of the point */
   z?: number;
   /** The M coordinates of the point */
-  m?: MValue;
+  m?: M;
 }
 
 /** Definition of a Point. May represent WebMercator Lon-Lat or S2Geometry S-T */
@@ -244,10 +244,10 @@ export type VectorGeometryType =
 export type VectorGeometry<M extends MValue = MValue> =
   | VectorPointGeometry<M>
   | VectorMultiPointGeometry<M>
-  | VectorLineStringGeometry
-  | VectorMultiLineStringGeometry
-  | VectorPolygonGeometry
-  | VectorMultiPolygonGeometry;
+  | VectorLineStringGeometry<M>
+  | VectorMultiLineStringGeometry<M>
+  | VectorPolygonGeometry<M>
+  | VectorMultiPolygonGeometry<M>;
 
 /** BaseGeometry with MValues is the a generic geometry type that includes MValues */
 export interface VectorBaseGeometry<

@@ -31,13 +31,15 @@ export type FeatureCollection<
   M = Record<string, unknown>,
   D extends MValue = MValue,
   P extends Properties = Properties,
-> = BaseFeatureCollection<'FeatureCollection', Feature<M, D, P> | VectorFeature<M, D, P>>;
+  G = Geometry<D> | VectorGeometry<D>,
+> = BaseFeatureCollection<'FeatureCollection', Feature<M, D, P, G> | VectorFeature<M, D, P, G>>;
 /** S2 FeatureCollection */
 export interface S2FeatureCollection<
   M = Record<string, unknown>,
   D extends MValue = MValue,
   P extends Properties = Properties,
-> extends BaseFeatureCollection<'S2FeatureCollection', S2Feature<M, D, P>> {
+  G = VectorGeometry<D>,
+> extends BaseFeatureCollection<'S2FeatureCollection', S2Feature<M, D, P, G>> {
   faces: Face[];
 }
 
@@ -98,14 +100,24 @@ export type FeatureCollections<
   M = Record<string, unknown>,
   D extends MValue = MValue,
   P extends Properties = Properties,
-> = FeatureCollection<M, D, P> | S2FeatureCollection<M, D, P>;
+  G = Geometry<D> | VectorGeometry<D>,
+> = FeatureCollection<M, D, P, G> | S2FeatureCollection<M, D, P, G>;
+
+/** Either an S2 or WG FeatureCollection where its known it's only Vector Geometry */
+export type VectorFeatureCollections<
+  M = Record<string, unknown>,
+  D extends MValue = MValue,
+  P extends Properties = Properties,
+  G extends VectorGeometry<D> = VectorGeometry<D>,
+> = FeatureCollection<M, D, P, G> | S2FeatureCollection<M, D, P, G>;
 
 /** Either an S2 or WG Feature */
 export type Features<
   M = Record<string, unknown>,
   D extends MValue = MValue,
   P extends Properties = Properties,
-> = Feature<M, D, P> | VectorFeature<M, D, P> | S2Feature<M, D, P>;
+  G = Geometry<D> | VectorGeometry<D>,
+> = Feature<M, D, P, G> | VectorFeature<M, D, P, G> | S2Feature<M, D, P, G>;
 
 /** Any Vector Geometry type */
 export type VectorFeatures<
@@ -119,4 +131,5 @@ export type JSONCollection<
   M = Record<string, unknown>,
   D extends MValue = MValue,
   P extends Properties = Properties,
-> = FeatureCollection<M, D, P> | S2FeatureCollection<M, D, P> | Features<M, D, P>;
+  G = Geometry<D> | VectorGeometry<D>,
+> = FeatureCollection<M, D, P, G> | S2FeatureCollection<M, D, P, G> | Features<M, D, P, G>;
