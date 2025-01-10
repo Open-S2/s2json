@@ -111,7 +111,7 @@ export type VectorFeatureCollections<
   M = Record<string, unknown>,
   D extends MValue = MValue,
   P extends Properties = Properties,
-  G extends VectorGeometry<D> = VectorGeometry<D>,
+  G = VectorGeometry<D>,
 > = FeatureCollection<M, D, P, G> | S2FeatureCollection<M, D, P, G>;
 
 /** Either an S2 or WG Feature */
@@ -127,7 +127,8 @@ export type VectorFeatures<
   M = Record<string, unknown>,
   D extends MValue = MValue,
   P extends Properties = Properties,
-> = VectorFeature<M, D, P> | S2Feature<M, D, P>;
+  G = VectorGeometry<D>,
+> = VectorFeature<M, D, P, G> | S2Feature<M, D, P, G>;
 
 /** All major S2JSON types */
 export type JSONCollection<
