@@ -7,6 +7,9 @@ export * from './values.spec';
 // NOTE: S2 -> S2Geometry
 // NOTE: WG -> WGS84
 
+/** Support for both vector and non-vector geometries */
+export type Geometries<M extends MValue = MValue> = Geometry<M> | VectorGeometry<M>;
+
 /** Whether the projection is S2 or WM */
 export type Projection = 'WM' | 'S2';
 
@@ -31,7 +34,7 @@ export type FeatureCollection<
   M = Record<string, unknown>,
   D extends MValue = MValue,
   P extends Properties = Properties,
-  G = Geometry<D> | VectorGeometry<D>,
+  G = Geometries<D>,
 > = BaseFeatureCollection<'FeatureCollection', Feature<M, D, P, G> | VectorFeature<M, D, P, G>>;
 /** S2 FeatureCollection */
 export interface S2FeatureCollection<
@@ -53,7 +56,7 @@ export interface BaseFeature<
   M = Record<string, unknown>,
   D extends MValue = MValue,
   P extends Properties = Properties,
-  G = Geometry<D> | VectorGeometry<D>,
+  G = Geometries<D>,
 > {
   type: T;
   id?: number;
@@ -100,7 +103,7 @@ export type FeatureCollections<
   M = Record<string, unknown>,
   D extends MValue = MValue,
   P extends Properties = Properties,
-  G = Geometry<D> | VectorGeometry<D>,
+  G = Geometries<D>,
 > = FeatureCollection<M, D, P, G> | S2FeatureCollection<M, D, P, G>;
 
 /** Either an S2 or WG FeatureCollection where its known it's only Vector Geometry */
@@ -116,7 +119,7 @@ export type Features<
   M = Record<string, unknown>,
   D extends MValue = MValue,
   P extends Properties = Properties,
-  G = Geometry<D> | VectorGeometry<D>,
+  G = Geometries<D>,
 > = Feature<M, D, P, G> | VectorFeature<M, D, P, G> | S2Feature<M, D, P, G>;
 
 /** Any Vector Geometry type */
@@ -131,5 +134,5 @@ export type JSONCollection<
   M = Record<string, unknown>,
   D extends MValue = MValue,
   P extends Properties = Properties,
-  G = Geometry<D> | VectorGeometry<D>,
+  G = Geometries<D>,
 > = FeatureCollection<M, D, P, G> | S2FeatureCollection<M, D, P, G> | Features<M, D, P, G>;
