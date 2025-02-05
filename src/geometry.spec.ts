@@ -204,7 +204,16 @@ export type MultiPolygon3DGeometry<M extends MValue = MValue> = BaseGeometry<
 /// Vector Types
 
 /** Definition of a Vector Point */
-export interface VectorPoint<M extends MValue | undefined = undefined> {
+export interface VectorPoint<M extends MValue = MValue> {
+  x: number;
+  y: number;
+  z?: number;
+  m?: M;
+  // t for tolerance. A tmp value used for simplification
+  t?: number;
+}
+/** Definition of a Vector Point with a gaurenteed M-Value */
+export interface VectorPointM<M extends MValue = MValue> {
   x: number;
   y: number;
   z?: number;
