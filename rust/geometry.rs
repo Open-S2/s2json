@@ -645,8 +645,8 @@ pub struct VectorPoint {
 }
 impl VectorPoint {
     /// Create a new point
-    pub fn new(x: f64, y: f64, z: Option<f64>) -> Self {
-        Self { x, y, z, m: None, t: None }
+    pub fn new(x: f64, y: f64, z: Option<f64>, m: Option<MValue>) -> Self {
+        Self { x, y, z, m, t: None }
     }
 
     /// Project the point into the 0->1 coordinate system
@@ -819,8 +819,8 @@ mod tests {
     #[test]
     fn test_bbox_functions() {
         let bbox = BBox::new(0., 0., 1., 1.);
-        assert!(bbox.point_overlap(VectorPoint::new(0.5, 0.5, None)));
-        assert!(!bbox.point_overlap(VectorPoint::new(2.0, 2.0, None)));
+        assert!(bbox.point_overlap(VectorPoint::new(0.5, 0.5, None, None)));
+        assert!(!bbox.point_overlap(VectorPoint::new(2.0, 2.0, None, None)));
         let bbox2 = BBox { left: 0.5, bottom: 0.5, right: 1.5, top: 1.5 };
         assert_eq!(
             bbox.overlap(&bbox2),
