@@ -1,3 +1,5 @@
+use core::f64;
+
 use serde::de::{self, SeqAccess, Visitor};
 use serde::ser::SerializeTuple;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
@@ -5,13 +7,10 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use alloc::fmt;
 use alloc::vec::Vec;
 
-use core::f64::consts::PI;
-
-use libm::{atan, log, pow, sin, sinh, sqrt};
+use crate::VectorPoint;
 
 /// Importing necessary types (equivalent to importing from 'values')
-use crate::values::*;
-use crate::Face;
+use crate::*;
 
 /// The axis to apply an operation to
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
@@ -27,7 +26,7 @@ pub enum Axis {
 /// The order is (left, bottom, right, top)
 /// If WM, then the projection is lon-lat
 /// If S2, then the projection is s-t
-#[derive(Copy, Clone, Default, Debug, PartialEq, PartialOrd)]
+#[derive(Copy, Clone, Debug, PartialEq, PartialOrd)]
 pub struct BBox<T = f64> {
     /// left most longitude (WM) or S (S2)
     pub left: T,
@@ -111,10 +110,53 @@ impl<T> BBox<T> {
         new_bbox
     }
 }
+impl Default for BBox<f64> {
+    fn default() -> Self {
+        BBox::new(f64::INFINITY, f64::INFINITY, -f64::INFINITY, -f64::INFINITY)
+    }
+}
 impl BBox<f64> {
     /// Creates a new BBox from a point
     pub fn from_point(point: &VectorPoint) -> Self {
         BBox::new(point.x, point.y, point.x, point.y)
+    }
+
+    /// Creates a new BBox from a linestring
+    pub fn from_linestring(line: &VectorLineString) -> Self {
+        let mut bbox = BBox::from_point(&line[0]);
+        for point in line {
+            bbox.extend_from_point(point);
+        }
+        bbox
+    }
+
+    /// Creates a new BBox from a multi-linestring
+    pub fn from_multi_linestring(lines: &VectorMultiLineString) -> Self {
+        let mut bbox = BBox::from_point(&lines[0][0]);
+        for line in lines {
+            for point in line {
+                bbox.extend_from_point(point);
+            }
+        }
+        bbox
+    }
+
+    /// Creates a new BBox from a polygon
+    pub fn from_polygon(polygon: &VectorPolygon) -> Self {
+        BBox::<f64>::from_multi_linestring(polygon)
+    }
+
+    /// Creates a new BBox from a multi-polygon
+    pub fn from_multi_polygon(polygons: &VectorMultiPolygon) -> Self {
+        let mut bbox = BBox::from_point(&polygons[0][0][0]);
+        for polygon in polygons {
+            for line in polygon {
+                for point in line {
+                    bbox.extend_from_point(point);
+                }
+            }
+        }
+        bbox
     }
 
     /// Extends the bounding box with a point
@@ -205,7 +247,7 @@ where
 
 /// A BBOX is defined in lon-lat space and helps with zooming motion to
 /// see the entire 3D line or polygon
-#[derive(Copy, Clone, Default, Debug, PartialEq, PartialOrd)]
+#[derive(Copy, Clone, Debug, PartialEq, PartialOrd)]
 pub struct BBox3D<T = f64> {
     /// left most longitude (WM) or S (S2)
     pub left: T,
@@ -323,6 +365,18 @@ where
         seq.end()
     }
 }
+impl Default for BBox3D<f64> {
+    fn default() -> Self {
+        BBox3D::new(
+            f64::INFINITY,
+            f64::INFINITY,
+            -f64::INFINITY,
+            -f64::INFINITY,
+            f64::INFINITY,
+            -f64::INFINITY,
+        )
+    }
+}
 impl BBox3D<f64> {
     /// Creates a new BBox3D from a point
     pub fn from_point(point: &VectorPoint) -> Self {
@@ -331,14 +385,52 @@ impl BBox3D<f64> {
             point.y,
             point.x,
             point.y,
-            point.z.unwrap_or(0.),
-            point.z.unwrap_or(1.),
+            point.z.unwrap_or(f64::INFINITY),
+            point.z.unwrap_or(-f64::INFINITY),
         )
+    }
+
+    /// Creates a new BBox from a linestring
+    pub fn from_linestring(line: &VectorLineString) -> Self {
+        let mut bbox = BBox3D::from_point(&line[0]);
+        for point in line {
+            bbox.extend_from_point(point);
+        }
+        bbox
+    }
+
+    /// Creates a new BBox from a multi-linestring
+    pub fn from_multi_linestring(lines: &VectorMultiLineString) -> Self {
+        let mut bbox = BBox3D::from_point(&lines[0][0]);
+        for line in lines {
+            for point in line {
+                bbox.extend_from_point(point);
+            }
+        }
+        bbox
+    }
+
+    /// Creates a new BBox from a polygon
+    pub fn from_polygon(polygon: &VectorPolygon) -> Self {
+        BBox3D::<f64>::from_multi_linestring(polygon)
+    }
+
+    /// Creates a new BBox from a multi-polygon
+    pub fn from_multi_polygon(polygons: &VectorMultiPolygon) -> Self {
+        let mut bbox = BBox3D::from_point(&polygons[0][0][0]);
+        for polygon in polygons {
+            for line in polygon {
+                for point in line {
+                    bbox.extend_from_point(point);
+                }
+            }
+        }
+        bbox
     }
 
     /// Creates a new BBox3D from a BBox
     pub fn from_bbox(bbox: &BBox) -> Self {
-        BBox3D::new(bbox.left, bbox.bottom, bbox.right, bbox.top, 0., 1.)
+        BBox3D::new(bbox.left, bbox.bottom, bbox.right, bbox.top, 0., 0.)
     }
 
     /// Extends the bounding box with a point
@@ -355,8 +447,8 @@ impl BBox3D<f64> {
             bottom: division_factor * v - 1.0,
             right: division_factor * (u + 1.0) - 1.0,
             top: division_factor * (v + 1.0) - 1.0,
-            near: 0.,
-            far: 1.,
+            near: f64::INFINITY,
+            far: -f64::INFINITY,
         }
     }
 
@@ -369,14 +461,14 @@ impl BBox3D<f64> {
             bottom: division_factor * t,
             right: division_factor * (s + 1.),
             top: division_factor * (t + 1.),
-            near: 0.,
-            far: 1.,
+            near: f64::INFINITY,
+            far: -f64::INFINITY,
         }
     }
 }
-impl From<&BBox> for BBox3D<f64> {
-    fn from(bbox: &BBox) -> Self {
-        BBox3D::from_bbox(bbox)
+impl From<BBox> for BBox3D<f64> {
+    fn from(bbox: BBox) -> Self {
+        BBox3D::from_bbox(&bbox)
     }
 }
 impl<'de, T> Deserialize<'de> for BBox3D<T>
@@ -495,7 +587,7 @@ impl From<&str> for GeometryType {
             "MultiLineString3D" => GeometryType::MultiLineString3D,
             "Polygon3D" => GeometryType::Polygon3D,
             "MultiPolygon3D" => GeometryType::MultiPolygon3D,
-            _ => GeometryType::Point,
+            _ => unreachable!(),
         }
     }
 }
@@ -622,73 +714,11 @@ impl From<&str> for VectorGeometryType {
             "MultiLineString" => VectorGeometryType::MultiLineString,
             "Polygon" => VectorGeometryType::Polygon,
             "MultiPolygon" => VectorGeometryType::MultiPolygon,
-            _ => VectorGeometryType::Point,
+            _ => panic!("Invalid vector geometry type: {}", s),
         }
     }
 }
 
-/// A Vector Point uses a structure for 2D or 3D points
-#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
-pub struct VectorPoint {
-    /// X coordinate
-    pub x: f64,
-    /// Y coordinate
-    pub y: f64,
-    /// Z coordinate or "altitude". May be None
-    pub z: Option<f64>,
-    /// M-Value
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub m: Option<MValue>,
-    /// T for tolerance. A tmp value used for simplification
-    #[serde(skip)]
-    pub t: Option<f64>,
-}
-impl VectorPoint {
-    /// Create a new point
-    pub fn new(x: f64, y: f64, z: Option<f64>, m: Option<MValue>) -> Self {
-        Self { x, y, z, m, t: None }
-    }
-
-    /// Project the point into the 0->1 coordinate system
-    pub fn project(&mut self, bbox: &mut Option<BBox3D>) {
-        let y = self.y;
-        let x = self.x;
-        let sin = sin((y * PI) / 180.);
-        let y2 = 0.5 - (0.25 * log((1. + sin) / (1. - sin))) / PI;
-        self.x = x / 360. + 0.5;
-        self.y = y2.clamp(0., 1.);
-
-        match bbox {
-            Some(bbox) => bbox.extend_from_point(self),
-            None => *bbox = Some(BBox3D::from_point(self)),
-        };
-    }
-
-    /// Unproject the point from the 0->1 coordinate system back to a lon-lat coordinate
-    pub fn unproject(&mut self) {
-        let lon = (self.x - 0.5) * 360.;
-        let y2 = 0.5 - self.y;
-        let lat = atan(sinh(PI * (y2 * 2.))).to_degrees();
-
-        self.x = lon;
-        self.y = lat;
-    }
-
-    /// Calculate the distance between two points
-    pub fn distance(&self, other: &VectorPoint) -> f64 {
-        sqrt(pow(other.x - self.x, 2.) + pow(other.y - self.y, 2.))
-    }
-}
-impl From<&Point> for VectorPoint {
-    fn from(p: &Point) -> Self {
-        Self { x: p.0, y: p.1, z: None, m: None, t: None }
-    }
-}
-impl From<&Point3D> for VectorPoint {
-    fn from(p: &Point3D) -> Self {
-        Self { x: p.0, y: p.1, z: Some(p.2), m: None, t: None }
-    }
-}
 /// Definition of a Vector MultiPoint
 pub type VectorMultiPoint = Vec<VectorPoint>;
 /// Definition of a Vector LineString
@@ -807,17 +837,53 @@ mod tests {
         assert_eq!(str_bbox, bbox);
 
         let default_bbox = BBox::default();
-        assert_eq!(default_bbox, BBox { left: 0.0, bottom: 0.0, right: 0.0, top: 0.0 });
+        assert_eq!(
+            default_bbox,
+            BBox {
+                left: f64::INFINITY,
+                bottom: f64::INFINITY,
+                right: -f64::INFINITY,
+                top: -f64::INFINITY
+            }
+        );
 
         let default_bbox_2 = BBOX::default();
         assert_eq!(
             default_bbox_2,
-            BBOX::BBox(BBox { left: 0.0, bottom: 0.0, right: 0.0, top: 0.0 })
+            BBOX::BBox(BBox {
+                left: f64::INFINITY,
+                bottom: f64::INFINITY,
+                right: -f64::INFINITY,
+                top: -f64::INFINITY
+            })
         );
     }
 
     #[test]
-    fn test_bbox_functions() {
+    fn test_bbox_serialize() {
+        let bbox = BBox { left: 0.0, bottom: 0.0, right: 1.0, top: 1.0 };
+        let bbox_str = serde_json::to_string(&bbox).unwrap();
+        assert_eq!(bbox_str, "[0.0,0.0,1.0,1.0]");
+    }
+
+    #[test]
+    fn test_bbox_deserialize() {
+        let bbox_str = "[0.0,0.0,1.0,1.0]";
+        let bbox: BBox = serde_json::from_str(bbox_str).unwrap();
+        assert_eq!(bbox, BBox { left: 0.0, bottom: 0.0, right: 1.0, top: 1.0 });
+    }
+
+    #[test]
+    fn test_bbox_clip() {
+        let bbox = BBox::new(0., 0., 1., 1.);
+        let bbox2 = BBox { left: 0.5, bottom: 0., right: 0.75, top: 1. };
+        assert_eq!(bbox.clip(Axis::X, 0.5, 0.75), bbox2);
+        let bbox2 = BBox { left: 0., bottom: 0.5, right: 1., top: 0.75 };
+        assert_eq!(bbox.clip(Axis::Y, 0.5, 0.75), bbox2);
+    }
+
+    #[test]
+    fn test_bbox_overlap() {
         let bbox = BBox::new(0., 0., 1., 1.);
         assert!(bbox.point_overlap(VectorPoint::new(0.5, 0.5, None, None)));
         assert!(!bbox.point_overlap(VectorPoint::new(2.0, 2.0, None, None)));
@@ -831,7 +897,17 @@ mod tests {
     }
 
     #[test]
-    fn test_bbox_functions_2() {
+    fn test_bbox_merge() {
+        let bbox = BBox::new(0., 0., 1., 1.);
+        let bbox2 = BBox { left: 0.5, bottom: 0.5, right: 1.5, top: 1.5 };
+        assert_eq!(bbox.merge(&bbox2), BBox { left: 0.0, bottom: 0.0, right: 1.5, top: 1.5 });
+        assert_eq!(bbox2.merge(&bbox), BBox { left: 0.0, bottom: 0.0, right: 1.5, top: 1.5 });
+        let bbox3 = BBox { left: 2.0, bottom: 2.0, right: 3.0, top: 3.0 };
+        assert_eq!(bbox.merge(&bbox3), BBox { left: 0.0, bottom: 0.0, right: 3.0, top: 3.0 });
+    }
+
+    #[test]
+    fn test_bbox_from_st_uv() {
         let bbox = BBox::from_st_zoom(0., 0., 0);
         assert_eq!(bbox, BBox { left: 0.0, bottom: 0.0, right: 1., top: 1. });
 
@@ -852,6 +928,51 @@ mod tests {
     }
 
     #[test]
+    fn test_bbox_from_point() {
+        let bbox = BBox::from_point(&VectorPoint::new(0., 0., None, None));
+        assert_eq!(bbox, BBox { left: 0.0, bottom: 0.0, right: 0.0, top: 0.0 });
+    }
+
+    #[test]
+    fn test_bbox_from_linestring() {
+        let bbox = BBox::from_linestring(&vec![
+            VectorPoint::new(0., 0., None, None),
+            VectorPoint::new(1., 1.5, None, None),
+        ]);
+        assert_eq!(bbox, BBox { left: 0.0, bottom: 0.0, right: 1.0, top: 1.5 });
+    }
+
+    #[test]
+    fn test_bbox_from_multilinestring() {
+        let bbox = BBox::from_multi_linestring(&vec![vec![
+            VectorPoint::new(0., 0., None, None),
+            VectorPoint::new(1., 1.5, None, None),
+        ]]);
+        assert_eq!(bbox, BBox { left: 0.0, bottom: 0.0, right: 1.0, top: 1.5 });
+    }
+
+    #[test]
+    fn test_bbox_from_polygon() {
+        let bbox = BBox::from_polygon(&vec![vec![
+            VectorPoint::new(0., 0., None, None),
+            VectorPoint::new(2., 1.5, None, None),
+        ]]);
+        assert_eq!(bbox, BBox { left: 0.0, bottom: 0.0, right: 2.0, top: 1.5 });
+    }
+
+    #[test]
+    fn test_bbox_from_multipolygon() {
+        let bbox = BBox::from_multi_polygon(&vec![
+            vec![vec![VectorPoint::new(0., 0., None, None), VectorPoint::new(2., 1.5, None, None)]],
+            vec![vec![
+                VectorPoint::new(0., 0., None, None),
+                VectorPoint::new(-1., 3.5, None, None),
+            ]],
+        ]);
+        assert_eq!(bbox, BBox { left: -1.0, bottom: 0.0, right: 2.0, top: 3.5 });
+    }
+
+    #[test]
     fn test_bbox3d() {
         let bbox = BBox3D { left: 0.0, bottom: 0.0, right: 1.0, top: 1.0, near: 0.0, far: 1.0 };
         assert_eq!(
@@ -866,7 +987,275 @@ mod tests {
         let default_bbox = BBox3D::default();
         assert_eq!(
             default_bbox,
-            BBox3D { left: 0.0, bottom: 0.0, right: 0.0, top: 0.0, near: 0.0, far: 0.0 }
+            BBox3D {
+                left: f64::INFINITY,
+                bottom: f64::INFINITY,
+                right: -f64::INFINITY,
+                top: -f64::INFINITY,
+                near: f64::INFINITY,
+                far: -f64::INFINITY
+            }
+        );
+    }
+
+    #[test]
+    fn test_bbox_3d_serialize() {
+        let bbox = BBox3D { left: 0.0, bottom: 0.0, right: 1.0, top: 1.0, near: 0.0, far: 1.0 };
+        let bbox_str = serde_json::to_string(&bbox).unwrap();
+        assert_eq!(bbox_str, "[0.0,0.0,1.0,1.0,0.0,1.0]");
+    }
+
+    #[test]
+    fn test_bbox_3_d_deserialize() {
+        let bbox_str = "[0.0,0.0,1.0,1.0,0.0,1.0]";
+        let bbox: BBox3D = serde_json::from_str(bbox_str).unwrap();
+        assert_eq!(
+            bbox,
+            BBox3D { left: 0.0, bottom: 0.0, right: 1.0, top: 1.0, near: 0.0, far: 1.0 }
+        );
+    }
+
+    #[test]
+    fn test_bbox_3_d_overlap() {
+        let bbox = BBox3D::new(0., 0., 1., 1., 0., 1.);
+        assert!(bbox.point_overlap(VectorPoint::new(0.5, 0.5, None, None)));
+        assert!(!bbox.point_overlap(VectorPoint::new(2.0, 2.0, None, None)));
+        let bbox2 = BBox3D { left: 0.5, bottom: 0.5, right: 1.5, top: 1.5, near: 0.5, far: 1.5 };
+        assert_eq!(
+            bbox.overlap(&bbox2),
+            Some(BBox3D { left: 0.5, bottom: 0.5, right: 1.0, top: 1.0, near: 0.5, far: 1.0 })
+        );
+        let bbox3 = BBox3D { left: 2.0, bottom: 2.0, right: 3.0, top: 3.0, near: 2.0, far: 3.0 };
+        assert_eq!(bbox3.overlap(&bbox), None);
+    }
+
+    #[test]
+    fn test_bbox_3_d_clip() {
+        let bbox = BBox3D::new(0., 0., 1., 1., -1., 5.);
+        let bbox2 = BBox3D { left: 0.5, bottom: 0., right: 0.75, top: 1., near: -1., far: 5. };
+        assert_eq!(bbox.clip(Axis::X, 0.5, 0.75), bbox2);
+        let bbox2 = BBox3D { left: 0., bottom: 0.5, right: 1., top: 0.75, near: -1., far: 5. };
+        assert_eq!(bbox.clip(Axis::Y, 0.5, 0.75), bbox2);
+    }
+
+    #[test]
+    fn test_bbox_3_d_merge() {
+        let bbox = BBox3D::new(0., 0., 1., 1., 0., 1.);
+        let bbox2 = BBox3D { left: 0.5, bottom: 0.5, right: 1.5, top: 1.5, near: 0.5, far: 1.5 };
+        assert_eq!(
+            bbox.merge(&bbox2),
+            BBox3D { left: 0.0, bottom: 0.0, right: 1.5, top: 1.5, near: 0.0, far: 1.5 }
+        );
+        assert_eq!(
+            bbox2.merge(&bbox),
+            BBox3D { left: 0.0, bottom: 0.0, right: 1.5, top: 1.5, near: 0.0, far: 1.5 }
+        );
+        let bbox3 = BBox3D { left: 2.0, bottom: 2.0, right: 3.0, top: 3.0, near: 2.0, far: 3.0 };
+        assert_eq!(
+            bbox.merge(&bbox3),
+            BBox3D { left: 0.0, bottom: 0.0, right: 3.0, top: 3.0, near: 0.0, far: 3.0 }
+        );
+    }
+
+    #[test]
+    fn test_bbox_3_d_from_point() {
+        let bbox = BBox3D::from_point(&VectorPoint::new(0., 0., None, None));
+        assert_eq!(
+            bbox,
+            BBox3D {
+                left: 0.0,
+                bottom: 0.0,
+                right: 0.0,
+                top: 0.0,
+                near: f64::INFINITY,
+                far: -f64::INFINITY
+            }
+        );
+    }
+
+    #[test]
+    fn test_bbox_3_d_from_linestring() {
+        let bbox = BBox3D::from_linestring(&vec![
+            VectorPoint::new(0., 0., None, None),
+            VectorPoint::new(1., 1.5, None, None),
+        ]);
+        assert_eq!(
+            bbox,
+            BBox3D {
+                left: 0.0,
+                bottom: 0.0,
+                right: 1.0,
+                top: 1.5,
+                near: f64::INFINITY,
+                far: -f64::INFINITY
+            }
+        );
+    }
+
+    #[test]
+    fn test_bbox_3_d_from_multilinestring() {
+        let bbox = BBox3D::from_multi_linestring(&vec![vec![
+            VectorPoint::new(0., 0., None, None),
+            VectorPoint::new(1., 1.5, None, None),
+        ]]);
+        assert_eq!(
+            bbox,
+            BBox3D {
+                left: 0.0,
+                bottom: 0.0,
+                right: 1.0,
+                top: 1.5,
+                near: f64::INFINITY,
+                far: -f64::INFINITY
+            }
+        );
+    }
+
+    #[test]
+    fn test_bbox_3_d_from_polygon() {
+        let bbox = BBox3D::from_polygon(&vec![vec![
+            VectorPoint::new(0., 0., None, None),
+            VectorPoint::new(2., 1.5, None, None),
+        ]]);
+        assert_eq!(
+            bbox,
+            BBox3D {
+                left: 0.0,
+                bottom: 0.0,
+                right: 2.0,
+                top: 1.5,
+                near: f64::INFINITY,
+                far: -f64::INFINITY
+            }
+        );
+    }
+
+    #[test]
+    fn test_bbox_3_d_from_multipolygon() {
+        let bbox = BBox3D::from_multi_polygon(&vec![
+            vec![vec![VectorPoint::new(0., 0., None, None), VectorPoint::new(2., 1.5, None, None)]],
+            vec![vec![
+                VectorPoint::new(0., 0., None, None),
+                VectorPoint::new(-1., 3.5, None, None),
+            ]],
+        ]);
+        assert_eq!(
+            bbox,
+            BBox3D {
+                left: -1.0,
+                bottom: 0.0,
+                right: 2.0,
+                top: 3.5,
+                near: f64::INFINITY,
+                far: -f64::INFINITY
+            }
+        );
+    }
+
+    #[test]
+    fn test_bbox_3_d_extend_from_point() {
+        let mut bbox = BBox3D::default();
+        bbox.extend_from_point(&VectorPoint::new(20., -4., None, None));
+        assert_eq!(
+            bbox,
+            BBox3D {
+                left: 20.0,
+                bottom: -4.0,
+                right: 20.0,
+                top: -4.0,
+                near: f64::INFINITY,
+                far: -f64::INFINITY
+            }
+        );
+    }
+
+    #[test]
+    fn test_bbox_3_d_from_st_uv() {
+        let bbox = BBox3D::from_st_zoom(0., 0., 0);
+        assert_eq!(
+            bbox,
+            BBox3D {
+                left: 0.0,
+                bottom: 0.0,
+                right: 1.,
+                top: 1.,
+                near: f64::INFINITY,
+                far: -f64::INFINITY
+            }
+        );
+
+        let bbox = BBox3D::from_st_zoom(1., 0., 1);
+        assert_eq!(
+            bbox,
+            BBox3D {
+                left: 0.5,
+                bottom: 0.0,
+                right: 1.,
+                top: 0.5,
+                near: f64::INFINITY,
+                far: -f64::INFINITY
+            }
+        );
+
+        let bbox = BBox3D::from_st_zoom(2., 0., 2);
+        assert_eq!(
+            bbox,
+            BBox3D {
+                left: 0.5,
+                bottom: 0.0,
+                right: 0.75,
+                top: 0.25,
+                near: f64::INFINITY,
+                far: -f64::INFINITY
+            }
+        );
+
+        let bbox = BBox3D::from_uv_zoom(0., 0., 0);
+        assert_eq!(
+            bbox,
+            BBox3D {
+                left: -1.0,
+                bottom: -1.0,
+                right: 1.,
+                top: 1.,
+                near: f64::INFINITY,
+                far: -f64::INFINITY
+            }
+        );
+
+        let bbox = BBox3D::from_uv_zoom(1., 0., 1);
+        assert_eq!(
+            bbox,
+            BBox3D {
+                left: 0.,
+                bottom: -1.0,
+                right: 1.,
+                top: 0.,
+                near: f64::INFINITY,
+                far: -f64::INFINITY
+            }
+        );
+
+        let bbox = BBox3D::from_uv_zoom(2., 0., 2);
+        assert_eq!(
+            bbox,
+            BBox3D {
+                left: 0.,
+                bottom: -1.0,
+                right: 0.5,
+                top: -0.5,
+                near: f64::INFINITY,
+                far: -f64::INFINITY
+            }
+        );
+    }
+
+    #[test]
+    fn test_bbox_3_d_from_bbox() {
+        let bbox: BBox3D = BBox::new(0., 0., 1., 1.).into();
+        assert_eq!(
+            bbox,
+            BBox3D { left: 0.0, bottom: 0.0, right: 1.0, top: 1.0, near: 0.0, far: 0.0 }
         );
     }
 
@@ -1141,5 +1530,162 @@ mod tests {
         let str_multi_polygon: MultiPolygon3DGeometry =
             serde_json::from_str(&multi_polygon_str).unwrap();
         assert_eq!(str_multi_polygon, multi_polygon);
+    }
+
+    #[test]
+    fn test_vector_geometry_type() {
+        let vgt_point: VectorGeometryType = "Point".into();
+        assert_eq!(vgt_point, VectorGeometryType::Point);
+        let vgt_line_string: VectorGeometryType = "LineString".into();
+        assert_eq!(vgt_line_string, VectorGeometryType::LineString);
+        let vgt_polygon: VectorGeometryType = "Polygon".into();
+        assert_eq!(vgt_polygon, VectorGeometryType::Polygon);
+        let vgt_multi_point: VectorGeometryType = "MultiPoint".into();
+        assert_eq!(vgt_multi_point, VectorGeometryType::MultiPoint);
+        let vgt_multi_line_string: VectorGeometryType = "MultiLineString".into();
+        assert_eq!(vgt_multi_line_string, VectorGeometryType::MultiLineString);
+        let vgt_multi_polygon: VectorGeometryType = "MultiPolygon".into();
+        assert_eq!(vgt_multi_polygon, VectorGeometryType::MultiPolygon);
+    }
+
+    #[test]
+    #[should_panic(expected = "Invalid vector geometry type")]
+    fn test_invalid_vector_geometry_type() {
+        // This should panic when an invalid string is passed
+        let _ = VectorGeometryType::from("Pant");
+    }
+
+    #[test]
+    fn test_vector_geometry_bbox() {
+        let vgt_point: VectorGeometry = VectorGeometry::Point(VectorPointGeometry {
+            _type: "Point".into(),
+            coordinates: VectorPoint { x: 0.0, y: 1.0, z: Some(2.0), m: None, t: None },
+            bbox: None,
+            is_3d: true,
+            offset: None,
+            vec_bbox: Some(BBox3D {
+                left: 0.0,
+                bottom: 1.0,
+                right: 0.0,
+                top: 1.0,
+                near: 2.0,
+                far: 2.0,
+            }),
+            indices: None,
+            tesselation: None,
+        });
+        assert_eq!(vgt_point.vec_bbox().unwrap(), BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 2.0));
+        let vgt_multi_point: VectorGeometry =
+            VectorGeometry::MultiPoint(VectorMultiPointGeometry {
+                _type: "MultiPoint".into(),
+                coordinates: vec![VectorPoint { x: 0.0, y: 1.0, z: Some(2.0), m: None, t: None }],
+                bbox: None,
+                is_3d: true,
+                offset: None,
+                vec_bbox: Some(BBox3D {
+                    left: 0.0,
+                    bottom: 1.0,
+                    right: 0.0,
+                    top: 1.0,
+                    near: 2.0,
+                    far: 2.0,
+                }),
+                indices: None,
+                tesselation: None,
+            });
+        assert_eq!(vgt_multi_point.vec_bbox().unwrap(), BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 2.0));
+        let vgt_line_string: VectorGeometry =
+            VectorGeometry::LineString(VectorLineStringGeometry {
+                _type: "LineString".into(),
+                coordinates: vec![VectorPoint { x: 0.0, y: 1.0, z: Some(2.0), m: None, t: None }],
+                bbox: None,
+                is_3d: true,
+                offset: None,
+                vec_bbox: Some(BBox3D {
+                    left: 0.0,
+                    bottom: 1.0,
+                    right: 0.0,
+                    top: 1.0,
+                    near: 2.0,
+                    far: 2.0,
+                }),
+                indices: None,
+                tesselation: None,
+            });
+        assert_eq!(vgt_line_string.vec_bbox().unwrap(), BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 2.0));
+        let vgt_multi_line_string: VectorGeometry =
+            VectorGeometry::MultiLineString(VectorMultiLineStringGeometry {
+                _type: "MultiLineString".into(),
+                coordinates: vec![vec![VectorPoint {
+                    x: 0.0,
+                    y: 1.0,
+                    z: Some(2.0),
+                    m: None,
+                    t: None,
+                }]],
+                bbox: None,
+                is_3d: true,
+                offset: None,
+                vec_bbox: Some(BBox3D {
+                    left: 0.0,
+                    bottom: 1.0,
+                    right: 0.0,
+                    top: 1.0,
+                    near: 2.0,
+                    far: 2.0,
+                }),
+                indices: None,
+                tesselation: None,
+            });
+        assert_eq!(
+            vgt_multi_line_string.vec_bbox().unwrap(),
+            BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 2.0)
+        );
+        let vgt_polygon: VectorGeometry = VectorGeometry::Polygon(VectorPolygonGeometry {
+            _type: "Polygon".into(),
+            coordinates: vec![vec![VectorPoint { x: 0.0, y: 1.0, z: Some(2.0), m: None, t: None }]],
+            bbox: None,
+            is_3d: true,
+            offset: None,
+            vec_bbox: Some(BBox3D {
+                left: 0.0,
+                bottom: 1.0,
+                right: 0.0,
+                top: 1.0,
+                near: 2.0,
+                far: 2.0,
+            }),
+            indices: None,
+            tesselation: None,
+        });
+        assert_eq!(vgt_polygon.vec_bbox().unwrap(), BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 2.0));
+        let vgt_multi_polygon: VectorGeometry =
+            VectorGeometry::MultiPolygon(VectorMultiPolygonGeometry {
+                _type: "MultiPolygon".into(),
+                coordinates: vec![vec![vec![VectorPoint {
+                    x: 0.0,
+                    y: 1.0,
+                    z: Some(2.0),
+                    m: None,
+                    t: None,
+                }]]],
+                bbox: None,
+                is_3d: true,
+                offset: None,
+                vec_bbox: Some(BBox3D {
+                    left: 0.0,
+                    bottom: 1.0,
+                    right: 0.0,
+                    top: 1.0,
+                    near: 2.0,
+                    far: 2.0,
+                }),
+                indices: None,
+                tesselation: None,
+            });
+        assert_eq!(
+            vgt_multi_polygon.vec_bbox().unwrap(),
+            BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 2.0)
+        );
     }
 }

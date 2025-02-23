@@ -10,8 +10,8 @@ export * from './values.spec';
 /** Support for both vector and non-vector geometries */
 export type Geometries<M extends MValue = MValue> = Geometry<M> | VectorGeometry<M>;
 
-/** Whether the projection is S2 or WM */
-export type Projection = 'WM' | 'S2';
+/** Whether the projection is S2 or WG */
+export type Projection = 'WG' | 'S2';
 
 /// S2 specific type
 

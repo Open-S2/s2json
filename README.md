@@ -3,6 +3,9 @@
 </h1>
 
 <p align="center">
+  <a href="https://img.shields.io/github/actions/workflow/status/Open-S2/s2json-spec/test.yml?logo=github">
+    <img src="https://img.shields.io/github/actions/workflow/status/Open-S2/s2json-spec/test.yml?logo=github" alt="GitHub Actions Workflow Status">
+  </a>
   <a href="https://npmjs.org/package/s2json-spec">
     <img src="https://img.shields.io/npm/v/s2json-spec.svg?logo=npm&logoColor=white" alt="npm">
   </a>
@@ -20,6 +23,9 @@
   </a>
   <a href="https://docs.rs/s2json">
     <img src="https://img.shields.io/badge/docs-rust-yellow.svg" alt="docs-rust">
+  </a>
+  <a href="https://coveralls.io/github/Open-S2/s2json-spec?branch=master">
+    <img src="https://coveralls.io/repos/github/Open-S2/s2json-spec/badge.svg?branch=master" alt="code-coverage">
   </a>
   <a href="https://discord.opens2.com">
     <img src="https://img.shields.io/discord/953563031701426206?logo=discord&logoColor=white" alt="Discord">

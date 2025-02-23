@@ -12,9 +12,12 @@ extern crate alloc;
 pub mod geometry;
 /// All values types and structs
 pub mod values;
+/// The VectorPoint struct is a powerful tool for 2D and 3D points
+pub mod vector_point;
 
 pub use geometry::*;
 pub use values::*;
+pub use vector_point::*;
 
 use serde::{Deserialize, Serialize};
 
@@ -28,8 +31,8 @@ use alloc::vec::Vec;
 pub enum Projection {
     /// S2
     S2,
-    /// WM
-    WM,
+    /// WG
+    WG,
 }
 
 //? S2 specific type
@@ -291,13 +294,16 @@ pub enum JSONCollection<M = ()> {
     S2FeatureCollection(S2FeatureCollection<M>),
     /// An WM Feature
     Feature(Feature<M>),
-    /// An WM or S2 Vector Feature
+    /// An WM Vector Feature
     VectorFeature(VectorFeature<M>),
+    /// An S2 Feature
+    S2Feature(S2Feature<M>),
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::vec;
 
     #[test]
     fn face() {
@@ -320,5 +326,163 @@ mod tests {
         assert_eq!(Face::Face3, Face::from(3));
         assert_eq!(Face::Face4, Face::from(4));
         assert_eq!(Face::Face5, Face::from(5));
+    }
+
+    #[test]
+    fn feature_collection_new() {
+        let mut attributions = Attributions::new();
+        attributions.insert("Open S2".to_string(), "https://opens2.com/legal/data".to_string());
+        let mut fc = FeatureCollection::<()>::new(Some(attributions.clone()));
+        assert_eq!(fc._type, "FeatureCollection");
+        assert_eq!(fc.features.len(), 0);
+        assert_eq!(fc.attributions, Some(attributions.clone()));
+        // update_bbox
+        fc.update_bbox(BBox::new(5., -2., 35., 2.2));
+        assert_eq!(fc.bbox, Some(BBox::new(5., -2., 35., 2.2)));
+    }
+
+    #[test]
+    fn s2_feature_collection_new() {
+        let mut attributions = Attributions::new();
+        attributions.insert("Open S2".to_string(), "https://opens2.com/legal/data".to_string());
+        let mut fc = S2FeatureCollection::<()>::new(Some(attributions.clone()));
+        assert_eq!(fc._type, "S2FeatureCollection");
+        assert_eq!(fc.features.len(), 0);
+        assert_eq!(fc.attributions, Some(attributions.clone()));
+        // update_bbox
+        fc.update_bbox(BBox::new(5., -2., 35., 2.2));
+        assert_eq!(fc.bbox, Some(BBox::new(5., -2., 35., 2.2)));
+        // add face
+        fc.add_face(0.into());
+        fc.add_face(3.into());
+        assert_eq!(fc.faces, vec![0.into(), 3.into()]);
+    }
+
+    #[test]
+    fn feature_new() {
+        let fc = Feature::<()>::new(
+            Some(22),
+            Properties::new(),
+            Geometry::Point(PointGeometry {
+                _type: "Point".into(),
+                coordinates: (0.0, 0.0),
+                m_values: None,
+                bbox: None,
+            }),
+            None,
+        );
+        assert_eq!(fc.id, Some(22));
+        assert_eq!(fc._type, "Feature");
+        assert_eq!(
+            fc.geometry,
+            Geometry::Point(PointGeometry {
+                _type: "Point".into(),
+                coordinates: (0.0, 0.0),
+                m_values: None,
+                bbox: None,
+            })
+        );
+        assert_eq!(fc.properties, Properties::new());
+        assert_eq!(fc.metadata, None);
+    }
+
+    #[test]
+    fn s2_feature_new() {
+        let fc = S2Feature::<()>::new_wm(
+            Some(55),
+            Properties::new(),
+            VectorGeometry::Point(VectorPointGeometry {
+                _type: "Point".into(),
+                coordinates: VectorPoint { x: 0.0, y: 1.0, z: Some(3.), m: None, t: None },
+                bbox: None,
+                is_3d: true,
+                offset: None,
+                vec_bbox: None,
+                indices: None,
+                tesselation: None,
+            }),
+            None,
+        );
+        assert_eq!(fc.id, Some(55));
+        assert_eq!(fc._type, "VectorFeature");
+        assert_eq!(
+            fc.geometry,
+            VectorGeometry::Point(VectorPointGeometry {
+                _type: "Point".into(),
+                coordinates: VectorPoint { x: 0.0, y: 1.0, z: Some(3.), m: None, t: None },
+                bbox: None,
+                is_3d: true,
+                offset: None,
+                vec_bbox: None,
+                indices: None,
+                tesselation: None,
+            })
+        );
+        assert_eq!(fc.properties, Properties::new());
+        assert_eq!(fc.metadata, None);
+        assert_eq!(fc.face, 0.into());
+
+        // S2
+
+        #[derive(PartialEq, Clone, Debug)]
+        struct MetaTest {
+            name: String,
+            value: String,
+        }
+
+        let fc = S2Feature::<MetaTest>::new_s2(
+            Some(55),
+            3.into(),
+            Properties::new(),
+            VectorGeometry::Point(VectorPointGeometry {
+                _type: "Point".into(),
+                coordinates: VectorPoint { x: 0.0, y: 1.0, z: Some(3.), m: None, t: None },
+                bbox: None,
+                is_3d: true,
+                offset: None,
+                vec_bbox: None,
+                indices: None,
+                tesselation: None,
+            }),
+            Some(MetaTest { name: "test".to_string(), value: "value".to_string() }),
+        );
+        assert_eq!(fc.id, Some(55));
+        assert_eq!(fc._type, "S2Feature");
+        assert_eq!(
+            fc.geometry,
+            VectorGeometry::Point(VectorPointGeometry {
+                _type: "Point".into(),
+                coordinates: VectorPoint { x: 0.0, y: 1.0, z: Some(3.), m: None, t: None },
+                bbox: None,
+                is_3d: true,
+                offset: None,
+                vec_bbox: None,
+                indices: None,
+                tesselation: None,
+            })
+        );
+        assert_eq!(fc.properties, Properties::new());
+        assert_eq!(
+            fc.metadata,
+            Some(MetaTest { name: "test".to_string(), value: "value".to_string() })
+        );
+        assert_eq!(fc.face, 3.into());
+
+        // from_vector_feature
+
+        let new_geo = VectorGeometry::Point(VectorPointGeometry {
+            _type: "Point".into(),
+            coordinates: VectorPoint { x: 5.0, y: 4.0, z: Some(-3.), m: None, t: None },
+            bbox: None,
+            is_3d: true,
+            offset: None,
+            vec_bbox: None,
+            indices: None,
+            tesselation: None,
+        });
+        let fc_clone_new_geometry =
+            VectorFeature::<MetaTest>::from_vector_feature(&fc, Some(new_geo.clone()));
+
+        assert_eq!(fc_clone_new_geometry.geometry, new_geo);
     }
 }
