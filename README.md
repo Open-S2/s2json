@@ -3,8 +3,8 @@
 </h1>
 
 <p align="center">
-  <a href="https://img.shields.io/github/actions/workflow/status/Open-S2/s2json-spec/test.yml?logo=github">
-    <img src="https://img.shields.io/github/actions/workflow/status/Open-S2/s2json-spec/test.yml?logo=github" alt="GitHub Actions Workflow Status">
+  <a href="https://img.shields.io/github/actions/workflow/status/Open-S2/s2json/test.yml?logo=github">
+    <img src="https://img.shields.io/github/actions/workflow/status/Open-S2/s2json/test.yml?logo=github" alt="GitHub Actions Workflow Status">
   </a>
   <a href="https://npmjs.org/package/s2json-spec">
     <img src="https://img.shields.io/npm/v/s2json-spec.svg?logo=npm&logoColor=white" alt="npm">
