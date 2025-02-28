@@ -27,9 +27,10 @@ use alloc::string::ToString;
 use alloc::vec::Vec;
 
 /// All projections that can be used
-#[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Default)]
 pub enum Projection {
     /// S2
+    #[default]
     S2,
     /// WG
     WG,
@@ -38,9 +39,10 @@ pub enum Projection {
 //? S2 specific type
 
 /// Cube-face on the S2 sphere
-#[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Default)]
 pub enum Face {
     /// Face 0
+    #[default]
     Face0 = 0,
     /// Face 1
     Face1 = 1,
@@ -74,7 +76,7 @@ impl From<u8> for Face {
 //? FeatureCollections
 
 /// WM FeatureCollection
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
 pub struct FeatureCollection<M = ()> {
     /// Type will always be "FeatureCollection"
     #[serde(rename = "type")]
@@ -108,13 +110,13 @@ impl<M> FeatureCollection<M> {
 }
 
 /// S2 FeatureCollection
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
 pub struct S2FeatureCollection<M = ()> {
     /// Type will always be "S2FeatureCollection"
     #[serde(rename = "type")]
     pub _type: String,
     /// Collection of S2 features
-    pub features: Vec<S2Feature<M>>,
+    pub features: Vec<VectorFeature<M>>,
     /// Track the faces that were used to generate the features
     pub faces: Vec<Face>,
     /// Attribution data
@@ -154,7 +156,7 @@ impl<M> S2FeatureCollection<M> {
 //? Features
 
 /// Component to build an WM Feature
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
 pub struct Feature<M = ()> {
     /// Type will always be "Feature"
     #[serde(rename = "type")]
@@ -246,9 +248,6 @@ impl<M> VectorFeature<M> {
     }
 }
 
-/// Component to build an S2 Feature. Uses VectorFeature but "face" property is applicable
-pub type S2Feature<M = ()> = VectorFeature<M>;
-
 //? Utility types
 
 /// Attribution data is stored in an object.
@@ -270,10 +269,8 @@ pub enum FeatureCollections<M = ()> {
 pub enum Features<M = ()> {
     /// An WM Feature
     Feature(Feature<M>),
-    /// An WM Vector Feature
+    /// An WM or S2 Vector Feature
     VectorFeature(VectorFeature<M>),
-    /// An S2 Feature
-    S2Feature(S2Feature<M>),
 }
 
 /// Either an WM Feature or an WM Vector Feature
@@ -296,8 +293,6 @@ pub enum JSONCollection<M = ()> {
     Feature(Feature<M>),
     /// An WM Vector Feature
     VectorFeature(VectorFeature<M>),
-    /// An S2 Feature
-    S2Feature(S2Feature<M>),
 }
 
 #[cfg(test)]
@@ -388,7 +383,7 @@ mod tests {
 
     #[test]
     fn s2_feature_new() {
-        let fc = S2Feature::<()>::new_wm(
+        let fc: VectorFeature = VectorFeature::<()>::new_wm(
             Some(55),
             Properties::new(),
             VectorGeometry::Point(VectorPointGeometry {
@@ -430,7 +425,7 @@ mod tests {
             value: String,
         }
 
-        let fc = S2Feature::<MetaTest>::new_s2(
+        let fc = VectorFeature::<MetaTest>::new_s2(
             Some(55),
             3.into(),
             Properties::new(),

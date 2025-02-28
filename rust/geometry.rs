@@ -530,7 +530,7 @@ impl Default for BBOX {
 }
 
 /// A Point in S2 Space with a Face
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
 pub struct STPoint {
     /// The face of the point
     pub face: Face,
@@ -545,9 +545,10 @@ pub struct STPoint {
 }
 
 /// Enum to represent specific geometry types as strings
-#[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Default)]
 pub enum GeometryType {
     /// Point
+    #[default]
     Point,
     /// MultiPoint
     MultiPoint,
@@ -645,9 +646,14 @@ pub enum Geometry {
     /// MultiPolygon3D Shape
     MultiPolygon3D(MultiPolygon3DGeometry),
 }
+impl Default for Geometry {
+    fn default() -> Self {
+        Geometry::Point(PointGeometry::default())
+    }
+}
 
 /// BaseGeometry is the a generic geometry type
-#[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Default)]
 pub struct BaseGeometry<G = Geometry, M = MValues, B = BBOX> {
     /// The geometry type
     #[serde(rename = "type")]
@@ -759,6 +765,11 @@ impl VectorGeometry {
         }
     }
 }
+impl Default for VectorGeometry {
+    fn default() -> Self {
+        VectorGeometry::Point(VectorPointGeometry::default())
+    }
+}
 
 /// BaseGeometry is the a generic geometry type
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
@@ -786,7 +797,7 @@ pub struct VectorBaseGeometry<G = VectorGeometry, O = VectorOffsets> {
     pub tesselation: Option<f64>,
 }
 
-/** All possible geometry offsets */
+/// All possible geometry offsets
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub enum VectorOffsets {
     /// LineString offset
@@ -797,6 +808,11 @@ pub enum VectorOffsets {
     PolygonOffset(VectorPolygonOffset),
     /// MultiPolygon offset
     MultiPolygonOffset(VectorMultiPolygonOffset),
+}
+impl Default for VectorOffsets {
+    fn default() -> Self {
+        VectorOffsets::LineOffset(0.0)
+    }
 }
 /** An offset defines how far the starting line is from the original starting point pre-slice */
 pub type VectorLineOffset = f64;

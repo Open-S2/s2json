@@ -48,6 +48,11 @@ pub enum ValueType {
     /// A nested object
     Nested(Value),
 }
+impl Default for ValueType {
+    fn default() -> Self {
+        ValueType::Primitive(PrimitiveValue::Null)
+    }
+}
 
 /// Shape design
 pub type Value = BTreeMap<String, ValueType>;
