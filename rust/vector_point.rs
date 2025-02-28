@@ -11,7 +11,7 @@ use libm::{atan, fabs, fmod, log, pow, sin, sinh, sqrt};
 use crate::*;
 
 /// A Vector Point uses a structure for 2D or 3D points
-#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone, Default)]
 pub struct VectorPoint {
     /// X coordinate
     pub x: f64,
