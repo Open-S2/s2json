@@ -78,8 +78,18 @@ impl From<Point> for VectorPoint {
         Self { x: p.0, y: p.1, z: None, m: None, t: None }
     }
 }
+impl From<&Point> for VectorPoint {
+    fn from(p: &Point) -> Self {
+        Self { x: p.0, y: p.1, z: None, m: None, t: None }
+    }
+}
 impl From<Point3D> for VectorPoint {
     fn from(p: Point3D) -> Self {
+        Self { x: p.0, y: p.1, z: Some(p.2), m: None, t: None }
+    }
+}
+impl From<&Point3D> for VectorPoint {
+    fn from(p: &Point3D) -> Self {
         Self { x: p.0, y: p.1, z: Some(p.2), m: None, t: None }
     }
 }
@@ -305,12 +315,28 @@ mod tests {
         assert_eq!(vector_point.z, None);
         assert_eq!(vector_point.m, None);
         assert_eq!(vector_point.t, None);
+
+        let point: Point = (1.0, 2.0);
+        let vector_point: VectorPoint = (&point).into();
+        assert_eq!(vector_point.x, 1.0);
+        assert_eq!(vector_point.y, 2.0);
+        assert_eq!(vector_point.z, None);
+        assert_eq!(vector_point.m, None);
+        assert_eq!(vector_point.t, None);
     }
 
     #[test]
     fn from_point_3d() {
         let point: Point3D = (1.0, 2.0, 3.0);
         let vector_point: VectorPoint = point.into();
+        assert_eq!(vector_point.x, 1.0);
+        assert_eq!(vector_point.y, 2.0);
+        assert_eq!(vector_point.z, Some(3.0));
+        assert_eq!(vector_point.m, None);
+        assert_eq!(vector_point.t, None);
+
+        let point: Point3D = (1.0, 2.0, 3.0);
+        let vector_point: VectorPoint = (&point).into();
         assert_eq!(vector_point.x, 1.0);
         assert_eq!(vector_point.y, 2.0);
         assert_eq!(vector_point.z, Some(3.0));
