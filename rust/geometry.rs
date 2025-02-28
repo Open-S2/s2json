@@ -1299,6 +1299,15 @@ mod tests {
     }
 
     #[test]
+    fn test_geometry_default() {
+        let geo = Geometry::default();
+        assert_eq!(geo, Geometry::Point(PointGeometry::default()));
+
+        let default_instance: Geometry = Default::default();
+        assert_eq!(geo, default_instance);
+    }
+
+    #[test]
     fn test_point3d_geometry() {
         let point = Point3DGeometry {
             _type: "Point3D".into(),
@@ -1549,6 +1558,15 @@ mod tests {
     }
 
     #[test]
+    fn test_vector_geometry_default() {
+        let default = VectorGeometry::default();
+        assert_eq!(default, VectorGeometry::Point(VectorPointGeometry::default()));
+
+        let default_instance: VectorGeometry = Default::default();
+        assert_eq!(default, default_instance);
+    }
+
+    #[test]
     fn test_vector_geometry_type() {
         let vgt_point: VectorGeometryType = "Point".into();
         assert_eq!(vgt_point, VectorGeometryType::Point);
@@ -1562,6 +1580,12 @@ mod tests {
         assert_eq!(vgt_multi_line_string, VectorGeometryType::MultiLineString);
         let vgt_multi_polygon: VectorGeometryType = "MultiPolygon".into();
         assert_eq!(vgt_multi_polygon, VectorGeometryType::MultiPolygon);
+
+        let default = VectorGeometryType::default();
+        assert_eq!(default, VectorGeometryType::Point);
+
+        let default_instance: VectorGeometryType = Default::default();
+        assert_eq!(default, default_instance);
     }
 
     #[test]

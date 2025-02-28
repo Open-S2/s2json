@@ -172,6 +172,15 @@ mod tests {
     }
 
     #[test]
+    fn value_default() {
+        let default = ValueType::default();
+        assert_eq!(default, ValueType::Primitive(PrimitiveValue::Null));
+
+        let default_instance: ValueType = Default::default();
+        assert_eq!(default, default_instance);
+    }
+
+    #[test]
     fn value_serialize() {
         let value: Value = BTreeMap::from([
             ("type".into(), ValueType::Primitive(PrimitiveValue::String("Point".into()))),
