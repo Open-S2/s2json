@@ -16,7 +16,6 @@ pub mod value;
 pub mod vector_point;
 
 pub use geometry::*;
-pub use s2json_derive::*;
 pub use value::*;
 pub use vector_point::*;
 

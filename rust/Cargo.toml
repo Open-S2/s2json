@@ -23,7 +23,6 @@ bench = true
 libm = "0.2"
 serde = { version = "1.0", default-features = false, features = ["alloc", "derive"] }
 serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
-s2json_derive = { path = "../rust-derive", version = "1" }
 
 [dev-dependencies]
 
