@@ -1,6 +1,6 @@
 use alloc::{string::String, string::ToString, vec::Vec};
 
-use crate::{PrimitiveValue, Value, ValuePrimitive, ValuePrimitiveType, ValueType};
+use crate::*;
 
 // PrimitiveValue
 impl PrimitiveValue {
@@ -301,7 +301,7 @@ where
 mod tests {
     use alloc::vec;
 
-    use crate::{MValue, MValueCompatible};
+    use crate::{MValue, MValueCompatible, VectorPoint};
 
     use super::*;
 
@@ -511,26 +511,29 @@ mod tests {
                 Self { r, g, b, a }
             }
         }
-        impl MValueCompatible for Rgba {
-            fn to_mvalue(&self) -> MValue {
+        impl MValueCompatible for Rgba {}
+        impl From<Rgba> for MValue {
+            fn from(rgba: Rgba) -> MValue {
                 MValue::from([
-                    ("r".into(), (self.r).into()),
-                    ("g".into(), (self.g).into()),
-                    ("b".into(), (self.b).into()),
-                    ("a".into(), (self.a).into()),
+                    ("r".into(), (rgba.r).into()),
+                    ("g".into(), (rgba.g).into()),
+                    ("b".into(), (rgba.b).into()),
+                    ("a".into(), (rgba.a).into()),
                 ])
             }
-            fn from_mvalue(mvalue: &MValue) -> Option<Self> {
-                let r: f64 = mvalue.get("r")?.to_prim()?.to_f64()?;
-                let g = mvalue.get("g")?.to_prim()?.to_f64()?;
-                let b = mvalue.get("b")?.to_prim()?.to_f64()?;
-                let a = mvalue.get("a")?.to_prim()?.to_f64()?;
-                Some(Rgba::new(r, g, b, a))
+        }
+        impl From<MValue> for Rgba {
+            fn from(mvalue: MValue) -> Self {
+                let r: f64 = mvalue.get("r").unwrap().to_prim().unwrap().to_f64().unwrap();
+                let g = mvalue.get("g").unwrap().to_prim().unwrap().to_f64().unwrap();
+                let b = mvalue.get("b").unwrap().to_prim().unwrap().to_f64().unwrap();
+                let a = mvalue.get("a").unwrap().to_prim().unwrap().to_f64().unwrap();
+                Rgba::new(r, g, b, a)
             }
         }
 
         let rgba = Rgba::new(0.1, 0.2, 0.3, 0.4);
-        let rgba_mvalue = rgba.to_mvalue();
+        let rgba_mvalue: MValue = rgba.into();
         assert_eq!(
             rgba_mvalue,
             MValue::from([
@@ -540,7 +543,12 @@ mod tests {
                 ("a".into(), ValueType::Primitive(PrimitiveValue::F64(0.4))),
             ])
         );
-        let back_to_rgba = Rgba::from_mvalue(&rgba_mvalue).unwrap();
+        let back_to_rgba: Rgba = rgba_mvalue.clone().into();
         assert_eq!(rgba, back_to_rgba);
+
+        let vp: VectorPoint<Rgba> =
+            VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: Some(rgba), t: None };
+        let vp_mvalue: MValue = vp.m.unwrap().into();
+        assert_eq!(vp_mvalue, rgba_mvalue);
     }
 }

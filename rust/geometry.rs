@@ -7,8 +7,6 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use alloc::fmt;
 use alloc::vec::Vec;
 
-use crate::VectorPoint;
-
 /// Importing necessary types (equivalent to importing from 'values')
 use crate::*;
 
@@ -47,7 +45,7 @@ impl<T> BBox<T> {
     }
 
     /// Checks if a point is within the BBox
-    pub fn point_overlap(&self, point: VectorPoint) -> bool
+    pub fn point_overlap<M: MValueCompatible>(&self, point: VectorPoint<M>) -> bool
     where
         T: Into<f64> + Copy, // Ensures that comparison operators work for type T
     {
@@ -117,12 +115,12 @@ impl Default for BBox<f64> {
 }
 impl BBox<f64> {
     /// Creates a new BBox from a point
-    pub fn from_point(point: &VectorPoint) -> Self {
+    pub fn from_point<M: MValueCompatible>(point: &VectorPoint<M>) -> Self {
         BBox::new(point.x, point.y, point.x, point.y)
     }
 
     /// Creates a new BBox from a linestring
-    pub fn from_linestring(line: &VectorLineString) -> Self {
+    pub fn from_linestring<M: MValueCompatible>(line: &VectorLineString<M>) -> Self {
         let mut bbox = BBox::from_point(&line[0]);
         for point in line {
             bbox.extend_from_point(point);
@@ -131,7 +129,7 @@ impl BBox<f64> {
     }
 
     /// Creates a new BBox from a multi-linestring
-    pub fn from_multi_linestring(lines: &VectorMultiLineString) -> Self {
+    pub fn from_multi_linestring<M: MValueCompatible>(lines: &VectorMultiLineString<M>) -> Self {
         let mut bbox = BBox::from_point(&lines[0][0]);
         for line in lines {
             for point in line {
@@ -142,12 +140,12 @@ impl BBox<f64> {
     }
 
     /// Creates a new BBox from a polygon
-    pub fn from_polygon(polygon: &VectorPolygon) -> Self {
+    pub fn from_polygon<M: MValueCompatible>(polygon: &VectorPolygon<M>) -> Self {
         BBox::<f64>::from_multi_linestring(polygon)
     }
 
     /// Creates a new BBox from a multi-polygon
-    pub fn from_multi_polygon(polygons: &VectorMultiPolygon) -> Self {
+    pub fn from_multi_polygon<M: MValueCompatible>(polygons: &VectorMultiPolygon<M>) -> Self {
         let mut bbox = BBox::from_point(&polygons[0][0][0]);
         for polygon in polygons {
             for line in polygon {
@@ -160,7 +158,7 @@ impl BBox<f64> {
     }
 
     /// Extends the bounding box with a point
-    pub fn extend_from_point(&mut self, point: &VectorPoint) {
+    pub fn extend_from_point<M: MValueCompatible>(&mut self, point: &VectorPoint<M>) {
         *self = self.merge(&BBox::from_point(point));
     }
 
@@ -274,7 +272,7 @@ impl<T> BBox3D<T> {
     }
 
     /// Checks if a point is within the BBox
-    pub fn point_overlap(&self, point: VectorPoint) -> bool
+    pub fn point_overlap<M: MValueCompatible>(&self, point: VectorPoint<M>) -> bool
     where
         T: Into<f64> + Copy, // Ensures that comparison operators work for type T
     {
@@ -379,7 +377,7 @@ impl Default for BBox3D<f64> {
 }
 impl BBox3D<f64> {
     /// Creates a new BBox3D from a point
-    pub fn from_point(point: &VectorPoint) -> Self {
+    pub fn from_point<M: MValueCompatible>(point: &VectorPoint<M>) -> Self {
         BBox3D::new(
             point.x,
             point.y,
@@ -391,7 +389,7 @@ impl BBox3D<f64> {
     }
 
     /// Creates a new BBox from a linestring
-    pub fn from_linestring(line: &VectorLineString) -> Self {
+    pub fn from_linestring<M: MValueCompatible>(line: &VectorLineString<M>) -> Self {
         let mut bbox = BBox3D::from_point(&line[0]);
         for point in line {
             bbox.extend_from_point(point);
@@ -400,7 +398,7 @@ impl BBox3D<f64> {
     }
 
     /// Creates a new BBox from a multi-linestring
-    pub fn from_multi_linestring(lines: &VectorMultiLineString) -> Self {
+    pub fn from_multi_linestring<M: MValueCompatible>(lines: &VectorMultiLineString<M>) -> Self {
         let mut bbox = BBox3D::from_point(&lines[0][0]);
         for line in lines {
             for point in line {
@@ -411,12 +409,12 @@ impl BBox3D<f64> {
     }
 
     /// Creates a new BBox from a polygon
-    pub fn from_polygon(polygon: &VectorPolygon) -> Self {
+    pub fn from_polygon<M: MValueCompatible>(polygon: &VectorPolygon<M>) -> Self {
         BBox3D::<f64>::from_multi_linestring(polygon)
     }
 
     /// Creates a new BBox from a multi-polygon
-    pub fn from_multi_polygon(polygons: &VectorMultiPolygon) -> Self {
+    pub fn from_multi_polygon<M: MValueCompatible>(polygons: &VectorMultiPolygon<M>) -> Self {
         let mut bbox = BBox3D::from_point(&polygons[0][0][0]);
         for polygon in polygons {
             for line in polygon {
@@ -434,7 +432,7 @@ impl BBox3D<f64> {
     }
 
     /// Extends the bounding box with a point
-    pub fn extend_from_point(&mut self, point: &VectorPoint) {
+    pub fn extend_from_point<M: MValueCompatible>(&mut self, point: &VectorPoint<M>) {
         *self = self.merge(&BBox3D::from_point(point));
     }
 
@@ -726,31 +724,31 @@ impl From<&str> for VectorGeometryType {
 }
 
 /// Definition of a Vector MultiPoint
-pub type VectorMultiPoint = Vec<VectorPoint>;
+pub type VectorMultiPoint<M> = Vec<VectorPoint<M>>;
 /// Definition of a Vector LineString
-pub type VectorLineString = Vec<VectorPoint>;
+pub type VectorLineString<M> = Vec<VectorPoint<M>>;
 /// Definition of a Vector MultiLineString
-pub type VectorMultiLineString = Vec<VectorLineString>;
+pub type VectorMultiLineString<M> = Vec<VectorLineString<M>>;
 /// Definition of a Vector Polygon
-pub type VectorPolygon = Vec<VectorLineString>;
+pub type VectorPolygon<M> = Vec<VectorLineString<M>>;
 /// Definition of a Vector MultiPolygon
-pub type VectorMultiPolygon = Vec<VectorPolygon>;
+pub type VectorMultiPolygon<M> = Vec<VectorPolygon<M>>;
 
 /// All possible geometry shapes
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
-pub enum VectorGeometry {
+pub enum VectorGeometry<M: MValueCompatible = MValue> {
     /// Point Shape
-    Point(VectorPointGeometry),
+    Point(VectorPointGeometry<M>),
     /// MultiPoint Shape
-    MultiPoint(VectorMultiPointGeometry),
+    MultiPoint(VectorMultiPointGeometry<M>),
     /// LineString Shape
-    LineString(VectorLineStringGeometry),
+    LineString(VectorLineStringGeometry<M>),
     /// MultiLineString Shape
-    MultiLineString(VectorMultiLineStringGeometry),
+    MultiLineString(VectorMultiLineStringGeometry<M>),
     /// Polygon Shape
-    Polygon(VectorPolygonGeometry),
+    Polygon(VectorPolygonGeometry<M>),
     /// MultiPolygon Shape
-    MultiPolygon(VectorMultiPolygonGeometry),
+    MultiPolygon(VectorMultiPolygonGeometry<M>),
 }
 impl VectorGeometry {
     /// Get the vec_bbox of the geometry
@@ -824,24 +822,32 @@ pub type VectorPolygonOffset = VectorMultiLineOffset;
 pub type VectorMultiPolygonOffset = Vec<VectorPolygonOffset>;
 
 /// PointGeometry is a point
-pub type VectorPointGeometry = VectorBaseGeometry<VectorPoint>;
+pub type VectorPointGeometry<M> = VectorBaseGeometry<VectorPoint<M>>;
 /// MultiPointGeometry contains multiple points
-pub type VectorMultiPointGeometry = VectorBaseGeometry<VectorMultiPoint, VectorLineOffset>;
+pub type VectorMultiPointGeometry<M> = VectorBaseGeometry<VectorMultiPoint<M>, VectorLineOffset>;
 /// LineStringGeometry is a line
-pub type VectorLineStringGeometry = VectorBaseGeometry<VectorLineString, VectorLineOffset>;
+pub type VectorLineStringGeometry<M> = VectorBaseGeometry<VectorLineString<M>, VectorLineOffset>;
 /// MultiLineStringGeometry contains multiple lines
-pub type VectorMultiLineStringGeometry =
-    VectorBaseGeometry<VectorMultiLineString, VectorMultiLineOffset>;
+pub type VectorMultiLineStringGeometry<M> =
+    VectorBaseGeometry<VectorMultiLineString<M>, VectorMultiLineOffset>;
 /// PolygonGeometry is a polygon with potential holes
-pub type VectorPolygonGeometry = VectorBaseGeometry<VectorPolygon, VectorPolygonOffset>;
+pub type VectorPolygonGeometry<M> = VectorBaseGeometry<VectorPolygon<M>, VectorPolygonOffset>;
 /// MultiPolygonGeometry is a polygon with multiple polygons with their own potential holes
-pub type VectorMultiPolygonGeometry =
-    VectorBaseGeometry<VectorMultiPolygon, VectorMultiPolygonOffset>;
+pub type VectorMultiPolygonGeometry<M> =
+    VectorBaseGeometry<VectorMultiPolygon<M>, VectorMultiPolygonOffset>;
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use alloc::vec;
+
+    #[test]
+    fn test_vector_offset() {
+        let offset = VectorOffsets::default();
+        assert_eq!(offset, VectorOffsets::LineOffset(0.0));
+        let offset: VectorOffsets = Default::default();
+        assert_eq!(offset, VectorOffsets::LineOffset(0.0));
+    }
 
     #[test]
     fn test_bbox() {
@@ -901,8 +907,8 @@ mod tests {
     #[test]
     fn test_bbox_overlap() {
         let bbox = BBox::new(0., 0., 1., 1.);
-        assert!(bbox.point_overlap(VectorPoint::new(0.5, 0.5, None, None)));
-        assert!(!bbox.point_overlap(VectorPoint::new(2.0, 2.0, None, None)));
+        assert!(bbox.point_overlap(VectorPoint::<MValue>::new(0.5, 0.5, None, None)));
+        assert!(!bbox.point_overlap(VectorPoint::<MValue>::new(2.0, 2.0, None, None)));
         let bbox2 = BBox { left: 0.5, bottom: 0.5, right: 1.5, top: 1.5 };
         assert_eq!(
             bbox.overlap(&bbox2),
@@ -945,14 +951,14 @@ mod tests {
 
     #[test]
     fn test_bbox_from_point() {
-        let bbox = BBox::from_point(&VectorPoint::new(0., 0., None, None));
+        let bbox = BBox::from_point(&VectorPoint::<MValue>::new(0., 0., None, None));
         assert_eq!(bbox, BBox { left: 0.0, bottom: 0.0, right: 0.0, top: 0.0 });
     }
 
     #[test]
     fn test_bbox_from_linestring() {
         let bbox = BBox::from_linestring(&vec![
-            VectorPoint::new(0., 0., None, None),
+            VectorPoint::<MValue>::new(0., 0., None, None),
             VectorPoint::new(1., 1.5, None, None),
         ]);
         assert_eq!(bbox, BBox { left: 0.0, bottom: 0.0, right: 1.0, top: 1.5 });
@@ -961,7 +967,7 @@ mod tests {
     #[test]
     fn test_bbox_from_multilinestring() {
         let bbox = BBox::from_multi_linestring(&vec![vec![
-            VectorPoint::new(0., 0., None, None),
+            VectorPoint::<MValue>::new(0., 0., None, None),
             VectorPoint::new(1., 1.5, None, None),
         ]]);
         assert_eq!(bbox, BBox { left: 0.0, bottom: 0.0, right: 1.0, top: 1.5 });
@@ -970,7 +976,7 @@ mod tests {
     #[test]
     fn test_bbox_from_polygon() {
         let bbox = BBox::from_polygon(&vec![vec![
-            VectorPoint::new(0., 0., None, None),
+            VectorPoint::<MValue>::new(0., 0., None, None),
             VectorPoint::new(2., 1.5, None, None),
         ]]);
         assert_eq!(bbox, BBox { left: 0.0, bottom: 0.0, right: 2.0, top: 1.5 });
@@ -979,7 +985,10 @@ mod tests {
     #[test]
     fn test_bbox_from_multipolygon() {
         let bbox = BBox::from_multi_polygon(&vec![
-            vec![vec![VectorPoint::new(0., 0., None, None), VectorPoint::new(2., 1.5, None, None)]],
+            vec![vec![
+                VectorPoint::<MValue>::new(0., 0., None, None),
+                VectorPoint::new(2., 1.5, None, None),
+            ]],
             vec![vec![
                 VectorPoint::new(0., 0., None, None),
                 VectorPoint::new(-1., 3.5, None, None),
@@ -1034,8 +1043,8 @@ mod tests {
     #[test]
     fn test_bbox_3_d_overlap() {
         let bbox = BBox3D::new(0., 0., 1., 1., 0., 1.);
-        assert!(bbox.point_overlap(VectorPoint::new(0.5, 0.5, None, None)));
-        assert!(!bbox.point_overlap(VectorPoint::new(2.0, 2.0, None, None)));
+        assert!(bbox.point_overlap(VectorPoint::<MValue>::new(0.5, 0.5, None, None)));
+        assert!(!bbox.point_overlap(VectorPoint::<MValue>::new(2.0, 2.0, None, None)));
         let bbox2 = BBox3D { left: 0.5, bottom: 0.5, right: 1.5, top: 1.5, near: 0.5, far: 1.5 };
         assert_eq!(
             bbox.overlap(&bbox2),
@@ -1075,7 +1084,7 @@ mod tests {
 
     #[test]
     fn test_bbox_3_d_from_point() {
-        let bbox = BBox3D::from_point(&VectorPoint::new(0., 0., None, None));
+        let bbox = BBox3D::from_point(&VectorPoint::<MValue>::new(0., 0., None, None));
         assert_eq!(
             bbox,
             BBox3D {
@@ -1092,7 +1101,7 @@ mod tests {
     #[test]
     fn test_bbox_3_d_from_linestring() {
         let bbox = BBox3D::from_linestring(&vec![
-            VectorPoint::new(0., 0., None, None),
+            VectorPoint::<MValue>::new(0., 0., None, None),
             VectorPoint::new(1., 1.5, None, None),
         ]);
         assert_eq!(
@@ -1111,7 +1120,7 @@ mod tests {
     #[test]
     fn test_bbox_3_d_from_multilinestring() {
         let bbox = BBox3D::from_multi_linestring(&vec![vec![
-            VectorPoint::new(0., 0., None, None),
+            VectorPoint::<MValue>::new(0., 0., None, None),
             VectorPoint::new(1., 1.5, None, None),
         ]]);
         assert_eq!(
@@ -1130,7 +1139,7 @@ mod tests {
     #[test]
     fn test_bbox_3_d_from_polygon() {
         let bbox = BBox3D::from_polygon(&vec![vec![
-            VectorPoint::new(0., 0., None, None),
+            VectorPoint::<MValue>::new(0., 0., None, None),
             VectorPoint::new(2., 1.5, None, None),
         ]]);
         assert_eq!(
@@ -1149,7 +1158,10 @@ mod tests {
     #[test]
     fn test_bbox_3_d_from_multipolygon() {
         let bbox = BBox3D::from_multi_polygon(&vec![
-            vec![vec![VectorPoint::new(0., 0., None, None), VectorPoint::new(2., 1.5, None, None)]],
+            vec![vec![
+                VectorPoint::<MValue>::new(0., 0., None, None),
+                VectorPoint::new(2., 1.5, None, None),
+            ]],
             vec![vec![
                 VectorPoint::new(0., 0., None, None),
                 VectorPoint::new(-1., 3.5, None, None),
@@ -1171,7 +1183,7 @@ mod tests {
     #[test]
     fn test_bbox_3_d_extend_from_point() {
         let mut bbox = BBox3D::default();
-        bbox.extend_from_point(&VectorPoint::new(20., -4., None, None));
+        bbox.extend_from_point(&VectorPoint::<MValue>::new(20., -4., None, None));
         assert_eq!(
             bbox,
             BBox3D {

@@ -58,23 +58,10 @@ pub type Properties = Value;
 /// Shape of a feature's M-Values object
 pub type MValue = Value;
 
-/// Ensures that a struct can be converted to a valid `MValue`
-pub trait MValueCompatible {
-    /// Converts the struct to a valid `MValue`
-    fn to_mvalue(&self) -> MValue;
-    /// Constructs the struct from a valid `MValue`
-    fn from_mvalue(value: &MValue) -> Option<Self>
-    where
-        Self: Sized;
-}
-impl MValueCompatible for MValue {
-    fn to_mvalue(&self) -> MValue {
-        self.clone()
-    }
-    fn from_mvalue(value: &MValue) -> Option<MValue> {
-        Some(value.clone())
-    }
-}
+/// Ensure M implements MValueCompatible
+pub trait MValueCompatible: From<MValue> + Into<MValue> + Clone {}
+
+impl MValueCompatible for MValue {}
 
 /// LineString Properties Shape
 pub type LineStringMValues = Vec<MValue>;
@@ -235,10 +222,10 @@ mod tests {
                 ),
             ])
         );
-        let deserialize_to: MValue = deserialize.to_mvalue();
+        let deserialize_to: MValue = deserialize.clone();
         assert_eq!(deserialize_to, deserialize);
         // from
-        let desrialize_from: MValue = MValue::from_mvalue(&deserialize_to).unwrap();
+        let desrialize_from: MValue = MValue::from(deserialize_to);
         assert_eq!(desrialize_from, deserialize);
     }
 }

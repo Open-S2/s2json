@@ -11,7 +11,7 @@ use libm::{atan, fabs, fmod, log, pow, sin, sinh, sqrt};
 use crate::*;
 
 /// A Vector Point uses a structure for 2D or 3D points
-#[derive(Serialize, Deserialize, Debug, PartialEq, Clone, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct VectorPoint<M: MValueCompatible = MValue> {
     /// X coordinate
     pub x: f64,
@@ -26,9 +26,9 @@ pub struct VectorPoint<M: MValueCompatible = MValue> {
     #[serde(skip)]
     pub t: Option<f64>,
 }
-impl VectorPoint {
+impl<M: MValueCompatible> VectorPoint<M> {
     /// Create a new point
-    pub fn new(x: f64, y: f64, z: Option<f64>, m: Option<MValue>) -> Self {
+    pub fn new(x: f64, y: f64, z: Option<f64>, m: Option<M>) -> Self {
         Self { x, y, z, m, t: None }
     }
 
@@ -57,7 +57,7 @@ impl VectorPoint {
     }
 
     /// Calculate the distance between two points
-    pub fn distance(&self, other: &VectorPoint) -> f64 {
+    pub fn distance(&self, other: &VectorPoint<M>) -> f64 {
         sqrt(pow(other.x - self.x, 2.) + pow(other.y - self.y, 2.))
     }
 
@@ -73,29 +73,29 @@ impl VectorPoint {
         }
     }
 }
-impl From<Point> for VectorPoint {
+impl<M: MValueCompatible> From<Point> for VectorPoint<M> {
     fn from(p: Point) -> Self {
         Self { x: p.0, y: p.1, z: None, m: None, t: None }
     }
 }
-impl From<&Point> for VectorPoint {
+impl<M: MValueCompatible> From<&Point> for VectorPoint<M> {
     fn from(p: &Point) -> Self {
         Self { x: p.0, y: p.1, z: None, m: None, t: None }
     }
 }
-impl From<Point3D> for VectorPoint {
+impl<M: MValueCompatible> From<Point3D> for VectorPoint<M> {
     fn from(p: Point3D) -> Self {
         Self { x: p.0, y: p.1, z: Some(p.2), m: None, t: None }
     }
 }
-impl From<&Point3D> for VectorPoint {
+impl<M: MValueCompatible> From<&Point3D> for VectorPoint<M> {
     fn from(p: &Point3D) -> Self {
         Self { x: p.0, y: p.1, z: Some(p.2), m: None, t: None }
     }
 }
 // Implementing the Add trait for VectorPoint
-impl Add<VectorPoint> for VectorPoint {
-    type Output = Self;
+impl<M: MValueCompatible> Add<VectorPoint<M>> for VectorPoint<M> {
+    type Output = VectorPoint<M>;
     fn add(self, other: Self) -> Self::Output {
         VectorPoint {
             x: self.x + other.x,
@@ -110,8 +110,8 @@ impl Add<VectorPoint> for VectorPoint {
         }
     }
 }
-impl Add<f64> for VectorPoint {
-    type Output = Self;
+impl<M: MValueCompatible> Add<f64> for VectorPoint<M> {
+    type Output = VectorPoint<M>;
     fn add(self, other: f64) -> Self::Output {
         VectorPoint {
             x: self.x + other,
@@ -123,8 +123,8 @@ impl Add<f64> for VectorPoint {
     }
 }
 // Implementing the Sub trait for VectorPoint
-impl Sub<VectorPoint> for VectorPoint {
-    type Output = Self;
+impl<M: MValueCompatible> Sub<VectorPoint<M>> for VectorPoint<M> {
+    type Output = VectorPoint<M>;
     fn sub(self, other: Self) -> Self::Output {
         VectorPoint {
             x: self.x - other.x,
@@ -138,8 +138,8 @@ impl Sub<VectorPoint> for VectorPoint {
         }
     }
 }
-impl Sub<f64> for VectorPoint {
-    type Output = Self;
+impl<M: MValueCompatible> Sub<f64> for VectorPoint<M> {
+    type Output = VectorPoint<M>;
     fn sub(self, other: f64) -> Self::Output {
         VectorPoint {
             x: self.x - other,
@@ -151,15 +151,15 @@ impl Sub<f64> for VectorPoint {
     }
 }
 // Implementing the Neg trait for VectorPoint
-impl Neg for VectorPoint {
-    type Output = Self;
+impl<M: MValueCompatible> Neg for VectorPoint<M> {
+    type Output = VectorPoint<M>;
     fn neg(self) -> Self::Output {
         VectorPoint { x: -self.x, y: -self.y, z: self.z.map(|z| -z), m: self.m.clone(), t: self.t }
     }
 }
 // Implementing the Div trait for VectorPoint
-impl Div<VectorPoint> for VectorPoint {
-    type Output = Self;
+impl<M: MValueCompatible> Div<VectorPoint<M>> for VectorPoint<M> {
+    type Output = VectorPoint<M>;
     fn div(self, other: Self) -> Self::Output {
         VectorPoint {
             x: self.x / other.x,
@@ -173,8 +173,8 @@ impl Div<VectorPoint> for VectorPoint {
         }
     }
 }
-impl Div<f64> for VectorPoint {
-    type Output = Self;
+impl<M: MValueCompatible> Div<f64> for VectorPoint<M> {
+    type Output = VectorPoint<M>;
     fn div(self, other: f64) -> Self::Output {
         VectorPoint {
             x: self.x / other,
@@ -186,8 +186,8 @@ impl Div<f64> for VectorPoint {
     }
 }
 // Implementing the Mul trait for VectorPoint
-impl Mul<VectorPoint> for VectorPoint {
-    type Output = Self;
+impl<M: MValueCompatible> Mul<VectorPoint<M>> for VectorPoint<M> {
+    type Output = VectorPoint<M>;
     fn mul(self, other: Self) -> Self::Output {
         VectorPoint {
             x: self.x * other.x,
@@ -201,8 +201,8 @@ impl Mul<VectorPoint> for VectorPoint {
         }
     }
 }
-impl Mul<f64> for VectorPoint {
-    type Output = Self;
+impl<M: MValueCompatible> Mul<f64> for VectorPoint<M> {
+    type Output = VectorPoint<M>;
     fn mul(self, other: f64) -> Self::Output {
         VectorPoint {
             x: self.x * other,
@@ -213,14 +213,14 @@ impl Mul<f64> for VectorPoint {
         }
     }
 }
-impl Rem<f64> for VectorPoint {
-    type Output = Self;
+impl<M: MValueCompatible> Rem<f64> for VectorPoint<M> {
+    type Output = VectorPoint<M>;
 
     fn rem(self, modulus: f64) -> Self::Output {
         self.modulo(modulus)
     }
 }
-impl RemAssign<f64> for VectorPoint {
+impl<M: MValueCompatible> RemAssign<f64> for VectorPoint<M> {
     fn rem_assign(&mut self, modulus: f64) {
         let modulus = fabs(modulus);
         self.x = fmod(self.x, modulus);
@@ -230,9 +230,9 @@ impl RemAssign<f64> for VectorPoint {
         }
     }
 }
-impl Eq for VectorPoint {}
-impl Ord for VectorPoint {
-    fn cmp(&self, other: &Self) -> Ordering {
+impl<M: MValueCompatible> Eq for VectorPoint<M> {}
+impl<M: MValueCompatible> Ord for VectorPoint<M> {
+    fn cmp(&self, other: &VectorPoint<M>) -> Ordering {
         match self.x.partial_cmp(&other.x) {
             Some(Ordering::Equal) => {}
             other => return other.unwrap_or(Ordering::Greater), // Handle cases where `x` comparison is not equal
@@ -247,8 +247,13 @@ impl Ord for VectorPoint {
         }
     }
 }
-impl PartialOrd for VectorPoint {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+impl<M: MValueCompatible> PartialEq for VectorPoint<M> {
+    fn eq(&self, other: &VectorPoint<M>) -> bool {
+        self.x == other.x && self.y == other.y && self.z == other.z
+    }
+}
+impl<M: MValueCompatible> PartialOrd for VectorPoint<M> {
+    fn partial_cmp(&self, other: &VectorPoint<M>) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
@@ -357,7 +362,7 @@ mod tests {
 
     #[test]
     fn vector_neg() {
-        let vector_point = VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
+        let vector_point = VectorPoint::<MValue> { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
         let result = -vector_point;
         assert_eq!(result.x, -1.0);
         assert_eq!(result.y, -2.0);
@@ -368,7 +373,8 @@ mod tests {
 
     #[test]
     fn vector_point_add() {
-        let vector_point1 = VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
+        let vector_point1 =
+            VectorPoint::<MValue> { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
         let vector_point2 = VectorPoint { x: 4.0, y: 5.0, z: Some(6.0), m: None, t: Some(5.2) };
         let result = vector_point1 + vector_point2;
         assert_eq!(result.x, 5.0);
@@ -380,7 +386,8 @@ mod tests {
 
     #[test]
     fn vector_point_add_f64() {
-        let vector_point1 = VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
+        let vector_point1: VectorPoint =
+            VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
         let float: f64 = 4.0;
         let result = vector_point1 + float;
         assert_eq!(result.x, 5.0);
@@ -392,8 +399,10 @@ mod tests {
 
     #[test]
     fn vector_point_sub() {
-        let vector_point1 = VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
-        let vector_point2 = VectorPoint { x: 4.0, y: 5.0, z: Some(6.0), m: None, t: Some(5.2) };
+        let vector_point1 =
+            VectorPoint::<MValue> { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
+        let vector_point2 =
+            VectorPoint::<MValue> { x: 4.0, y: 5.0, z: Some(6.0), m: None, t: Some(5.2) };
         let result = vector_point1 - vector_point2;
         assert_eq!(result.x, -3.0);
         assert_eq!(result.y, -3.0);
@@ -404,7 +413,8 @@ mod tests {
 
     #[test]
     fn vector_point_sub_f64() {
-        let vector_point1 = VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
+        let vector_point1: VectorPoint =
+            VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
         let float: f64 = 4.0;
         let result = vector_point1 - float;
         assert_eq!(result.x, -3.0);
@@ -416,8 +426,10 @@ mod tests {
 
     #[test]
     fn vector_point_mul() {
-        let vector_point1 = VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
-        let vector_point2 = VectorPoint { x: 4.0, y: 5.0, z: Some(6.0), m: None, t: Some(5.2) };
+        let vector_point1: VectorPoint =
+            VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
+        let vector_point2: VectorPoint =
+            VectorPoint { x: 4.0, y: 5.0, z: Some(6.0), m: None, t: Some(5.2) };
         let result = vector_point1 * vector_point2;
         assert_eq!(result.x, 4.0);
         assert_eq!(result.y, 10.0);
@@ -428,7 +440,8 @@ mod tests {
 
     #[test]
     fn vector_point_mul_f64() {
-        let vector_point1 = VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
+        let vector_point1: VectorPoint =
+            VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
         let float: f64 = 4.0;
         let result = vector_point1 * float;
         assert_eq!(result.x, 4.0);
@@ -440,7 +453,8 @@ mod tests {
 
     #[test]
     fn vector_point_div() {
-        let vector_point1 = VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
+        let vector_point1: VectorPoint =
+            VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
         let vector_point2 = VectorPoint { x: 4.0, y: 5.0, z: Some(6.0), m: None, t: Some(5.2) };
         let result = vector_point1 / vector_point2;
         assert_eq!(result.x, 0.25);
@@ -452,7 +466,8 @@ mod tests {
 
     #[test]
     fn vector_point_div_f64() {
-        let vector_point1 = VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
+        let vector_point1: VectorPoint =
+            VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
         let float: f64 = 4.0;
         let result = vector_point1 / float;
         assert_eq!(result.x, 0.25);
@@ -464,7 +479,8 @@ mod tests {
 
     #[test]
     fn vector_point_rem() {
-        let vector_point1 = VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
+        let vector_point1: VectorPoint =
+            VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
         let result = vector_point1 % 2.;
         assert_eq!(result.x, 1.0);
         assert_eq!(result.y, 0.0);
@@ -475,7 +491,8 @@ mod tests {
 
     #[test]
     fn vector_point_rem_assigned() {
-        let mut vector_point1 = VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
+        let mut vector_point1: VectorPoint =
+            VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
         vector_point1 %= 2.;
         assert_eq!(vector_point1.x, 1.0);
         assert_eq!(vector_point1.y, 0.0);
@@ -512,15 +529,15 @@ mod tests {
 
     #[test]
     fn test_vectorpoint_ordering_x() {
-        let a = VectorPoint { x: 1.0, y: 0.0, z: None, m: None, t: None };
-        let b = VectorPoint { x: 2.0, y: 0.0, z: None, m: None, t: None };
+        let a: VectorPoint = VectorPoint { x: 1.0, y: 0.0, z: None, m: None, t: None };
+        let b: VectorPoint = VectorPoint { x: 2.0, y: 0.0, z: None, m: None, t: None };
         assert_eq!(a.cmp(&b), Ordering::Less);
         assert_eq!(b.cmp(&a), Ordering::Greater);
     }
 
     #[test]
     fn test_vectorpoint_ordering_y() {
-        let a = VectorPoint { x: 1.0, y: 1.0, z: None, m: None, t: None };
+        let a: VectorPoint = VectorPoint { x: 1.0, y: 1.0, z: None, m: None, t: None };
         let b = VectorPoint { x: 1.0, y: 2.0, z: None, m: None, t: None };
         assert_eq!(a.cmp(&b), Ordering::Less);
         assert_eq!(b.cmp(&a), Ordering::Greater);
@@ -528,7 +545,7 @@ mod tests {
 
     #[test]
     fn test_vectorpoint_ordering_z() {
-        let a = VectorPoint { x: 1.0, y: 1.0, z: Some(1.0), m: None, t: None };
+        let a: VectorPoint = VectorPoint { x: 1.0, y: 1.0, z: Some(1.0), m: None, t: None };
         let b = VectorPoint { x: 1.0, y: 1.0, z: Some(2.0), m: None, t: None };
         assert_eq!(a.cmp(&b), Ordering::Less);
         assert_eq!(b.cmp(&a), Ordering::Greater);
@@ -536,7 +553,7 @@ mod tests {
 
     #[test]
     fn test_vectorpoint_ordering_z_none() {
-        let a = VectorPoint { x: 1.0, y: 1.0, z: None, m: None, t: None };
+        let a: VectorPoint = VectorPoint { x: 1.0, y: 1.0, z: None, m: None, t: None };
         let b = VectorPoint { x: 1.0, y: 1.0, z: Some(2.0), m: None, t: None };
         assert_eq!(a.cmp(&b), Ordering::Less); // `None` is treated as equal to any value in `z`
         assert_eq!(b.cmp(&a), Ordering::Greater);
@@ -544,7 +561,7 @@ mod tests {
 
     #[test]
     fn test_vectorpoint_ordering_z_some() {
-        let a = VectorPoint { x: 1.0, y: 1.0, z: Some(-1.0), m: None, t: None };
+        let a: VectorPoint = VectorPoint { x: 1.0, y: 1.0, z: Some(-1.0), m: None, t: None };
         let b = VectorPoint { x: 1.0, y: 1.0, z: Some(2.0), m: None, t: None };
         assert_eq!(a.cmp(&b), Ordering::Less); // `None` is treated as equal to any value in `z`
         assert_eq!(b.cmp(&a), Ordering::Greater);
@@ -552,7 +569,7 @@ mod tests {
 
     #[test]
     fn test_vectorpoint_equality() {
-        let a = VectorPoint { x: 1.0, y: 1.0, z: Some(1.0), m: None, t: None };
+        let a: VectorPoint = VectorPoint { x: 1.0, y: 1.0, z: Some(1.0), m: None, t: None };
         let b = VectorPoint { x: 1.0, y: 1.0, z: Some(1.0), m: None, t: None };
         assert_eq!(a, b);
         assert_eq!(a.cmp(&b), Ordering::Equal);
@@ -560,21 +577,23 @@ mod tests {
 
     #[test]
     fn test_vectorpoint_nan_handling() {
-        let nan_point = VectorPoint { x: f64::NAN, y: 1.0, z: None, m: None, t: None };
+        let nan_point: VectorPoint = VectorPoint { x: f64::NAN, y: 1.0, z: None, m: None, t: None };
         let normal_point = VectorPoint { x: 1.0, y: 1.0, z: None, m: None, t: None };
 
         // Since `partial_cmp` should return `None` for NaN, `cmp` must not panic.
         assert_eq!(nan_point.cmp(&normal_point), Ordering::Greater);
 
         // z nan
-        let nan_point = VectorPoint { x: 1.0, y: 1.0, z: Some(f64::NAN), m: None, t: None };
+        let nan_point: VectorPoint =
+            VectorPoint { x: 1.0, y: 1.0, z: Some(f64::NAN), m: None, t: None };
         let normal_point = VectorPoint { x: 1.0, y: 1.0, z: Some(1.0), m: None, t: None };
         assert_eq!(nan_point.cmp(&normal_point), Ordering::Equal);
     }
 
     #[test]
     fn test_vectorpoint_partial_comp() {
-        let vector_point1 = VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
+        let vector_point1: VectorPoint =
+            VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
         let vector_point2 = VectorPoint { x: 1.0, y: 2.0, z: Some(1.0), m: None, t: None };
 
         assert_eq!(vector_point1.partial_cmp(&vector_point2), Some(Ordering::Greater));
@@ -583,7 +602,7 @@ mod tests {
 
     #[test]
     fn test_vectorpoint_with_m() {
-        let vector_point1: VectorPoint = VectorPoint {
+        let vector_point1: VectorPoint<MValue> = VectorPoint {
             x: 1.0,
             y: 2.0,
             z: Some(3.0),
@@ -603,8 +622,10 @@ mod tests {
             ])),
             t: Some(-1.2),
         };
-        let vector_point2: VectorPoint =
+        let vector_point2: VectorPoint<MValue> =
             VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
         assert_eq!(vector_point1.partial_cmp(&vector_point2), Some(Ordering::Equal));
+        // we only check for equality in x, y, z
+        assert!(vector_point1 == vector_point2);
     }
 }
