@@ -12,6 +12,8 @@ extern crate alloc;
 pub mod geometry;
 /// All values types and structs
 pub mod value;
+/// All values impl
+pub mod value_impl;
 /// The VectorPoint struct is a powerful tool for 2D and 3D points
 pub mod vector_point;
 

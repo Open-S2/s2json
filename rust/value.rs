@@ -31,7 +31,7 @@ pub enum ValuePrimitiveType {
     /// Primitive type
     Primitive(PrimitiveValue),
     /// Nested shape that can only contain primitives
-    NestedPrimitive(BTreeMap<String, PrimitiveValue>),
+    NestedPrimitive(ValuePrimitive),
 }
 
 /// Supports primitive types `string`, `number`, `boolean`, `null`
@@ -48,12 +48,9 @@ pub enum ValueType {
     /// A nested object
     Nested(Value),
 }
-impl Default for ValueType {
-    fn default() -> Self {
-        ValueType::Primitive(PrimitiveValue::Null)
-    }
-}
 
+/// Shape of a ValuePrimitiveType Nested object
+pub type ValuePrimitive = BTreeMap<String, PrimitiveValue>;
 /// Shape design
 pub type Value = BTreeMap<String, ValueType>;
 /// Shape of a features properties object
@@ -62,25 +59,20 @@ pub type Properties = Value;
 pub type MValue = Value;
 
 /// Ensures that a struct can be converted to a valid `MValue`
-pub trait MValueDeserialize {
+pub trait MValueCompatible {
     /// Converts the struct to a valid `MValue`
     fn to_mvalue(&self) -> MValue;
-}
-/// Ensures that a struct can be constructed from a valid `MValue`
-pub trait MValueSerialize {
     /// Constructs the struct from a valid `MValue`
-    fn from_mvalue(value: MValue) -> Option<Self>
+    fn from_mvalue(value: &MValue) -> Option<Self>
     where
         Self: Sized;
 }
-impl MValueDeserialize for MValue {
+impl MValueCompatible for MValue {
     fn to_mvalue(&self) -> MValue {
         self.clone()
     }
-}
-impl MValueSerialize for MValue {
-    fn from_mvalue(value: MValue) -> Option<MValue> {
-        Some(value)
+    fn from_mvalue(value: &MValue) -> Option<MValue> {
+        Some(value.clone())
     }
 }
 
@@ -246,7 +238,7 @@ mod tests {
         let deserialize_to: MValue = deserialize.to_mvalue();
         assert_eq!(deserialize_to, deserialize);
         // from
-        let desrialize_from: MValue = MValue::from_mvalue(deserialize_to).unwrap();
+        let desrialize_from: MValue = MValue::from_mvalue(&deserialize_to).unwrap();
         assert_eq!(desrialize_from, deserialize);
     }
 }

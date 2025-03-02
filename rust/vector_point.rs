@@ -12,7 +12,7 @@ use crate::*;
 
 /// A Vector Point uses a structure for 2D or 3D points
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone, Default)]
-pub struct VectorPoint<M: MValueDeserialize + MValueSerialize = MValue> {
+pub struct VectorPoint<M: MValueCompatible = MValue> {
     /// X coordinate
     pub x: f64,
     /// Y coordinate
