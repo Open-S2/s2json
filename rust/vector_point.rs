@@ -26,6 +26,12 @@ pub struct VectorPoint<M: MValueCompatible = MValue> {
     #[serde(skip)]
     pub t: Option<f64>,
 }
+impl<M1: MValueCompatible> VectorPoint<M1> {
+    /// Calculate the distance between two points, allowing different M types
+    pub fn distance<M2: MValueCompatible>(&self, other: &VectorPoint<M2>) -> f64 {
+        sqrt(pow(other.x - self.x, 2.) + pow(other.y - self.y, 2.))
+    }
+}
 impl<M: MValueCompatible> VectorPoint<M> {
     /// Create a new point
     pub fn new(x: f64, y: f64, z: Option<f64>, m: Option<M>) -> Self {
@@ -54,11 +60,6 @@ impl<M: MValueCompatible> VectorPoint<M> {
 
         self.x = lon;
         self.y = lat;
-    }
-
-    /// Calculate the distance between two points
-    pub fn distance(&self, other: &VectorPoint<M>) -> f64 {
-        sqrt(pow(other.x - self.x, 2.) + pow(other.y - self.y, 2.))
     }
 
     /// Apply modular arithmetic to x, y, and z using `modulus`
@@ -305,7 +306,7 @@ mod tests {
     }
 
     #[test]
-    fn distance() {
+    fn test_distance() {
         let vector_point: VectorPoint = VectorPoint::new(1.0, 2.0, None, None);
         let other: VectorPoint = VectorPoint::new(3.0, 4.0, None, None);
         assert_eq!(vector_point.distance(&other), 2.8284271247461903);

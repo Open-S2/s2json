@@ -546,9 +546,14 @@ mod tests {
         let back_to_rgba: Rgba = rgba_mvalue.clone().into();
         assert_eq!(rgba, back_to_rgba);
 
-        let vp: VectorPoint<Rgba> =
-            VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: Some(rgba), t: None };
+        let vp: VectorPoint<Rgba> = VectorPoint { x: 1.0, y: 2.0, z: None, m: Some(rgba), t: None };
         let vp_mvalue: MValue = vp.m.unwrap().into();
         assert_eq!(vp_mvalue, rgba_mvalue);
+
+        // distance
+        let a: VectorPoint<Rgba> = VectorPoint { x: 1.0, y: 2.0, z: None, m: Some(rgba), t: None };
+        let b: VectorPoint = VectorPoint::new(3.0, 4.0, None, None);
+        let dist = a.distance(&b);
+        assert_eq!(dist, 2.8284271247461903);
     }
 }
