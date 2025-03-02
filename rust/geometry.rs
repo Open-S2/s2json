@@ -724,15 +724,15 @@ impl From<&str> for VectorGeometryType {
 }
 
 /// Definition of a Vector MultiPoint
-pub type VectorMultiPoint<M> = Vec<VectorPoint<M>>;
+pub type VectorMultiPoint<M = MValue> = Vec<VectorPoint<M>>;
 /// Definition of a Vector LineString
-pub type VectorLineString<M> = Vec<VectorPoint<M>>;
+pub type VectorLineString<M = MValue> = Vec<VectorPoint<M>>;
 /// Definition of a Vector MultiLineString
-pub type VectorMultiLineString<M> = Vec<VectorLineString<M>>;
+pub type VectorMultiLineString<M = MValue> = Vec<VectorLineString<M>>;
 /// Definition of a Vector Polygon
-pub type VectorPolygon<M> = Vec<VectorLineString<M>>;
+pub type VectorPolygon<M = MValue> = Vec<VectorLineString<M>>;
 /// Definition of a Vector MultiPolygon
-pub type VectorMultiPolygon<M> = Vec<VectorPolygon<M>>;
+pub type VectorMultiPolygon<M = MValue> = Vec<VectorPolygon<M>>;
 
 /// All possible geometry shapes
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
@@ -822,18 +822,21 @@ pub type VectorPolygonOffset = VectorMultiLineOffset;
 pub type VectorMultiPolygonOffset = Vec<VectorPolygonOffset>;
 
 /// PointGeometry is a point
-pub type VectorPointGeometry<M> = VectorBaseGeometry<VectorPoint<M>>;
+pub type VectorPointGeometry<M = MValue> = VectorBaseGeometry<VectorPoint<M>>;
 /// MultiPointGeometry contains multiple points
-pub type VectorMultiPointGeometry<M> = VectorBaseGeometry<VectorMultiPoint<M>, VectorLineOffset>;
+pub type VectorMultiPointGeometry<M = MValue> =
+    VectorBaseGeometry<VectorMultiPoint<M>, VectorLineOffset>;
 /// LineStringGeometry is a line
-pub type VectorLineStringGeometry<M> = VectorBaseGeometry<VectorLineString<M>, VectorLineOffset>;
+pub type VectorLineStringGeometry<M = MValue> =
+    VectorBaseGeometry<VectorLineString<M>, VectorLineOffset>;
 /// MultiLineStringGeometry contains multiple lines
-pub type VectorMultiLineStringGeometry<M> =
+pub type VectorMultiLineStringGeometry<M = MValue> =
     VectorBaseGeometry<VectorMultiLineString<M>, VectorMultiLineOffset>;
 /// PolygonGeometry is a polygon with potential holes
-pub type VectorPolygonGeometry<M> = VectorBaseGeometry<VectorPolygon<M>, VectorPolygonOffset>;
+pub type VectorPolygonGeometry<M = MValue> =
+    VectorBaseGeometry<VectorPolygon<M>, VectorPolygonOffset>;
 /// MultiPolygonGeometry is a polygon with multiple polygons with their own potential holes
-pub type VectorMultiPolygonGeometry<M> =
+pub type VectorMultiPolygonGeometry<M = MValue> =
     VectorBaseGeometry<VectorMultiPolygon<M>, VectorMultiPolygonOffset>;
 
 #[cfg(test)]
