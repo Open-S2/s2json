@@ -132,6 +132,8 @@
           "geojson"
         ],
         "extensions": [
+          ".jsonl",
+          ".jsonld",
           ".geojsonl",
           ".geojsonld"
         ],

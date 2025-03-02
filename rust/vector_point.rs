@@ -12,7 +12,7 @@ use crate::*;
 
 /// A Vector Point uses a structure for 2D or 3D points
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone, Default)]
-pub struct VectorPoint {
+pub struct VectorPoint<M: MValueDeserialize + MValueSerialize = MValue> {
     /// X coordinate
     pub x: f64,
     /// Y coordinate
@@ -21,7 +21,7 @@ pub struct VectorPoint {
     pub z: Option<f64>,
     /// M-Value
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub m: Option<MValue>,
+    pub m: Option<M>,
     /// T for tolerance. A tmp value used for simplification
     #[serde(skip)]
     pub t: Option<f64>,
@@ -346,7 +346,8 @@ mod tests {
 
     #[test]
     fn vector_point() {
-        let vector_point = VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
+        let vector_point: VectorPoint =
+            VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
         assert_eq!(vector_point.x, 1.0);
         assert_eq!(vector_point.y, 2.0);
         assert_eq!(vector_point.z, Some(3.0));
@@ -485,20 +486,27 @@ mod tests {
 
     #[test]
     fn vector_equality() {
-        let vector_point1 = VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
-        let vector_point2 = VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
+        let vector_point1: VectorPoint =
+            VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
+        let vector_point2: VectorPoint =
+            VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
         assert_eq!(vector_point1, vector_point2);
 
-        let vector_point1 = VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
-        let vector_point2 = VectorPoint { x: 2.0, y: 3.0, z: Some(4.0), m: None, t: None };
+        let vector_point1: VectorPoint =
+            VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
+        let vector_point2: VectorPoint =
+            VectorPoint { x: 2.0, y: 3.0, z: Some(4.0), m: None, t: None };
         assert_ne!(vector_point1, vector_point2);
 
-        let vector_point1 = VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
-        let vector_point2 = VectorPoint { x: 1.0, y: 2.0, z: None, m: None, t: None };
+        let vector_point1: VectorPoint =
+            VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
+        let vector_point2: VectorPoint = VectorPoint { x: 1.0, y: 2.0, z: None, m: None, t: None };
         assert_ne!(vector_point1, vector_point2);
 
-        let vector_point1 = VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
-        let vector_point2 = VectorPoint { x: 1.0, y: 2.0, z: Some(1.0), m: None, t: None };
+        let vector_point1: VectorPoint =
+            VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
+        let vector_point2: VectorPoint =
+            VectorPoint { x: 1.0, y: 2.0, z: Some(1.0), m: None, t: None };
         assert_ne!(vector_point1, vector_point2);
     }
 
@@ -571,5 +579,32 @@ mod tests {
 
         assert_eq!(vector_point1.partial_cmp(&vector_point2), Some(Ordering::Greater));
         assert_eq!(vector_point2.partial_cmp(&vector_point1), Some(Ordering::Less));
+    }
+
+    #[test]
+    fn test_vectorpoint_with_m() {
+        let vector_point1: VectorPoint = VectorPoint {
+            x: 1.0,
+            y: 2.0,
+            z: Some(3.0),
+            m: Some(BTreeMap::from([
+                ("class".into(), ValueType::Primitive(PrimitiveValue::String("ocean".into()))),
+                ("offset".into(), ValueType::Primitive(PrimitiveValue::U64(22))),
+                (
+                    "info".into(),
+                    ValueType::Nested(BTreeMap::from([
+                        (
+                            "name".into(),
+                            ValueType::Primitive(PrimitiveValue::String("Pacific Ocean".into())),
+                        ),
+                        ("value".into(), ValueType::Primitive(PrimitiveValue::F32(22.2))),
+                    ])),
+                ),
+            ])),
+            t: Some(-1.2),
+        };
+        let vector_point2: VectorPoint =
+            VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
+        assert_eq!(vector_point1.partial_cmp(&vector_point2), Some(Ordering::Equal));
     }
 }

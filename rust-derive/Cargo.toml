@@ -1,0 +1,29 @@
+[package]
+name = "s2json-derive"
+version = "1.0.0"
+edition = "2021"
+authors = ["Craig O'Connor <oconnorct1@gmail.com>"]
+description = "This library supports the S2JSON 1.0 Specification"
+documentation = "https://docs.rs/s2json-derive"
+homepage = "https://github.com/OpenS2/s2json"
+repository = "https://github.com/OpenS2/s2json"
+readme = "README.md"
+categories = ["encoding", "wasm", "embedded", "no-std"]
+keywords = ["open", "vector", "tile", "gis", "low-cost-code"]
+license = "MIT"
+
+[dependencies]
+proc-macro2 = "1.0"
+quote = "1.0"
+syn = { version = "1.0", features = ["derive"] }
+s2json = { path = "../rust" }
+
+[dev-dependencies]
+serde = { version = "1.0", default-features = false, features = ["alloc", "derive"] }
+serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
+
+[lib]
+proc-macro = true
+name = "s2json_derive"
+path = "lib.rs"
+bench = true

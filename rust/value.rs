@@ -61,6 +61,29 @@ pub type Properties = Value;
 /// Shape of a feature's M-Values object
 pub type MValue = Value;
 
+/// Ensures that a struct can be converted to a valid `MValue`
+pub trait MValueDeserialize {
+    /// Converts the struct to a valid `MValue`
+    fn to_mvalue(&self) -> MValue;
+}
+/// Ensures that a struct can be constructed from a valid `MValue`
+pub trait MValueSerialize {
+    /// Constructs the struct from a valid `MValue`
+    fn from_mvalue(value: MValue) -> Option<Self>
+    where
+        Self: Sized;
+}
+impl MValueDeserialize for MValue {
+    fn to_mvalue(&self) -> MValue {
+        self.clone()
+    }
+}
+impl MValueSerialize for MValue {
+    fn from_mvalue(value: MValue) -> Option<MValue> {
+        Some(value)
+    }
+}
+
 /// LineString Properties Shape
 pub type LineStringMValues = Vec<MValue>;
 /// MultiLineString MValues Shape
@@ -202,7 +225,7 @@ mod tests {
         }
         "#;
 
-        let deserialize = serde_json::from_str::<Value>(value_str).unwrap();
+        let deserialize: MValue = serde_json::from_str::<Value>(value_str).unwrap();
         assert_eq!(
             deserialize,
             BTreeMap::from([
@@ -220,5 +243,10 @@ mod tests {
                 ),
             ])
         );
+        let deserialize_to: MValue = deserialize.to_mvalue();
+        assert_eq!(deserialize_to, deserialize);
+        // from
+        let desrialize_from: MValue = MValue::from_mvalue(deserialize_to).unwrap();
+        assert_eq!(desrialize_from, deserialize);
     }
 }

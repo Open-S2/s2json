@@ -11,12 +11,12 @@ extern crate alloc;
 /// All geometry types and structs
 pub mod geometry;
 /// All values types and structs
-pub mod values;
+pub mod value;
 /// The VectorPoint struct is a powerful tool for 2D and 3D points
 pub mod vector_point;
 
 pub use geometry::*;
-pub use values::*;
+pub use value::*;
 pub use vector_point::*;
 
 use serde::{Deserialize, Serialize};
