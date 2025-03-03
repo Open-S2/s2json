@@ -291,11 +291,11 @@ pub enum WMFeature<M = (), D: MValueCompatible = MValue> {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub enum JSONCollection<M = (), D: MValueCompatible = MValue> {
     /// An WM FeatureCollection
-    FeatureCollection(FeatureCollection<M>),
+    FeatureCollection(FeatureCollection<M, D>),
     /// An S2 FeatureCollection
     S2FeatureCollection(S2FeatureCollection<M, D>),
     /// An WM Feature
-    Feature(Feature<M>),
+    Feature(Feature<M, D>),
     /// An WM Vector Feature
     VectorFeature(VectorFeature<M, D>),
 }

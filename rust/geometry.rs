@@ -755,7 +755,7 @@ pub enum VectorGeometry<M: MValueCompatible = MValue> {
     /// MultiPolygon Shape
     MultiPolygon(VectorMultiPolygonGeometry<M>),
 }
-impl VectorGeometry {
+impl<M: MValueCompatible> VectorGeometry<M> {
     /// Get the vec_bbox of the geometry
     pub fn vec_bbox(&self) -> &Option<BBox3D> {
         match self {
