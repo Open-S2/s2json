@@ -59,33 +59,33 @@ pub type Properties = Value;
 pub type MValue = Value;
 
 /// Ensure M implements MValueCompatible
-pub trait MValueCompatible: From<MValue> + Into<MValue> + Clone {}
+pub trait MValueCompatible: From<MValue> + Into<MValue> + Clone + Default {}
 
 impl MValueCompatible for MValue {}
 
 /// LineString Properties Shape
-pub type LineStringMValues = Vec<MValue>;
+pub type LineStringMValues<M = MValue> = Vec<M>;
 /// MultiLineString MValues Shape
-pub type MultiLineStringMValues = Vec<LineStringMValues>;
+pub type MultiLineStringMValues<M = MValue> = Vec<LineStringMValues<M>>;
 /// Polygon MValues Shape
-pub type PolygonMValues = Vec<LineStringMValues>;
+pub type PolygonMValues<M = MValue> = Vec<LineStringMValues<M>>;
 /// MultiPolygon MValues Shape
-pub type MultiPolygonMValues = Vec<PolygonMValues>;
+pub type MultiPolygonMValues<M = MValue> = Vec<PolygonMValues<M>>;
 
 /// All possible M-Value shapes
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(untagged)]
-pub enum MValues {
+pub enum MValues<M: MValueCompatible = MValue> {
     /// Single M-Value
-    MValue(MValue),
+    MValue(M),
     /// LineString M-Value
-    LineStringMValues(LineStringMValues),
+    LineStringMValues(LineStringMValues<M>),
     /// MultiLineString M-Value
-    MultiLineStringMValues(MultiLineStringMValues),
+    MultiLineStringMValues(MultiLineStringMValues<M>),
     /// Polygon M-Value
-    PolygonMValues(PolygonMValues),
+    PolygonMValues(PolygonMValues<M>),
     /// MultiPolygon M-Value
-    MultiPolygonMValues(MultiPolygonMValues),
+    MultiPolygonMValues(MultiPolygonMValues<M>),
 }
 
 #[cfg(test)]

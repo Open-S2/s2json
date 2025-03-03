@@ -1,5 +1,7 @@
 use alloc::{string::String, string::ToString, vec::Vec};
 
+use libm::round;
+
 use crate::*;
 
 // PrimitiveValue
@@ -22,8 +24,8 @@ impl PrimitiveValue {
         match self {
             PrimitiveValue::U64(v) => Some(*v),
             PrimitiveValue::I64(v) => Some(*v as u64),
-            PrimitiveValue::F64(v) => Some(*v as u64),
-            PrimitiveValue::F32(v) => Some(*v as u64),
+            PrimitiveValue::F64(v) => Some(round(*v) as u64),
+            PrimitiveValue::F32(v) => Some(round((*v).into()) as u64),
             _ => None,
         }
     }
@@ -33,8 +35,8 @@ impl PrimitiveValue {
         match self {
             PrimitiveValue::U64(v) => Some(*v as i64),
             PrimitiveValue::I64(v) => Some(*v),
-            PrimitiveValue::F64(v) => Some(*v as i64),
-            PrimitiveValue::F32(v) => Some(*v as i64),
+            PrimitiveValue::F64(v) => Some(round(*v) as i64),
+            PrimitiveValue::F32(v) => Some(round((*v).into()) as i64),
             _ => None,
         }
     }
@@ -494,7 +496,7 @@ mod tests {
 
     #[test]
     fn test_rgba_struct() {
-        #[derive(Debug, Clone, Copy, PartialEq)]
+        #[derive(Debug, Clone, Copy, PartialEq, Default)]
         pub struct Rgba {
             /// Gamma corrected Red between 0 and 1
             pub r: f64,
