@@ -1,11 +1,12 @@
 use serde::{Deserialize, Serialize};
 
-use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
 
+use crate::Map;
+
 /// Primitive types supported by Properties
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
 #[serde(untagged)]
 pub enum PrimitiveValue {
     /// String type utf8 encoded
@@ -21,6 +22,7 @@ pub enum PrimitiveValue {
     /// boolean
     Bool(bool),
     /// null
+    #[default]
     Null,
 }
 
@@ -50,9 +52,9 @@ pub enum ValueType {
 }
 
 /// Shape of a ValuePrimitiveType Nested object
-pub type ValuePrimitive = BTreeMap<String, PrimitiveValue>;
+pub type ValuePrimitive = Map<String, PrimitiveValue>;
 /// Shape design
-pub type Value = BTreeMap<String, ValueType>;
+pub type Value = Map<String, ValueType>;
 /// Shape of a features properties object
 pub type Properties = Value;
 /// Shape of a feature's M-Values object
@@ -88,9 +90,36 @@ pub enum MValues<M: MValueCompatible = MValue> {
     MultiPolygonMValues(MultiPolygonMValues<M>),
 }
 
+/// All possible JSON shapes
+#[derive(Serialize, Deserialize, Clone, PartialEq, Debug)]
+#[serde(untagged)]
+pub enum JSONValue {
+    /// Represents a JSON primitive
+    Primitive(PrimitiveValue),
+    /// Represents a JSON array.
+    Array(Vec<JSONValue>),
+    /// Represents a JSON object.
+    Object(Map<String, JSONValue>),
+}
+
+/// Shape of an un-restricted features properties object
+pub type JSONProperties = Map<String, JSONValue>;
+
+/// Shape of the restricted Mapbox properties object
+pub type MapboxProperties = Map<String, PrimitiveValue>;
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn json_value() {
+        let json_default = JSONValue::default();
+        assert_eq!(json_default, JSONValue::Primitive(PrimitiveValue::Null));
+
+        let json_default2: JSONValue = Default::default();
+        assert_eq!(json_default2, json_default);
+    }
 
     #[test]
     fn primitive_value() {
@@ -184,7 +213,7 @@ mod tests {
 
     #[test]
     fn value_serialize() {
-        let value: Value = BTreeMap::from([
+        let value = Value::from([
             ("type".into(), ValueType::Primitive(PrimitiveValue::String("Point".into()))),
             ("coordinates".into(), ValueType::Primitive(PrimitiveValue::F32(1.0))),
         ]);
@@ -207,12 +236,12 @@ mod tests {
         let deserialize: MValue = serde_json::from_str::<Value>(value_str).unwrap();
         assert_eq!(
             deserialize,
-            BTreeMap::from([
+            Value::from([
                 ("class".into(), ValueType::Primitive(PrimitiveValue::String("ocean".into()))),
                 ("offset".into(), ValueType::Primitive(PrimitiveValue::U64(22))),
                 (
                     "info".into(),
-                    ValueType::Nested(BTreeMap::from([
+                    ValueType::Nested(Value::from([
                         (
                             "name".into(),
                             ValueType::Primitive(PrimitiveValue::String("Pacific Ocean".into()))

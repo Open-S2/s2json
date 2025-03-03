@@ -26,12 +26,6 @@ pub struct VectorPoint<M: MValueCompatible = MValue> {
     #[serde(skip)]
     pub t: Option<f64>,
 }
-impl<M1: MValueCompatible> VectorPoint<M1> {
-    /// Calculate the distance between two points, allowing different M types
-    pub fn distance<M2: MValueCompatible>(&self, other: &VectorPoint<M2>) -> f64 {
-        sqrt(pow(other.x - self.x, 2.) + pow(other.y - self.y, 2.))
-    }
-}
 impl<M: MValueCompatible> VectorPoint<M> {
     /// Create a new point
     pub fn new(x: f64, y: f64, z: Option<f64>, m: Option<M>) -> Self {
@@ -60,6 +54,11 @@ impl<M: MValueCompatible> VectorPoint<M> {
 
         self.x = lon;
         self.y = lat;
+    }
+
+    /// Calculate the distance between two points, allowing different M types
+    pub fn distance<M2: MValueCompatible>(&self, other: &VectorPoint<M2>) -> f64 {
+        sqrt(pow(other.x - self.x, 2.) + pow(other.y - self.y, 2.))
     }
 
     /// Apply modular arithmetic to x, y, and z using `modulus`
@@ -94,10 +93,9 @@ impl<M: MValueCompatible> From<&Point3D> for VectorPoint<M> {
         Self { x: p.0, y: p.1, z: Some(p.2), m: None, t: None }
     }
 }
-// Implementing the Add trait for VectorPoint
-impl<M: MValueCompatible> Add<VectorPoint<M>> for VectorPoint<M> {
-    type Output = VectorPoint<M>;
-    fn add(self, other: Self) -> Self::Output {
+impl<M1: MValueCompatible, M2: MValueCompatible> Add<VectorPoint<M2>> for VectorPoint<M1> {
+    type Output = VectorPoint<M1>;
+    fn add(self, other: VectorPoint<M2>) -> Self::Output {
         VectorPoint {
             x: self.x + other.x,
             y: self.y + other.y,
@@ -106,8 +104,8 @@ impl<M: MValueCompatible> Add<VectorPoint<M>> for VectorPoint<M> {
                 (Some(z1), Some(z2)) => Some(z1 + z2),
                 _ => None, // If either `z` is None, the result is `None`
             },
-            m: self.m.clone().or(other.m.clone()), // Combine m values
-            t: self.t.or(other.t),                 // Handle `t` as necessary
+            m: self.m.clone(),     // Combine m values
+            t: self.t.or(other.t), // Handle `t` as necessary
         }
     }
 }
@@ -124,9 +122,9 @@ impl<M: MValueCompatible> Add<f64> for VectorPoint<M> {
     }
 }
 // Implementing the Sub trait for VectorPoint
-impl<M: MValueCompatible> Sub<VectorPoint<M>> for VectorPoint<M> {
-    type Output = VectorPoint<M>;
-    fn sub(self, other: Self) -> Self::Output {
+impl<M1: MValueCompatible, M2: MValueCompatible> Sub<VectorPoint<M2>> for VectorPoint<M1> {
+    type Output = VectorPoint<M1>;
+    fn sub(self, other: VectorPoint<M2>) -> Self::Output {
         VectorPoint {
             x: self.x - other.x,
             y: self.y - other.y,
@@ -134,8 +132,8 @@ impl<M: MValueCompatible> Sub<VectorPoint<M>> for VectorPoint<M> {
                 (Some(z1), Some(z2)) => Some(z1 - z2),
                 _ => None, // If either `z` is None, the result is `None`
             },
-            m: self.m.clone().or(other.m.clone()), // Combine m values
-            t: self.t.or(other.t),                 // Handle `t` as necessary
+            m: self.m.clone(),     // Combine m values
+            t: self.t.or(other.t), // Handle `t` as necessary
         }
     }
 }
@@ -159,9 +157,9 @@ impl<M: MValueCompatible> Neg for VectorPoint<M> {
     }
 }
 // Implementing the Div trait for VectorPoint
-impl<M: MValueCompatible> Div<VectorPoint<M>> for VectorPoint<M> {
-    type Output = VectorPoint<M>;
-    fn div(self, other: Self) -> Self::Output {
+impl<M1: MValueCompatible, M2: MValueCompatible> Div<VectorPoint<M2>> for VectorPoint<M1> {
+    type Output = VectorPoint<M1>;
+    fn div(self, other: VectorPoint<M2>) -> Self::Output {
         VectorPoint {
             x: self.x / other.x,
             y: self.y / other.y,
@@ -169,8 +167,8 @@ impl<M: MValueCompatible> Div<VectorPoint<M>> for VectorPoint<M> {
                 (Some(z1), Some(z2)) => Some(z1 / z2),
                 _ => None, // If either `z` is None, the result is `None`
             },
-            m: self.m.clone().or(other.m.clone()), // Combine m values
-            t: self.t.or(other.t),                 // Handle `t` as necessary
+            m: self.m.clone(),     // Combine m values
+            t: self.t.or(other.t), // Handle `t` as necessary
         }
     }
 }
@@ -187,9 +185,9 @@ impl<M: MValueCompatible> Div<f64> for VectorPoint<M> {
     }
 }
 // Implementing the Mul trait for VectorPoint
-impl<M: MValueCompatible> Mul<VectorPoint<M>> for VectorPoint<M> {
-    type Output = VectorPoint<M>;
-    fn mul(self, other: Self) -> Self::Output {
+impl<M1: MValueCompatible, M2: MValueCompatible> Mul<VectorPoint<M2>> for VectorPoint<M1> {
+    type Output = VectorPoint<M1>;
+    fn mul(self, other: VectorPoint<M2>) -> Self::Output {
         VectorPoint {
             x: self.x * other.x,
             y: self.y * other.y,
@@ -197,8 +195,8 @@ impl<M: MValueCompatible> Mul<VectorPoint<M>> for VectorPoint<M> {
                 (Some(z1), Some(z2)) => Some(z1 * z2),
                 _ => None, // If either `z` is None, the result is `None`
             },
-            m: self.m.clone().or(other.m.clone()), // Combine m values
-            t: self.t.or(other.t),                 // Handle `t` as necessary
+            m: self.m.clone(),     // Combine m values
+            t: self.t.or(other.t), // Handle `t` as necessary
         }
     }
 }
@@ -374,9 +372,10 @@ mod tests {
 
     #[test]
     fn vector_point_add() {
-        let vector_point1 =
-            VectorPoint::<MValue> { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
-        let vector_point2 = VectorPoint { x: 4.0, y: 5.0, z: Some(6.0), m: None, t: Some(5.2) };
+        let vector_point1: VectorPoint =
+            VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
+        let vector_point2: VectorPoint =
+            VectorPoint { x: 4.0, y: 5.0, z: Some(6.0), m: None, t: Some(5.2) };
         let result = vector_point1 + vector_point2;
         assert_eq!(result.x, 5.0);
         assert_eq!(result.y, 7.0);
@@ -456,7 +455,8 @@ mod tests {
     fn vector_point_div() {
         let vector_point1: VectorPoint =
             VectorPoint { x: 1.0, y: 2.0, z: Some(3.0), m: None, t: None };
-        let vector_point2 = VectorPoint { x: 4.0, y: 5.0, z: Some(6.0), m: None, t: Some(5.2) };
+        let vector_point2: VectorPoint =
+            VectorPoint { x: 4.0, y: 5.0, z: Some(6.0), m: None, t: Some(5.2) };
         let result = vector_point1 / vector_point2;
         assert_eq!(result.x, 0.25);
         assert_eq!(result.y, 0.4);
@@ -607,12 +607,12 @@ mod tests {
             x: 1.0,
             y: 2.0,
             z: Some(3.0),
-            m: Some(BTreeMap::from([
+            m: Some(Value::from([
                 ("class".into(), ValueType::Primitive(PrimitiveValue::String("ocean".into()))),
                 ("offset".into(), ValueType::Primitive(PrimitiveValue::U64(22))),
                 (
                     "info".into(),
-                    ValueType::Nested(BTreeMap::from([
+                    ValueType::Nested(Value::from([
                         (
                             "name".into(),
                             ValueType::Primitive(PrimitiveValue::String("Pacific Ocean".into())),

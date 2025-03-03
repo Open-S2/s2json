@@ -4,7 +4,6 @@
 
 //     use std::str;
 
-//     use alloc::collections::BTreeMap;
 //     use alloc::string::String;
 //     // use alloc::vec::Vec;
 
@@ -28,7 +27,7 @@
 //         println!("{:?}", mvalue); // Debug output
 //         assert_eq!(
 //             mvalue,
-//             BTreeMap::from([
+//             Value::from([
 //                 ("name".into(), ValueType::Primitive(PrimitiveValue::String("example".into()))),
 //                 ("value".into(), ValueType::Primitive(PrimitiveValue::U64(42))),
 //             ])
@@ -53,7 +52,7 @@
 //         println!("{:?}", mvalue); // Debug output
 //         assert_eq!(
 //             mvalue,
-//             BTreeMap::from([
+//             Value::from([
 //                 ("a".into(), ValueType::Primitive(PrimitiveValue::U64(1))),
 //                 ("b".into(), ValueType::Primitive(PrimitiveValue::U64(2))),
 //                 ("c".into(), ValueType::Primitive(PrimitiveValue::U64(3))),
@@ -80,7 +79,7 @@
 //         println!("{:?}", mvalue); // Debug output
 //         assert_eq!(
 //             mvalue,
-//             BTreeMap::from([
+//             Value::from([
 //                 ("a".into(), ValueType::Primitive(PrimitiveValue::I64(1))),
 //                 ("b".into(), ValueType::Primitive(PrimitiveValue::I64(2))),
 //                 ("c".into(), ValueType::Primitive(PrimitiveValue::I64(3))),
@@ -105,7 +104,7 @@
 //         println!("{:?}", mvalue); // Debug output
 //         assert_eq!(
 //             mvalue,
-//             BTreeMap::from([
+//             Value::from([
 //                 ("a".into(), ValueType::Primitive(PrimitiveValue::F64(1.0))),
 //                 ("b".into(), ValueType::Primitive(PrimitiveValue::F64(2.0))),
 //             ])
@@ -127,7 +126,7 @@
 //         println!("{:?}", mvalue); // Debug output
 //         assert_eq!(
 //             mvalue,
-//             BTreeMap::from([("a".into(), ValueType::Primitive(PrimitiveValue::Bool(true)))]),
+//             Value::from([("a".into(), ValueType::Primitive(PrimitiveValue::Bool(true)))]),
 //         );
 //     }
 
@@ -150,10 +149,10 @@
 //         println!("{:?}", mvalue); // Debug output
 //         assert_eq!(
 //             mvalue,
-//             BTreeMap::from([
+//             Value::from([
 //                 (
 //                     "a".into(),
-//                     ValueType::Nested(BTreeMap::from([
+//                     ValueType::Nested(Value::from([
 //                         ("a".into(), ValueType::Primitive(PrimitiveValue::String("a".into()))),
 //                         ("b".into(), ValueType::Primitive(PrimitiveValue::U64(1))),
 //                     ])),
@@ -176,7 +175,7 @@
 //         println!("{:?}", mvalue); // Debug output
 //         assert_eq!(
 //             mvalue,
-//             BTreeMap::from([("a".into(), ValueType::Primitive(PrimitiveValue::U64(1)))]),
+//             Value::from([("a".into(), ValueType::Primitive(PrimitiveValue::U64(1)))]),
 //         );
 
 //         let test_struct = TestStruct { a: None };
@@ -185,7 +184,7 @@
 //         println!("{:?}", mvalue); // Debug output
 //         assert_eq!(
 //             mvalue,
-//             BTreeMap::from([("a".into(), ValueType::Primitive(PrimitiveValue::Null))]),
+//             Value::from([("a".into(), ValueType::Primitive(PrimitiveValue::Null))]),
 //         );
 //     }
 // }

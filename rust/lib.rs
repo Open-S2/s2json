@@ -10,6 +10,8 @@ extern crate alloc;
 
 /// All geometry types and structs
 pub mod geometry;
+/// BTreeMap wrapper
+pub mod map;
 /// All values types and structs
 pub mod value;
 /// All values impl
@@ -18,12 +20,12 @@ pub mod value_impl;
 pub mod vector_point;
 
 pub use geometry::*;
+pub use map::*;
 pub use value::*;
 pub use vector_point::*;
 
 use serde::{Deserialize, Serialize};
 
-use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec::Vec;
@@ -79,12 +81,13 @@ impl From<u8> for Face {
 
 /// WM FeatureCollection
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
-pub struct FeatureCollection<M = (), D: MValueCompatible = MValue> {
+pub struct FeatureCollection<M = (), P: MValueCompatible = Properties, D: MValueCompatible = MValue>
+{
     /// Type will always be "FeatureCollection"
     #[serde(rename = "type")]
     pub _type: String,
     /// Collection of WM features
-    pub features: Vec<WMFeature<M, D>>,
+    pub features: Vec<WMFeature<M, P, D>>,
     /// Attribution data
     #[serde(skip_serializing_if = "Option::is_none")]
     pub attributions: Option<Attributions>,
@@ -92,7 +95,7 @@ pub struct FeatureCollection<M = (), D: MValueCompatible = MValue> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bbox: Option<BBox>,
 }
-impl<M> FeatureCollection<M> {
+impl<M, P: MValueCompatible, D: MValueCompatible> FeatureCollection<M, P, D> {
     /// Create a new FeatureCollection
     pub fn new(attributions: Option<Attributions>) -> Self {
         Self {
@@ -113,12 +116,16 @@ impl<M> FeatureCollection<M> {
 
 /// S2 FeatureCollection
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
-pub struct S2FeatureCollection<M = (), D: MValueCompatible = MValue> {
+pub struct S2FeatureCollection<
+    M = (),
+    P: MValueCompatible = Properties,
+    D: MValueCompatible = MValue,
+> {
     /// Type will always be "S2FeatureCollection"
     #[serde(rename = "type")]
     pub _type: String,
     /// Collection of S2 features
-    pub features: Vec<VectorFeature<M, D>>,
+    pub features: Vec<VectorFeature<M, P, D>>,
     /// Track the faces that were used to generate the features
     pub faces: Vec<Face>,
     /// Attribution data
@@ -128,7 +135,7 @@ pub struct S2FeatureCollection<M = (), D: MValueCompatible = MValue> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bbox: Option<BBox>,
 }
-impl<M, D: MValueCompatible> S2FeatureCollection<M, D> {
+impl<M, P: MValueCompatible, D: MValueCompatible> S2FeatureCollection<M, P, D> {
     /// Create a new S2FeatureCollection
     pub fn new(attributions: Option<Attributions>) -> Self {
         Self {
@@ -159,7 +166,7 @@ impl<M, D: MValueCompatible> S2FeatureCollection<M, D> {
 
 /// Component to build an WM Feature
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
-pub struct Feature<M = (), D: MValueCompatible = MValue> {
+pub struct Feature<M = (), P: MValueCompatible = Properties, D: MValueCompatible = MValue> {
     /// Type will always be "Feature"
     #[serde(rename = "type")]
     pub _type: String,
@@ -167,28 +174,23 @@ pub struct Feature<M = (), D: MValueCompatible = MValue> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<u64>,
     /// Properties of the feature
-    pub properties: Properties,
+    pub properties: P,
     /// Geometry of the feature
     pub geometry: Geometry<D>,
     /// Metadata of the feature
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<M>,
 }
-impl<M, D: MValueCompatible> Feature<M, D> {
+impl<M, P: MValueCompatible, D: MValueCompatible> Feature<M, P, D> {
     /// Create a new Feature
-    pub fn new(
-        id: Option<u64>,
-        properties: Properties,
-        geometry: Geometry<D>,
-        metadata: Option<M>,
-    ) -> Self {
+    pub fn new(id: Option<u64>, properties: P, geometry: Geometry<D>, metadata: Option<M>) -> Self {
         Self { _type: "Feature".to_string(), id, properties, geometry, metadata }
     }
 }
 
 /// Component to build an WM or S2 Vector Feature
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
-pub struct VectorFeature<M = (), D: MValueCompatible = MValue> {
+pub struct VectorFeature<M = (), P: MValueCompatible = Properties, D: MValueCompatible = MValue> {
     /// Type will always be "VectorFeature"
     #[serde(rename = "type")]
     pub _type: String,
@@ -198,18 +200,18 @@ pub struct VectorFeature<M = (), D: MValueCompatible = MValue> {
     /// Face of the feature
     pub face: Face,
     /// Properties of the feature
-    pub properties: Properties,
+    pub properties: P,
     /// Geometry of the feature
     pub geometry: VectorGeometry<D>,
     /// Metadata of the feature
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<M>,
 }
-impl<M, D: MValueCompatible> VectorFeature<M, D> {
+impl<M, P: MValueCompatible, D: MValueCompatible> VectorFeature<M, P, D> {
     /// Create a new VectorFeature in the WM format
     pub fn new_wm(
         id: Option<u64>,
-        properties: Properties,
+        properties: P,
         geometry: VectorGeometry<D>,
         metadata: Option<M>,
     ) -> Self {
@@ -227,7 +229,7 @@ impl<M, D: MValueCompatible> VectorFeature<M, D> {
     pub fn new_s2(
         id: Option<u64>,
         face: Face,
-        properties: Properties,
+        properties: P,
         geometry: VectorGeometry<D>,
         metadata: Option<M>,
     ) -> Self {
@@ -236,7 +238,7 @@ impl<M, D: MValueCompatible> VectorFeature<M, D> {
 
     /// Create a new VectorFeature using an input VectorFeature. Assign new geometry if provided
     pub fn from_vector_feature(
-        feature: &VectorFeature<M, D>,
+        feature: &VectorFeature<M, P, D>,
         geometry: Option<VectorGeometry<D>>,
     ) -> Self
     where
@@ -258,46 +260,47 @@ impl<M, D: MValueCompatible> VectorFeature<M, D> {
 /// Attribution data is stored in an object.
 /// The key is the name of the attribution, and the value is the href link
 /// e.g. { "Open S2": "https://opens2.com/legal/data" }
-pub type Attributions = BTreeMap<String, String>;
+pub type Attributions = Map<String, String>;
 
 /// Either an S2 or WM FeatureCollection
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
-pub enum FeatureCollections<M = (), D: MValueCompatible = MValue> {
+pub enum FeatureCollections<M = (), P: MValueCompatible = Properties, D: MValueCompatible = MValue>
+{
     /// An WM FeatureCollection
-    FeatureCollection(FeatureCollection<M, D>),
+    FeatureCollection(FeatureCollection<M, P, D>),
     /// An S2 FeatureCollection
-    S2FeatureCollection(S2FeatureCollection<M, D>),
+    S2FeatureCollection(S2FeatureCollection<M, P, D>),
 }
 
 /// Either an S2 or WM Feature
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
-pub enum Features<M = (), D: MValueCompatible = MValue> {
+pub enum Features<M = (), P: MValueCompatible = Properties, D: MValueCompatible = MValue> {
     /// An WM Feature
-    Feature(Feature<M, D>),
+    Feature(Feature<M, P, D>),
     /// An WM or S2 Vector Feature
-    VectorFeature(VectorFeature<M, D>),
+    VectorFeature(VectorFeature<M, P, D>),
 }
 
 /// Either an WM Feature or an WM Vector Feature
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
-pub enum WMFeature<M = (), D: MValueCompatible = MValue> {
+pub enum WMFeature<M = (), P: MValueCompatible = Properties, D: MValueCompatible = MValue> {
     /// An WM Feature
-    Feature(Feature<M, D>),
+    Feature(Feature<M, P, D>),
     /// An WM Vector Feature
-    VectorFeature(VectorFeature<M, D>),
+    VectorFeature(VectorFeature<M, P, D>),
 }
 
 /// All major S2JSON types
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
-pub enum JSONCollection<M = (), D: MValueCompatible = MValue> {
+pub enum JSONCollection<M = (), P: MValueCompatible = Properties, D: MValueCompatible = MValue> {
     /// An WM FeatureCollection
-    FeatureCollection(FeatureCollection<M, D>),
+    FeatureCollection(FeatureCollection<M, P, D>),
     /// An S2 FeatureCollection
-    S2FeatureCollection(S2FeatureCollection<M, D>),
+    S2FeatureCollection(S2FeatureCollection<M, P, D>),
     /// An WM Feature
-    Feature(Feature<M, D>),
+    Feature(Feature<M, P, D>),
     /// An WM Vector Feature
-    VectorFeature(VectorFeature<M, D>),
+    VectorFeature(VectorFeature<M, P, D>),
 }
 
 #[cfg(test)]

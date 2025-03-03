@@ -122,6 +122,20 @@ where
         }
     }
 }
+impl From<&PrimitiveValue> for JSONValue {
+    fn from(v: &PrimitiveValue) -> Self {
+        JSONValue::Primitive(v.clone())
+    }
+}
+impl From<&JSONValue> for PrimitiveValue {
+    fn from(v: &JSONValue) -> Self {
+        match v {
+            JSONValue::Primitive(v) => v.clone(),
+            // DROPS VALUES THAT ARE NOT PRIMITIVES
+            _ => PrimitiveValue::Null,
+        }
+    }
+}
 
 // ValuePrimitiveType
 impl ValuePrimitiveType {
@@ -199,6 +213,36 @@ where
         match v {
             Some(v) => v.into(),
             None => ValuePrimitiveType::Primitive(PrimitiveValue::Null),
+        }
+    }
+}
+impl From<&ValuePrimitiveType> for JSONValue {
+    fn from(v: &ValuePrimitiveType) -> Self {
+        match v {
+            ValuePrimitiveType::Primitive(v) => JSONValue::Primitive(v.clone()),
+            ValuePrimitiveType::NestedPrimitive(v) => {
+                let mut map = Map::<String, JSONValue>::new();
+                for (k, v) in v.iter() {
+                    map.insert(k.clone(), v.into());
+                }
+                JSONValue::Object(map)
+            }
+        }
+    }
+}
+impl From<&JSONValue> for ValuePrimitiveType {
+    fn from(v: &JSONValue) -> Self {
+        match v {
+            JSONValue::Primitive(v) => ValuePrimitiveType::Primitive(v.clone()),
+            JSONValue::Object(v) => {
+                let mut map = ValuePrimitive::new();
+                for (k, v) in v.iter() {
+                    map.insert(k.clone(), v.into());
+                }
+                ValuePrimitiveType::NestedPrimitive(map)
+            }
+            // DROPS ALL ARRAY DATA AS IT IS NOT SUPPORTED INSIDE VALUE PRIMITIVES
+            _ => ValuePrimitiveType::Primitive(PrimitiveValue::Null),
         }
     }
 }
@@ -296,6 +340,111 @@ where
             Some(v) => v.into(),
             None => ValueType::Primitive(PrimitiveValue::Null),
         }
+    }
+}
+impl From<&JSONValue> for ValueType {
+    fn from(v: &JSONValue) -> Self {
+        match v {
+            JSONValue::Primitive(v) => ValueType::Primitive(v.clone()),
+            JSONValue::Array(v) => ValueType::Array(v.iter().map(Into::into).collect()),
+            JSONValue::Object(v) => {
+                let mut res = Value::new();
+                for (k, v) in v.iter() {
+                    res.insert(k.clone(), v.into());
+                }
+                ValueType::Nested(res)
+            }
+        }
+    }
+}
+impl From<&ValueType> for JSONValue {
+    fn from(v: &ValueType) -> Self {
+        match v {
+            ValueType::Primitive(v) => JSONValue::Primitive(v.clone()),
+            ValueType::Array(v) => JSONValue::Array(v.iter().map(Into::into).collect()),
+            ValueType::Nested(v) => {
+                let mut res = Map::<String, JSONValue>::new();
+                for (k, v) in v.iter() {
+                    res.insert(k.clone(), v.into());
+                }
+                JSONValue::Object(res)
+            }
+        }
+    }
+}
+
+impl Default for JSONValue {
+    fn default() -> Self {
+        JSONValue::Primitive(PrimitiveValue::Null)
+    }
+}
+impl JSONValue {
+    /// Returns the value as a primitive
+    pub fn to_prim(&self) -> Option<&PrimitiveValue> {
+        match self {
+            JSONValue::Primitive(v) => Some(v),
+            _ => None,
+        }
+    }
+
+    /// Returns the value as a vector
+    pub fn to_vec(&self) -> Option<&Vec<JSONValue>> {
+        match self {
+            JSONValue::Array(v) => Some(v),
+            _ => None,
+        }
+    }
+
+    /// Returns the value as a nested object
+    pub fn to_nested(&self) -> Option<&Map<String, JSONValue>> {
+        match self {
+            JSONValue::Object(v) => Some(v),
+            _ => None,
+        }
+    }
+}
+
+impl MValueCompatible for JSONProperties {}
+impl From<JSONProperties> for MValue {
+    fn from(json: JSONProperties) -> MValue {
+        let mut res = MValue::new();
+        for (k, v) in json.iter() {
+            res.insert(k.clone(), v.into());
+        }
+        res
+    }
+}
+impl From<MValue> for JSONProperties {
+    fn from(v: MValue) -> JSONProperties {
+        let mut res = JSONProperties::new();
+        for (k, v) in v.iter() {
+            res.insert(k.clone(), v.into());
+        }
+        res
+    }
+}
+
+impl MValueCompatible for MapboxProperties {}
+impl From<MapboxProperties> for MValue {
+    fn from(json: MapboxProperties) -> MValue {
+        let mut res = MValue::new();
+        for (k, v) in json.iter() {
+            res.insert(k.clone(), ValueType::Primitive(v.clone()));
+        }
+        res
+    }
+}
+impl From<MValue> for MapboxProperties {
+    fn from(v: MValue) -> MapboxProperties {
+        let mut res = MapboxProperties::new();
+        // Only copy over primitive values
+        for (k, v) in v.iter() {
+            let value = v.clone();
+            if let Some(p) = value.to_prim() {
+                res.insert(k.clone(), p.clone());
+            }
+        }
+        res
     }
 }
 
@@ -557,5 +706,191 @@ mod tests {
         let b: VectorPoint = VectorPoint::new(3.0, 4.0, None, None);
         let dist = a.distance(&b);
         assert_eq!(dist, 2.8284271247461903);
+    }
+
+    #[test]
+    fn to_mapbox() {
+        let value: MValue = MValue::from([
+            ("a".into(), "b".into()),
+            ("c".into(), 2.0_f32.into()),
+            (
+                "d".into(),
+                MValue::from([("2".into(), "3".into()), ("4".into(), 2.0_f32.into())]).into(),
+            ),
+        ]);
+        let mapbox_value: MapboxProperties = value.clone().into();
+        assert_eq!(
+            mapbox_value,
+            MapboxProperties::from([("a".into(), "b".into()), ("c".into(), 2.0_f32.into()),])
+        );
+    }
+
+    #[test]
+    fn from_mapbox() {
+        let mapbox_value: MapboxProperties = MapboxProperties::from([("a".into(), "b".into())]);
+        let value: MValue = mapbox_value.clone().into();
+        assert_eq!(value, MValue::from([("a".into(), "b".into()),]));
+    }
+
+    #[test]
+    fn to_json_obj() {
+        let value: MValue = MValue::from([
+            ("a".into(), "b".into()),
+            ("c".into(), 2.0_f32.into()),
+            (
+                "d".into(),
+                MValue::from([("2".into(), "3".into()), ("4".into(), 2.0_f32.into())]).into(),
+            ),
+            (
+                "e".into(),
+                Vec::<ValuePrimitiveType>::from(["a".into(), "b".into(), "c".into()]).into(),
+            ),
+        ]);
+        let json_value: JSONProperties = value.clone().into();
+        assert_eq!(
+            json_value,
+            JSONProperties::from([
+                ("a".into(), JSONValue::Primitive(PrimitiveValue::String("b".into()))),
+                ("c".into(), JSONValue::Primitive(PrimitiveValue::F32(2.0))),
+                (
+                    "d".into(),
+                    JSONValue::Object(JSONProperties::from([
+                        ("2".into(), JSONValue::Primitive(PrimitiveValue::String("3".into()))),
+                        ("4".into(), JSONValue::Primitive(PrimitiveValue::F32(2.0))),
+                    ]))
+                ),
+                (
+                    "e".into(),
+                    JSONValue::Array(Vec::from([
+                        JSONValue::Primitive(PrimitiveValue::String("a".into())),
+                        JSONValue::Primitive(PrimitiveValue::String("b".into())),
+                        JSONValue::Primitive(PrimitiveValue::String("c".into())),
+                    ]))
+                ),
+            ])
+        );
+
+        // get prim
+        let prim_a = json_value.get("a").unwrap().to_prim().unwrap().to_string().unwrap();
+        assert_eq!(prim_a, "b");
+        let failed_to_prim = json_value.get("d").unwrap().to_prim();
+        assert_eq!(failed_to_prim, None);
+
+        // get array
+        let array_e = json_value.get("e").unwrap().to_vec().unwrap();
+        assert_eq!(
+            *array_e,
+            Vec::from([
+                JSONValue::Primitive(PrimitiveValue::String("a".into())),
+                JSONValue::Primitive(PrimitiveValue::String("b".into())),
+                JSONValue::Primitive(PrimitiveValue::String("c".into())),
+            ])
+        );
+        let array_fail = json_value.get("a").unwrap().to_vec();
+        assert_eq!(array_fail, None);
+
+        // get obj
+        let obj_d = json_value.get("d").unwrap().to_nested().unwrap();
+        assert_eq!(
+            *obj_d,
+            JSONProperties::from([
+                ("2".into(), JSONValue::Primitive(PrimitiveValue::String("3".into()))),
+                ("4".into(), JSONValue::Primitive(PrimitiveValue::F32(2.0))),
+            ])
+        );
+        let obj_fail = json_value.get("a").unwrap().to_nested();
+        assert_eq!(obj_fail, None);
+    }
+
+    #[test]
+    fn from_json_obj() {
+        let json_value = JSONProperties::from([
+            ("a".into(), JSONValue::Primitive(PrimitiveValue::String("b".into()))),
+            ("c".into(), JSONValue::Primitive(PrimitiveValue::F32(2.0))),
+            (
+                "d".into(),
+                JSONValue::Object(JSONProperties::from([
+                    ("2".into(), JSONValue::Primitive(PrimitiveValue::String("3".into()))),
+                    ("4".into(), JSONValue::Primitive(PrimitiveValue::F32(2.0))),
+                ])),
+            ),
+            (
+                "e".into(),
+                JSONValue::Array(Vec::from([
+                    JSONValue::Primitive(PrimitiveValue::String("a".into())),
+                    JSONValue::Primitive(PrimitiveValue::String("b".into())),
+                    JSONValue::Primitive(PrimitiveValue::String("c".into())),
+                ])),
+            ),
+        ]);
+        let value: MValue = json_value.clone().into();
+        assert_eq!(
+            value,
+            MValue::from([
+                ("a".into(), "b".into()),
+                ("c".into(), 2.0_f32.into()),
+                (
+                    "d".into(),
+                    MValue::from([("2".into(), "3".into()), ("4".into(), 2.0_f32.into())]).into(),
+                ),
+                (
+                    "e".into(),
+                    Vec::<ValuePrimitiveType>::from(["a".into(), "b".into(), "c".into()]).into(),
+                ),
+            ])
+        );
+    }
+
+    #[test]
+    fn test_prim_to_json() {
+        let json: JSONValue = (&PrimitiveValue::String("test".into())).into();
+        assert_eq!(json, JSONValue::Primitive(PrimitiveValue::String("test".into())));
+
+        let prim: PrimitiveValue = (&json).into();
+        assert_eq!(prim, PrimitiveValue::String("test".into()));
+
+        // to prim but json is not a prim
+        let json = JSONValue::Array(Vec::new());
+        let prim: PrimitiveValue = (&json).into();
+        assert_eq!(prim, PrimitiveValue::Null);
+    }
+
+    #[test]
+    fn test_value_prim_type_to_json() {
+        let prim = ValuePrimitiveType::NestedPrimitive(Map::from([
+            ("a".into(), "b".into()),
+            ("c".into(), 2.0_f32.into()),
+        ]));
+        let json: JSONValue = (&prim).into();
+        assert_eq!(
+            json,
+            JSONValue::Object(JSONProperties::from([
+                ("a".into(), JSONValue::Primitive(PrimitiveValue::String("b".into()))),
+                ("c".into(), JSONValue::Primitive(PrimitiveValue::F32(2.0))),
+            ]))
+        );
+
+        let json = JSONValue::Object(JSONProperties::from([
+            ("2".into(), JSONValue::Primitive(PrimitiveValue::String("3".into()))),
+            ("4".into(), JSONValue::Primitive(PrimitiveValue::F32(2.0))),
+        ]));
+
+        let prim: ValuePrimitiveType = (&json).into();
+        assert_eq!(
+            prim,
+            ValuePrimitiveType::NestedPrimitive(Map::from([
+                ("2".into(), "3".into()),
+                ("4".into(), 2.0_f32.into()),
+            ]))
+        );
+
+        // Array Fails
+        let json = JSONValue::Array(Vec::from([
+            JSONValue::Primitive(PrimitiveValue::String("c".into())),
+            JSONValue::Primitive(PrimitiveValue::String("d".into())),
+        ]));
+
+        let prim: ValuePrimitiveType = (&json).into();
+        assert_eq!(prim, ValuePrimitiveType::Primitive(PrimitiveValue::Null));
     }
 }
