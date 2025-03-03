@@ -529,7 +529,7 @@ impl Default for BBOX {
 
 /// A Point in S2 Space with a Face
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
-pub struct STPoint {
+pub struct STPoint<M: MValueCompatible = MValue> {
     /// The face of the point
     pub face: Face,
     /// The s coordinate
@@ -539,7 +539,7 @@ pub struct STPoint {
     /// The z coordinate
     pub z: Option<f64>,
     /// The m coordinate
-    pub m: Option<MValue>,
+    pub m: Option<M>,
 }
 
 /// Enum to represent specific geometry types as strings
