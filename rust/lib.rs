@@ -283,6 +283,7 @@ pub enum Features<M = (), P: MValueCompatible = Properties, D: MValueCompatible 
 
 /// Either an WM Feature or an WM Vector Feature
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+#[serde(untagged)]
 pub enum WMFeature<M = (), P: MValueCompatible = Properties, D: MValueCompatible = MValue> {
     /// An WM Feature
     Feature(Feature<M, P, D>),
@@ -292,6 +293,7 @@ pub enum WMFeature<M = (), P: MValueCompatible = Properties, D: MValueCompatible
 
 /// All major S2JSON types
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+#[serde(untagged)]
 pub enum JSONCollection<M = (), P: MValueCompatible = Properties, D: MValueCompatible = MValue> {
     /// An WM FeatureCollection
     FeatureCollection(FeatureCollection<M, P, D>),
@@ -342,6 +344,11 @@ mod tests {
         // update_bbox
         fc.update_bbox(BBox::new(5., -2., 35., 2.2));
         assert_eq!(fc.bbox, Some(BBox::new(5., -2., 35., 2.2)));
+
+        let string = serde_json::to_string(&fc).unwrap();
+        assert_eq!(string, "{\"type\":\"FeatureCollection\",\"features\":[],\"attributions\":{\"Open S2\":\"https://opens2.com/legal/data\"},\"bbox\":[5.0,-2.0,35.0,2.2]}");
+        let back_to_fc: FeatureCollection = serde_json::from_str(&string).unwrap();
+        assert_eq!(back_to_fc, fc);
     }
 
     #[test]
@@ -359,6 +366,11 @@ mod tests {
         fc.add_face(0.into());
         fc.add_face(3.into());
         assert_eq!(fc.faces, vec![0.into(), 3.into()]);
+
+        let string = serde_json::to_string(&fc).unwrap();
+        assert_eq!(string, "{\"type\":\"S2FeatureCollection\",\"features\":[],\"faces\":[\"Face0\",\"Face3\"],\"attributions\":{\"Open S2\":\"https://opens2.com/legal/data\"},\"bbox\":[5.0,-2.0,35.0,2.2]}");
+        let back_to_fc: S2FeatureCollection = serde_json::from_str(&string).unwrap();
+        assert_eq!(back_to_fc, fc);
     }
 
     #[test]

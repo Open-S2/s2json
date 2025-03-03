@@ -618,6 +618,7 @@ pub type MultiPolygon3D = Vec<Polygon3D>;
 
 /// All possible geometry shapes
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
+#[serde(untagged)]
 pub enum Geometry<M: MValueCompatible = MValue> {
     /// Point Shape
     Point(PointGeometry<M>),
@@ -848,6 +849,7 @@ pub type VectorMultiPolygonGeometry<M = MValue> =
 mod tests {
     use super::*;
     use alloc::vec;
+    use serde_json::json;
 
     #[test]
     fn test_vector_offset() {
@@ -1747,5 +1749,93 @@ mod tests {
             vgt_multi_polygon.vec_bbox().unwrap(),
             BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 2.0)
         );
+    }
+
+    #[test]
+    fn from_string() {
+        let geo_str = json!({
+            "type": "Point",
+            "coordinates": [0, 0],
+        })
+        .to_string();
+        let _feature: Geometry = serde_json::from_str(&geo_str).unwrap();
+
+        let feature_str = json!({
+            "type": "Feature",
+            "properties": { "a": 1 },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [0, 0],
+            }
+        })
+        .to_string();
+        let _feature: Feature = serde_json::from_str(&feature_str).unwrap();
+
+        let json_string = r#"{
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "properties": { "a": 1 },
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [0, 0]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "b": 2 },
+                    "geometry": {
+                        "type": "Point3D",
+                        "coordinates": [45, 45, 1]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "c": 3 },
+                    "geometry": {
+                        "type": "MultiPoint",
+                        "coordinates": [
+                            [-45, -45],
+                            [-45, 45]
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "d": 4 },
+                    "geometry": {
+                        "type": "MultiPoint3D",
+                        "coordinates": [
+                            [45, -45, 1],
+                            [-180, 20, 2]
+                        ]
+                    }
+                }
+            ]
+        }"#;
+        let data: FeatureCollection = serde_json::from_str(json_string).unwrap();
+        assert_eq!(data.features.len(), 4);
+
+        let data2: JSONCollection = serde_json::from_str(json_string).unwrap();
+        if let JSONCollection::FeatureCollection(fc) = data2 {
+            assert_eq!(fc.features.len(), 4);
+            if let WMFeature::Feature(first_feature) = &fc.features[0] {
+                assert_eq!(first_feature.id, None);
+                assert_eq!(first_feature._type, "Feature");
+                assert_eq!(
+                    first_feature.geometry,
+                    Geometry::Point(PointGeometry {
+                        _type: "Point".into(),
+                        coordinates: (0.0, 0.0),
+                        ..Default::default()
+                    })
+                );
+            } else {
+                panic!("Expected Feature");
+            }
+        } else {
+            panic!("Expected FeatureCollection");
+        }
     }
 }
