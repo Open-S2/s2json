@@ -201,7 +201,7 @@ impl<M: MValueCompatible> Default for VectorGeometry<M> {
 
 /// BaseGeometry is the a generic geometry type
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
-pub struct VectorBaseGeometry<T, G = VectorGeometry, O = VectorOffsets> {
+pub struct VectorBaseGeometry<T = PointGeometryType, G = VectorGeometry, O = VectorOffsets> {
     /// The geometry type
     #[serde(rename = "type")]
     pub _type: T,

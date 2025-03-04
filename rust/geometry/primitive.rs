@@ -240,7 +240,7 @@ impl<M: MValueCompatible> Default for Geometry<M> {
 
 /// BaseGeometry is the a generic geometry type
 #[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Default)]
-pub struct BaseGeometry<T, M = MValue, G = Geometry<M>, B = BBOX> {
+pub struct BaseGeometry<T = PointGeometryType, M = MValue, G = Geometry<M>, B = BBOX> {
     /// The geometry type
     #[serde(rename = "type")]
     pub _type: T,
