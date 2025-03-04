@@ -421,7 +421,7 @@ mod tests {
             Properties::new(),
             Geometry::Point(PointGeometry {
                 _type: "Point".into(),
-                coordinates: (0.0, 0.0),
+                coordinates: Point(0.0, 0.0),
                 m_values: None,
                 bbox: None,
             }),
@@ -433,7 +433,7 @@ mod tests {
             fc.geometry,
             Geometry::Point(PointGeometry {
                 _type: "Point".into(),
-                coordinates: (0.0, 0.0),
+                coordinates: Point(0.0, 0.0),
                 m_values: None,
                 bbox: None,
             })

@@ -343,7 +343,7 @@ mod tests {
 
     #[test]
     fn from_point() {
-        let point: Point = (1.0, 2.0);
+        let point = Point(1.0, 2.0);
         let vector_point: VectorPoint = point.into();
         assert_eq!(vector_point.x, 1.0);
         assert_eq!(vector_point.y, 2.0);
@@ -351,7 +351,7 @@ mod tests {
         assert_eq!(vector_point.m, None);
         assert_eq!(vector_point.t, None);
 
-        let point: Point = (1.0, 2.0);
+        let point = Point(1.0, 2.0);
         let vector_point: VectorPoint = (&point).into();
         assert_eq!(vector_point.x, 1.0);
         assert_eq!(vector_point.y, 2.0);
@@ -362,7 +362,7 @@ mod tests {
 
     #[test]
     fn from_point_3d() {
-        let point: Point3D = (1.0, 2.0, 3.0);
+        let point: Point3D = Point3D(1.0, 2.0, 3.0);
         let vector_point: VectorPoint = point.into();
         assert_eq!(vector_point.x, 1.0);
         assert_eq!(vector_point.y, 2.0);
@@ -370,7 +370,7 @@ mod tests {
         assert_eq!(vector_point.m, None);
         assert_eq!(vector_point.t, None);
 
-        let point: Point3D = (1.0, 2.0, 3.0);
+        let point: Point3D = Point3D(1.0, 2.0, 3.0);
         let vector_point: VectorPoint = (&point).into();
         assert_eq!(vector_point.x, 1.0);
         assert_eq!(vector_point.y, 2.0);

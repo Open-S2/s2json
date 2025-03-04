@@ -592,7 +592,8 @@ impl From<&str> for GeometryType {
 }
 
 /// Definition of a Point. May represent WebMercator Lon-Lat or S2Geometry S-T
-pub type Point = (f64, f64);
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Default)]
+pub struct Point(pub f64, pub f64);
 /// Definition of a MultiPoint
 pub type MultiPoint = Vec<Point>;
 /// Definition of a LineString
@@ -604,7 +605,8 @@ pub type Polygon = Vec<Vec<Point>>;
 /// Definition of a MultiPolygon
 pub type MultiPolygon = Vec<Polygon>;
 /// Definition of a 3D Point. May represent WebMercator Lon-Lat or S2Geometry S-T with a z-value
-pub type Point3D = (f64, f64, f64);
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Default)]
+pub struct Point3D(pub f64, pub f64, pub f64);
 /// Definition of a 3D MultiPoint
 pub type MultiPoint3D = Vec<Point3D>;
 /// Definition of a 3D LineString
@@ -615,6 +617,21 @@ pub type MultiLineString3D = Vec<LineString3D>;
 pub type Polygon3D = Vec<Vec<Point3D>>;
 /// Definition of a 3D MultiPolygon
 pub type MultiPolygon3D = Vec<Polygon3D>;
+/// Define a Point or Point3D
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Default)]
+pub struct PointOrPoint3D(pub f64, pub f64, pub Option<f64>);
+
+impl From<Point> for PointOrPoint3D {
+    fn from(p: Point) -> Self {
+        PointOrPoint3D(p.0, p.1, None)
+    }
+}
+
+impl From<Point3D> for PointOrPoint3D {
+    fn from(p: Point3D) -> Self {
+        PointOrPoint3D(p.0, p.1, Some(p.2))
+    }
+}
 
 /// All possible geometry shapes
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
@@ -1370,7 +1387,7 @@ mod tests {
     fn test_point_geometry() {
         let point = PointGeometry {
             _type: "Point".into(),
-            coordinates: (0.0, 0.0),
+            coordinates: Point(0.0, 0.0),
             m_values: None,
             bbox: None,
         };
@@ -1378,7 +1395,7 @@ mod tests {
             point,
             PointGeometry {
                 _type: "Point".into(),
-                coordinates: (0.0, 0.0),
+                coordinates: Point(0.0, 0.0),
                 m_values: None,
                 bbox: None
             }
@@ -1402,7 +1419,7 @@ mod tests {
     fn test_point3d_geometry() {
         let point = Point3DGeometry {
             _type: "Point3D".into(),
-            coordinates: (0.0, 0.0, 0.0),
+            coordinates: Point3D(0.0, 0.0, 0.0),
             m_values: None,
             bbox: Some(BBox3D {
                 left: 0.0,
@@ -1417,7 +1434,7 @@ mod tests {
             point,
             Point3DGeometry {
                 _type: "Point3D".into(),
-                coordinates: (0.0, 0.0, 0.0),
+                coordinates: Point3D(0.0, 0.0, 0.0),
                 m_values: None,
                 bbox: Some(BBox3D {
                     left: 0.0,
@@ -1443,7 +1460,7 @@ mod tests {
     fn test_line_string_geometry() {
         let line = LineStringGeometry {
             _type: "LineString".into(),
-            coordinates: vec![(0.0, 0.0), (1.0, 1.0)],
+            coordinates: vec![Point(0.0, 0.0), Point(1.0, 1.0)],
             m_values: None,
             bbox: None,
         };
@@ -1451,7 +1468,7 @@ mod tests {
             line,
             LineStringGeometry {
                 _type: "LineString".into(),
-                coordinates: vec![(0.0, 0.0), (1.0, 1.0)],
+                coordinates: vec![Point(0.0, 0.0), Point(1.0, 1.0)],
                 m_values: None,
                 bbox: None
             }
@@ -1466,7 +1483,7 @@ mod tests {
     fn test_line_string3d_geometry() {
         let line = LineString3DGeometry::<MValue> {
             _type: "LineString3D".into(),
-            coordinates: vec![(0.0, 0.0, 0.0), (1.0, 1.0, 1.0)],
+            coordinates: vec![Point3D(0.0, 0.0, 0.0), Point3D(1.0, 1.0, 1.0)],
             m_values: None,
             bbox: None,
         };
@@ -1474,7 +1491,7 @@ mod tests {
             line,
             LineString3DGeometry {
                 _type: "LineString3D".into(),
-                coordinates: vec![(0.0, 0.0, 0.0), (1.0, 1.0, 1.0)],
+                coordinates: vec![Point3D(0.0, 0.0, 0.0), Point3D(1.0, 1.0, 1.0)],
                 m_values: None,
                 bbox: None
             }
@@ -1492,7 +1509,7 @@ mod tests {
     fn test_multi_point_geometry() {
         let multi_point = MultiPointGeometry {
             _type: "MultiPoint".into(),
-            coordinates: vec![(0.0, 0.0), (1.0, 1.0)],
+            coordinates: vec![Point(0.0, 0.0), Point(1.0, 1.0)],
             m_values: None,
             bbox: None,
         };
@@ -1500,7 +1517,7 @@ mod tests {
             multi_point,
             MultiPointGeometry {
                 _type: "MultiPoint".into(),
-                coordinates: vec![(0.0, 0.0), (1.0, 1.0)],
+                coordinates: vec![Point(0.0, 0.0), Point(1.0, 1.0)],
                 m_values: None,
                 bbox: None
             }
@@ -1518,7 +1535,7 @@ mod tests {
     fn test_multi_point3d_geometry() {
         let multi_point = MultiPoint3DGeometry {
             _type: "MultiPoint3D".into(),
-            coordinates: vec![(0.0, 0.0, 0.0), (1.0, 1.0, 1.0)],
+            coordinates: vec![Point3D(0.0, 0.0, 0.0), Point3D(1.0, 1.0, 1.0)],
             m_values: None,
             bbox: None,
         };
@@ -1526,7 +1543,7 @@ mod tests {
             multi_point,
             MultiPoint3DGeometry {
                 _type: "MultiPoint3D".into(),
-                coordinates: vec![(0.0, 0.0, 0.0), (1.0, 1.0, 1.0)],
+                coordinates: vec![Point3D(0.0, 0.0, 0.0), Point3D(1.0, 1.0, 1.0)],
                 m_values: None,
                 bbox: None
             }
@@ -1544,7 +1561,7 @@ mod tests {
     fn test_polygon_geometry() {
         let polygon = PolygonGeometry {
             _type: "Polygon".into(),
-            coordinates: vec![vec![(0.0, 0.0), (1.0, 1.0), (0.0, 1.0)]],
+            coordinates: vec![vec![Point(0.0, 0.0), Point(1.0, 1.0), Point(0.0, 1.0)]],
             m_values: None,
             bbox: None,
         };
@@ -1552,7 +1569,7 @@ mod tests {
             polygon,
             PolygonGeometry {
                 _type: "Polygon".into(),
-                coordinates: vec![vec![(0.0, 0.0), (1.0, 1.0), (0.0, 1.0)]],
+                coordinates: vec![vec![Point(0.0, 0.0), Point(1.0, 1.0), Point(0.0, 1.0)]],
                 m_values: None,
                 bbox: None
             }
@@ -1570,7 +1587,11 @@ mod tests {
     fn test_polygon3d_geometry() {
         let polygon = Polygon3DGeometry {
             _type: "Polygon3D".into(),
-            coordinates: vec![vec![(0.0, 0.0, 0.0), (1.0, 1.0, 1.0), (0.0, 1.0, 1.0)]],
+            coordinates: vec![vec![
+                Point3D(0.0, 0.0, 0.0),
+                Point3D(1.0, 1.0, 1.0),
+                Point3D(0.0, 1.0, 1.0),
+            ]],
             m_values: None,
             bbox: None,
         };
@@ -1578,7 +1599,11 @@ mod tests {
             polygon,
             Polygon3DGeometry {
                 _type: "Polygon3D".into(),
-                coordinates: vec![vec![(0.0, 0.0, 0.0), (1.0, 1.0, 1.0), (0.0, 1.0, 1.0)]],
+                coordinates: vec![vec![
+                    Point3D(0.0, 0.0, 0.0),
+                    Point3D(1.0, 1.0, 1.0),
+                    Point3D(0.0, 1.0, 1.0)
+                ]],
                 m_values: None,
                 bbox: None
             }
@@ -1597,7 +1622,7 @@ mod tests {
     fn test_multi_polygon_geometry() {
         let multi_polygon = MultiPolygonGeometry {
             _type: "MultiPolygon".into(),
-            coordinates: vec![vec![vec![(0.0, 0.0), (1.0, 1.0), (0.0, 1.0)]]],
+            coordinates: vec![vec![vec![Point(0.0, 0.0), Point(1.0, 1.0), Point(0.0, 1.0)]]],
             m_values: None,
             bbox: None,
         };
@@ -1605,7 +1630,7 @@ mod tests {
             multi_polygon,
             MultiPolygonGeometry {
                 _type: "MultiPolygon".into(),
-                coordinates: vec![vec![vec![(0.0, 0.0), (1.0, 1.0), (0.0, 1.0)]]],
+                coordinates: vec![vec![vec![Point(0.0, 0.0), Point(1.0, 1.0), Point(0.0, 1.0)]]],
                 m_values: None,
                 bbox: None
             }
@@ -1624,7 +1649,11 @@ mod tests {
     fn test_multi_polygon3d_geometry() {
         let multi_polygon = MultiPolygon3DGeometry {
             _type: "MultiPolygon3D".into(),
-            coordinates: vec![vec![vec![(0.0, 0.0, 0.0), (1.0, 1.0, 1.0), (0.0, 1.0, 1.0)]]],
+            coordinates: vec![vec![vec![
+                Point3D(0.0, 0.0, 0.0),
+                Point3D(1.0, 1.0, 1.0),
+                Point3D(0.0, 1.0, 1.0),
+            ]]],
             m_values: None,
             bbox: None,
         };
@@ -1632,7 +1661,11 @@ mod tests {
             multi_polygon,
             MultiPolygon3DGeometry {
                 _type: "MultiPolygon3D".into(),
-                coordinates: vec![vec![vec![(0.0, 0.0, 0.0), (1.0, 1.0, 1.0), (0.0, 1.0, 1.0)]]],
+                coordinates: vec![vec![vec![
+                    Point3D(0.0, 0.0, 0.0),
+                    Point3D(1.0, 1.0, 1.0),
+                    Point3D(0.0, 1.0, 1.0)
+                ]]],
                 m_values: None,
                 bbox: None
             }
@@ -1896,7 +1929,7 @@ mod tests {
                     first_feature.geometry,
                     Geometry::Point(PointGeometry {
                         _type: "Point".into(),
-                        coordinates: (0.0, 0.0),
+                        coordinates: Point(0.0, 0.0),
                         ..Default::default()
                     })
                 );
@@ -2154,5 +2187,16 @@ mod tests {
                 ..Default::default()
             })
         );
+    }
+
+    #[test]
+    fn point_or_point3d() {
+        let point = Point(0., 1.);
+        let point_or_point3d: PointOrPoint3D = point.into();
+        assert_eq!(point_or_point3d, PointOrPoint3D(0., 1., None));
+
+        let point = Point3D(0., 1., 2.);
+        let point_or_point3d: PointOrPoint3D = point.into();
+        assert_eq!(point_or_point3d, PointOrPoint3D(0., 1., Some(2.)));
     }
 }
