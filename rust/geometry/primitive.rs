@@ -55,7 +55,7 @@ impl From<&str> for GeometryType {
 }
 
 /// Definition of a Point. May represent WebMercator Lon-Lat or S2Geometry S-T
-#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Default)]
+#[derive(Copy, Clone, Serialize, Deserialize, Debug, PartialEq, Default)]
 pub struct Point(pub f64, pub f64);
 /// Definition of a MultiPoint
 pub type MultiPoint = Vec<Point>;
@@ -68,7 +68,7 @@ pub type Polygon = Vec<Vec<Point>>;
 /// Definition of a MultiPolygon
 pub type MultiPolygon = Vec<Polygon>;
 /// Definition of a 3D Point. May represent WebMercator Lon-Lat or S2Geometry S-T with a z-value
-#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Default)]
+#[derive(Copy, Clone, Serialize, Deserialize, Debug, PartialEq, Default)]
 pub struct Point3D(pub f64, pub f64, pub f64);
 /// Definition of a 3D MultiPoint
 pub type MultiPoint3D = Vec<Point3D>;
@@ -81,7 +81,7 @@ pub type Polygon3D = Vec<Vec<Point3D>>;
 /// Definition of a 3D MultiPolygon
 pub type MultiPolygon3D = Vec<Polygon3D>;
 /// Define a Point or Point3D
-#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Default)]
+#[derive(Copy, Clone, Serialize, Deserialize, Debug, PartialEq, Default)]
 pub struct PointOrPoint3D(pub f64, pub f64, pub Option<f64>);
 
 impl From<Point> for PointOrPoint3D {
