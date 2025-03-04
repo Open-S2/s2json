@@ -1,4 +1,5 @@
-// #![no_std]
+#![no_std]
+#![feature(coverage_attribute)]
 #![deny(missing_docs)]
 
 //! The `s2json` Rust crate provides functionalities to read and write S2JSON Spec data structures.
@@ -600,6 +601,48 @@ mod tests {
     }
 
     #[test]
+    fn parse_feature_multipoint() {
+        let json_string = r#"{
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+                "type": "MultiPoint",
+                "coordinates": [
+                    [-13.292352825505162, 54.34883408204476],
+                    [36.83102287804303, 59.56941785818924],
+                    [50.34083898563978, 16.040052775278994],
+                    [76.38149901912357, 35.155968522292056]
+                ]
+            }
+        }"#;
+
+        let feature: Feature = serde_json::from_str(json_string).unwrap();
+        assert_eq!(feature._type, "Feature".into());
+        assert_eq!(
+            feature.geometry,
+            Geometry::MultiPoint(MultiPointGeometry {
+                _type: "MultiPoint".into(),
+                coordinates: vec![
+                    Point(-13.292352825505162, 54.34883408204476),
+                    Point(36.83102287804303, 59.56941785818924),
+                    Point(50.34083898563978, 16.040052775278994),
+                    Point(76.38149901912357, 35.155968522292056),
+                ],
+                ..Default::default()
+            })
+        );
+
+        let back_to_str = serde_json::to_string(&feature).unwrap();
+        assert_eq!(
+            back_to_str,
+            "{\"type\":\"Feature\",\"properties\":{},\"geometry\":{\"type\":\"MultiPoint\",\"\
+             coordinates\":[[-13.292352825505162,54.34883408204476],[36.83102287804303,59.\
+             56941785818924],[50.34083898563978,16.040052775278994],[76.38149901912357,35.\
+             155968522292056]]}}"
+        );
+    }
+
+    #[test]
     fn parse_feature_linestring() {
         let json_string = r#"{
             "type": "Feature",
@@ -666,6 +709,43 @@ mod tests {
             geometry,
             VectorGeometry::LineString(VectorLineStringGeometry {
                 _type: VectorGeometryType::LineString,
+                is_3d: false,
+                coordinates: vec![
+                    VectorPoint::from_xy(-13.292352825505162, 54.34883408204476),
+                    VectorPoint::from_xy(36.83102287804303, 59.56941785818924),
+                    VectorPoint::from_xy(50.34083898563978, 16.040052775278994),
+                    VectorPoint::from_xy(76.38149901912357, 35.155968522292056),
+                ],
+                ..Default::default()
+            })
+        )
+    }
+
+    #[test]
+    fn parse_vector_feature_multipoint() {
+        let json_string = r#"{
+            "type": "VectorFeature",
+            "face": 0,
+            "properties": {},
+            "geometry": {
+                "type": "MultiPoint",
+                "is3D": false,
+                "coordinates": [
+                    { "x": -13.292352825505162, "y": 54.34883408204476 },
+                    { "x": 36.83102287804303, "y": 59.56941785818924 },
+                    { "x": 50.34083898563978, "y": 16.040052775278994 },
+                    { "x": 76.38149901912357, "y": 35.155968522292056 }
+                ]
+            }
+        }"#;
+
+        let feature: VectorFeature = serde_json::from_str(json_string).unwrap();
+        assert_eq!(feature._type, "VectorFeature".into());
+        let geometry = feature.geometry;
+        assert_eq!(
+            geometry,
+            VectorGeometry::MultiPoint(VectorMultiPointGeometry {
+                _type: VectorGeometryType::MultiPoint,
                 is_3d: false,
                 coordinates: vec![
                     VectorPoint::from_xy(-13.292352825505162, 54.34883408204476),

@@ -68,6 +68,7 @@ pub enum VectorGeometry<M: MValueCompatible = MValue> {
 #[allow(unused_extern_crates, clippy::useless_attribute)]
 extern crate serde as _serde;
 #[automatically_derived]
+#[coverage(off)]
 impl<'de, M: MValueCompatible> _serde::Deserialize<'de> for VectorGeometry<M>
 where
     M: _serde::Deserialize<'de>,
