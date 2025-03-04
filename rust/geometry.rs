@@ -768,6 +768,75 @@ impl<M: MValueCompatible> VectorGeometry<M> {
             VectorGeometry::MultiPolygon(g) => &g.vec_bbox,
         }
     }
+
+    /// Create a new point
+    pub fn new_point(coordinates: VectorPoint<M>, bbox: Option<BBox3D>) -> Self {
+        VectorGeometry::Point(VectorPointGeometry {
+            _type: VectorGeometryType::Point,
+            is_3d: coordinates.z.is_some(),
+            coordinates,
+            bbox,
+            ..Default::default()
+        })
+    }
+
+    /// Create a new multipoint
+    pub fn new_multipoint(coordinates: VectorMultiPoint<M>, bbox: Option<BBox3D>) -> Self {
+        VectorGeometry::MultiPoint(VectorMultiPointGeometry {
+            _type: VectorGeometryType::MultiPoint,
+            is_3d: coordinates[0].z.is_some(),
+            coordinates,
+            bbox,
+            ..Default::default()
+        })
+    }
+
+    /// Create a new linestring
+    pub fn new_linestring(coordinates: VectorLineString<M>, bbox: Option<BBox3D>) -> Self {
+        VectorGeometry::LineString(VectorLineStringGeometry {
+            _type: VectorGeometryType::LineString,
+            is_3d: coordinates[0].z.is_some(),
+            coordinates,
+            bbox,
+            ..Default::default()
+        })
+    }
+
+    /// Create a new multilinestring
+    pub fn new_multilinestring(
+        coordinates: VectorMultiLineString<M>,
+        bbox: Option<BBox3D>,
+    ) -> Self {
+        VectorGeometry::MultiLineString(VectorMultiLineStringGeometry {
+            _type: VectorGeometryType::MultiLineString,
+            is_3d: coordinates[0][0].z.is_some(),
+            coordinates,
+            bbox,
+            ..Default::default()
+        })
+    }
+
+    /// Create a new polygon
+    pub fn new_polygon(coordinates: VectorPolygon<M>, bbox: Option<BBox3D>) -> Self {
+        VectorGeometry::Polygon(VectorPolygonGeometry {
+            _type: VectorGeometryType::Polygon,
+            is_3d: coordinates[0][0].z.is_some(),
+            coordinates,
+            bbox,
+            ..Default::default()
+        })
+    }
+
+    /// Create a new multipolygon
+    pub fn new_multipolygon(coordinates: VectorMultiPolygon<M>, bbox: Option<BBox3D>) -> Self {
+        VectorGeometry::MultiPolygon(VectorMultiPolygonGeometry {
+            _type: VectorGeometryType::MultiPolygon,
+            is_3d: coordinates[0][0][0].z.is_some(),
+            coordinates,
+            bbox,
+            ..Default::default()
+        })
+    }
 }
 impl<M: MValueCompatible> Default for VectorGeometry<M> {
     fn default() -> Self {
@@ -1837,5 +1906,253 @@ mod tests {
         } else {
             panic!("Expected FeatureCollection");
         }
+    }
+
+    #[test]
+    fn vector_geometry_new_point() {
+        let point = VectorPoint::from_xy(0.5, 0.75);
+        let bbox = BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 3.0);
+        let geometry = VectorGeometry::new_point(point.clone(), Some(bbox));
+
+        assert_eq!(
+            geometry,
+            VectorGeometry::Point(VectorPointGeometry {
+                _type: "Point".into(),
+                coordinates: point,
+                bbox: Some(bbox),
+                is_3d: false,
+                ..Default::default()
+            })
+        );
+    }
+
+    #[test]
+    fn vector_geometry_new_point_3d() {
+        let point = VectorPoint::from_xyz(0.5, 0.75, 1.0);
+        let bbox = BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 3.0);
+        let geometry = VectorGeometry::new_point(point.clone(), Some(bbox));
+
+        assert_eq!(
+            geometry,
+            VectorGeometry::Point(VectorPointGeometry {
+                _type: "Point".into(),
+                coordinates: point,
+                bbox: Some(bbox),
+                is_3d: true,
+                ..Default::default()
+            })
+        );
+    }
+
+    #[test]
+    fn vector_geometry_new_multipoint() {
+        let multipoint = vec![VectorPoint::from_xy(0.5, 0.75), VectorPoint::from_xy(1.75, 2.5)];
+        let bbox = BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 3.0);
+        let geometry = VectorGeometry::new_multipoint(multipoint.clone(), Some(bbox));
+
+        assert_eq!(
+            geometry,
+            VectorGeometry::MultiPoint(VectorMultiPointGeometry {
+                _type: "MultiPoint".into(),
+                coordinates: multipoint,
+                bbox: Some(bbox),
+                is_3d: false,
+                ..Default::default()
+            })
+        );
+    }
+
+    #[test]
+    fn vector_geometry_new_multipoint_3d() {
+        let multipoint =
+            vec![VectorPoint::from_xyz(0.5, 0.75, -1.0), VectorPoint::from_xyz(1.75, 2.5, 1.)];
+        let bbox = BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 3.0);
+        let geometry = VectorGeometry::new_multipoint(multipoint.clone(), Some(bbox));
+
+        assert_eq!(
+            geometry,
+            VectorGeometry::MultiPoint(VectorMultiPointGeometry {
+                _type: "MultiPoint".into(),
+                coordinates: multipoint,
+                bbox: Some(bbox),
+                is_3d: true,
+                ..Default::default()
+            })
+        );
+    }
+
+    #[test]
+    fn vector_geometry_new_line_string() {
+        let line_string = vec![VectorPoint::from_xy(0.5, 0.75), VectorPoint::from_xy(1.75, 2.5)];
+        let bbox = BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 3.0);
+        let geometry = VectorGeometry::new_linestring(line_string.clone(), Some(bbox));
+
+        assert_eq!(
+            geometry,
+            VectorGeometry::LineString(VectorLineStringGeometry {
+                _type: "LineString".into(),
+                coordinates: line_string,
+                bbox: Some(bbox),
+                is_3d: false,
+                ..Default::default()
+            })
+        );
+    }
+
+    #[test]
+    fn vector_geometry_new_linestring_3d() {
+        let linestring =
+            vec![VectorPoint::from_xyz(0.5, 0.75, -1.0), VectorPoint::from_xyz(1.75, 2.5, 1.)];
+        let bbox = BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 3.0);
+        let geometry = VectorGeometry::new_linestring(linestring.clone(), Some(bbox));
+
+        assert_eq!(
+            geometry,
+            VectorGeometry::LineString(VectorLineStringGeometry {
+                _type: "LineString".into(),
+                coordinates: linestring,
+                bbox: Some(bbox),
+                is_3d: true,
+                ..Default::default()
+            })
+        );
+    }
+
+    #[test]
+    fn vector_geometry_new_multi_line_string() {
+        let multi_line_string = vec![
+            vec![VectorPoint::from_xy(0.5, 0.75), VectorPoint::from_xy(1.75, 2.5)],
+            vec![VectorPoint::from_xy(1.5, 2.75), VectorPoint::from_xy(3.75, 4.5)],
+        ];
+        let bbox = BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 3.0);
+        let geometry = VectorGeometry::new_multilinestring(multi_line_string.clone(), Some(bbox));
+
+        assert_eq!(
+            geometry,
+            VectorGeometry::MultiLineString(VectorMultiLineStringGeometry {
+                _type: "MultiLineString".into(),
+                coordinates: multi_line_string,
+                bbox: Some(bbox),
+                is_3d: false,
+                ..Default::default()
+            })
+        );
+    }
+
+    #[test]
+    fn vector_geometry_new_multi_line_string_3d() {
+        let multi_line_string = vec![
+            vec![VectorPoint::from_xyz(0.5, 0.75, -1.), VectorPoint::from_xyz(1.75, 2.5, -2.)],
+            vec![VectorPoint::from_xyz(1.5, 2.75, 1.), VectorPoint::from_xyz(3.75, 4.5, 2.)],
+        ];
+        let bbox = BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 3.0);
+        let geometry = VectorGeometry::new_multilinestring(multi_line_string.clone(), Some(bbox));
+
+        assert_eq!(
+            geometry,
+            VectorGeometry::MultiLineString(VectorMultiLineStringGeometry {
+                _type: "MultiLineString".into(),
+                coordinates: multi_line_string,
+                bbox: Some(bbox),
+                is_3d: true,
+                ..Default::default()
+            })
+        );
+    }
+
+    #[test]
+    fn vector_geometry_new_polygon() {
+        let polygon = vec![
+            vec![VectorPoint::from_xy(0.5, 0.75), VectorPoint::from_xy(1.75, 2.5)],
+            vec![VectorPoint::from_xy(1.5, 2.75), VectorPoint::from_xy(3.75, 4.5)],
+        ];
+        let bbox = BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 3.0);
+        let geometry = VectorGeometry::new_polygon(polygon.clone(), Some(bbox));
+
+        assert_eq!(
+            geometry,
+            VectorGeometry::Polygon(VectorPolygonGeometry {
+                _type: "Polygon".into(),
+                coordinates: polygon,
+                bbox: Some(bbox),
+                is_3d: false,
+                ..Default::default()
+            })
+        );
+    }
+
+    #[test]
+    fn vector_geometry_new_polygon_3d() {
+        let polygon_3d = vec![
+            vec![VectorPoint::from_xyz(0.5, 0.75, -1.), VectorPoint::from_xyz(1.75, 2.5, -2.)],
+            vec![VectorPoint::from_xyz(1.5, 2.75, 1.), VectorPoint::from_xyz(3.75, 4.5, 2.)],
+        ];
+        let bbox = BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 3.0);
+        let geometry = VectorGeometry::new_polygon(polygon_3d.clone(), Some(bbox));
+
+        assert_eq!(
+            geometry,
+            VectorGeometry::Polygon(VectorPolygonGeometry {
+                _type: "Polygon".into(),
+                coordinates: polygon_3d,
+                bbox: Some(bbox),
+                is_3d: true,
+                ..Default::default()
+            })
+        );
+    }
+
+    #[test]
+    fn vector_geometry_new_multipolygon() {
+        let multipolygon = vec![
+            vec![
+                vec![VectorPoint::from_xy(0.5, 0.75), VectorPoint::from_xy(1.75, 2.5)],
+                vec![VectorPoint::from_xy(1.5, 2.75), VectorPoint::from_xy(3.75, 4.5)],
+            ],
+            vec![
+                vec![VectorPoint::from_xy(1.5, 2.75), VectorPoint::from_xy(3.75, 4.5)],
+                vec![VectorPoint::from_xy(5.5, 6.75), VectorPoint::from_xy(7.75, 8.5)],
+            ],
+        ];
+        let bbox = BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 3.0);
+        let geometry = VectorGeometry::new_multipolygon(multipolygon.clone(), Some(bbox));
+
+        assert_eq!(
+            geometry,
+            VectorGeometry::MultiPolygon(VectorMultiPolygonGeometry {
+                _type: "MultiPolygon".into(),
+                coordinates: multipolygon,
+                bbox: Some(bbox),
+                is_3d: false,
+                ..Default::default()
+            })
+        );
+    }
+
+    #[test]
+    fn vector_geometry_new_multipolygon_3d() {
+        let multipolygon = vec![
+            vec![
+                vec![VectorPoint::from_xyz(0.5, 0.75, -1.), VectorPoint::from_xyz(1.75, 2.5, -2.)],
+                vec![VectorPoint::from_xyz(1.5, 2.75, -3.), VectorPoint::from_xyz(3.75, 4.5, -4.)],
+            ],
+            vec![
+                vec![VectorPoint::from_xyz(1.5, 2.75, 1.), VectorPoint::from_xyz(3.75, 4.5, 2.)],
+                vec![VectorPoint::from_xyz(5.5, 6.75, 3.), VectorPoint::from_xyz(7.75, 8.5, 4.)],
+            ],
+        ];
+        let bbox = BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 3.0);
+        let geometry = VectorGeometry::new_multipolygon(multipolygon.clone(), Some(bbox));
+
+        assert_eq!(
+            geometry,
+            VectorGeometry::MultiPolygon(VectorMultiPolygonGeometry {
+                _type: "MultiPolygon".into(),
+                coordinates: multipolygon,
+                bbox: Some(bbox),
+                is_3d: true,
+                ..Default::default()
+            })
+        );
     }
 }
