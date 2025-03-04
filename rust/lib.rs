@@ -77,6 +77,24 @@ impl From<u8> for Face {
     }
 }
 
+/// FeatureCollection or S2FeatureCollection type string
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
+pub enum FeatureCollectionType {
+    /// WM FeatureCollection
+    #[default]
+    FeatureCollection,
+    /// S2 FeatureCollection
+    S2FeatureCollection,
+}
+impl From<&str> for FeatureCollectionType {
+    fn from(s: &str) -> Self {
+        match s {
+            "S2FeatureCollection" => FeatureCollectionType::S2FeatureCollection,
+            _ => FeatureCollectionType::FeatureCollection,
+        }
+    }
+}
+
 //? FeatureCollections
 
 /// WM FeatureCollection
@@ -85,7 +103,7 @@ pub struct FeatureCollection<M = (), P: MValueCompatible = Properties, D: MValue
 {
     /// Type will always be "FeatureCollection"
     #[serde(rename = "type")]
-    pub _type: String,
+    pub _type: FeatureCollectionType,
     /// Collection of WM features
     pub features: Vec<WMFeature<M, P, D>>,
     /// Attribution data
@@ -98,12 +116,7 @@ pub struct FeatureCollection<M = (), P: MValueCompatible = Properties, D: MValue
 impl<M, P: MValueCompatible, D: MValueCompatible> FeatureCollection<M, P, D> {
     /// Create a new FeatureCollection
     pub fn new(attributions: Option<Attributions>) -> Self {
-        Self {
-            _type: "FeatureCollection".to_string(),
-            features: Vec::new(),
-            attributions,
-            bbox: None,
-        }
+        Self { _type: "FeatureCollection".into(), features: Vec::new(), attributions, bbox: None }
     }
 
     /// update the bounding box
@@ -123,7 +136,7 @@ pub struct S2FeatureCollection<
 > {
     /// Type will always be "S2FeatureCollection"
     #[serde(rename = "type")]
-    pub _type: String,
+    pub _type: FeatureCollectionType,
     /// Collection of S2 features
     pub features: Vec<VectorFeature<M, P, D>>,
     /// Track the faces that were used to generate the features
@@ -139,7 +152,7 @@ impl<M, P: MValueCompatible, D: MValueCompatible> S2FeatureCollection<M, P, D> {
     /// Create a new S2FeatureCollection
     pub fn new(attributions: Option<Attributions>) -> Self {
         Self {
-            _type: "S2FeatureCollection".to_string(),
+            _type: "S2FeatureCollection".into(),
             features: Vec::new(),
             faces: Vec::new(),
             attributions,
@@ -379,7 +392,7 @@ mod tests {
         let mut attributions = Attributions::new();
         attributions.insert("Open S2".to_string(), "https://opens2.com/legal/data".to_string());
         let mut fc = FeatureCollection::<()>::new(Some(attributions.clone()));
-        assert_eq!(fc._type, "FeatureCollection");
+        assert_eq!(fc._type, FeatureCollectionType::FeatureCollection);
         assert_eq!(fc.features.len(), 0);
         assert_eq!(fc.attributions, Some(attributions.clone()));
         // update_bbox
@@ -396,8 +409,8 @@ mod tests {
     fn s2_feature_collection_new() {
         let mut attributions = Attributions::new();
         attributions.insert("Open S2".to_string(), "https://opens2.com/legal/data".to_string());
-        let mut fc = S2FeatureCollection::<()>::new(Some(attributions.clone()));
-        assert_eq!(fc._type, "S2FeatureCollection");
+        let mut fc = S2FeatureCollection::new(Some(attributions.clone()));
+        assert_eq!(fc._type, FeatureCollectionType::S2FeatureCollection);
         assert_eq!(fc.features.len(), 0);
         assert_eq!(fc.attributions, Some(attributions.clone()));
         // update_bbox
