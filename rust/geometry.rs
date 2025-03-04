@@ -769,7 +769,7 @@ impl<M: MValueCompatible> VectorGeometry<M> {
         }
     }
 }
-impl Default for VectorGeometry {
+impl<M: MValueCompatible> Default for VectorGeometry<M> {
     fn default() -> Self {
         VectorGeometry::Point(VectorPointGeometry::default())
     }

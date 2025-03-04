@@ -165,7 +165,7 @@ impl<M, P: MValueCompatible, D: MValueCompatible> S2FeatureCollection<M, P, D> {
 //? Features
 
 /// Component to build an WM Feature
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct Feature<M = (), P: MValueCompatible = Properties, D: MValueCompatible = MValue> {
     /// Type will always be "Feature"
     #[serde(rename = "type")]
@@ -187,6 +187,17 @@ impl<M, P: MValueCompatible, D: MValueCompatible> Feature<M, P, D> {
         Self { _type: "Feature".to_string(), id, properties, geometry, metadata }
     }
 }
+impl<M, P: MValueCompatible, D: MValueCompatible> Default for Feature<M, P, D> {
+    fn default() -> Self {
+        Self {
+            _type: "Feature".to_string(),
+            id: None,
+            properties: Default::default(),
+            geometry: Default::default(),
+            metadata: None,
+        }
+    }
+}
 
 /// Component to build an WM or S2 Vector Feature
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
@@ -206,6 +217,18 @@ pub struct VectorFeature<M = (), P: MValueCompatible = Properties, D: MValueComp
     /// Metadata of the feature
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<M>,
+}
+impl<M, P: MValueCompatible, D: MValueCompatible> Default for VectorFeature<M, P, D> {
+    fn default() -> Self {
+        Self {
+            _type: "VectorFeature".to_string(),
+            face: 0.into(),
+            id: None,
+            properties: Default::default(),
+            geometry: Default::default(),
+            metadata: None,
+        }
+    }
 }
 impl<M, P: MValueCompatible, D: MValueCompatible> VectorFeature<M, P, D> {
     /// Create a new VectorFeature in the WM format
@@ -331,6 +354,24 @@ mod tests {
         assert_eq!(Face::Face3, Face::from(3));
         assert_eq!(Face::Face4, Face::from(4));
         assert_eq!(Face::Face5, Face::from(5));
+    }
+
+    #[test]
+    fn defaults() {
+        let f: Feature = Default::default();
+        assert_eq!(f._type, "Feature");
+        assert_eq!(f.id, None);
+        assert_eq!(f.properties, Properties::default());
+        assert_eq!(f.geometry, Geometry::default());
+        assert_eq!(f.metadata, None);
+
+        let f: VectorFeature = Default::default();
+        assert_eq!(f._type, "VectorFeature");
+        assert_eq!(f.id, None);
+        assert_eq!(f.face, 0.into());
+        assert_eq!(f.properties, Properties::default());
+        assert_eq!(f.geometry, VectorGeometry::default());
+        assert_eq!(f.metadata, None);
     }
 
     #[test]

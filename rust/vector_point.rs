@@ -26,6 +26,17 @@ pub struct VectorPoint<M: MValueCompatible = MValue> {
     #[serde(skip)]
     pub t: Option<f64>,
 }
+impl VectorPoint<MValue> {
+    /// Helper function for tests. Create a new point quickly from an xy coordinate
+    pub fn from_xy(x: f64, y: f64) -> Self {
+        Self { x, y, z: None, m: None, t: None }
+    }
+
+    /// Helper function for tests. Create a new point quickly from an xyz coordinate
+    pub fn from_xyz(x: f64, y: f64, z: f64) -> Self {
+        Self { x, y, z: Some(z), m: None, t: None }
+    }
+}
 impl<M: MValueCompatible> VectorPoint<M> {
     /// Create a new point
     pub fn new(x: f64, y: f64, z: Option<f64>, m: Option<M>) -> Self {
@@ -267,6 +278,26 @@ mod tests {
         assert_eq!(vector_point.x, 1.0);
         assert_eq!(vector_point.y, 2.0);
         assert_eq!(vector_point.z, None);
+        assert_eq!(vector_point.m, None);
+        assert_eq!(vector_point.t, None);
+    }
+
+    #[test]
+    fn from_xy() {
+        let vector_point: VectorPoint = VectorPoint::from_xy(1.0, 2.0);
+        assert_eq!(vector_point.x, 1.0);
+        assert_eq!(vector_point.y, 2.0);
+        assert_eq!(vector_point.z, None);
+        assert_eq!(vector_point.m, None);
+        assert_eq!(vector_point.t, None);
+    }
+
+    #[test]
+    fn from_xyz() {
+        let vector_point: VectorPoint = VectorPoint::from_xyz(1.0, 2.0, 3.0);
+        assert_eq!(vector_point.x, 1.0);
+        assert_eq!(vector_point.y, 2.0);
+        assert_eq!(vector_point.z, Some(3.0));
         assert_eq!(vector_point.m, None);
         assert_eq!(vector_point.t, None);
     }
