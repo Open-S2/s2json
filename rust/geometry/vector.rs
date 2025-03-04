@@ -5,81 +5,34 @@ use alloc::vec::Vec;
 /// Importing necessary types (equivalent to importing from 'values')
 use crate::*;
 
-/// Vector Point type for geometry
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
-pub enum VectorPointGeometryType {
-    /// Point Type
+/// Enum to represent specific vector geometry types as strings
+#[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Default)]
+pub enum VectorGeometryType {
+    /// Point
     #[default]
     Point,
-}
-impl From<&str> for VectorPointGeometryType {
-    fn from(_: &str) -> Self {
-        VectorPointGeometryType::Point
-    }
-}
-
-/// Vector MultiPoint type for geometry
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
-pub enum VectorMultiPointGeometryType {
-    /// Point Type
-    #[default]
+    /// MultiPoint
     MultiPoint,
-}
-impl From<&str> for VectorMultiPointGeometryType {
-    fn from(_: &str) -> Self {
-        VectorMultiPointGeometryType::MultiPoint
-    }
-}
-
-/// Vector LineString type for geometry
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
-pub enum VectorLineStringGeometryType {
-    /// Point Type
-    #[default]
+    /// LineString
     LineString,
-}
-impl From<&str> for VectorLineStringGeometryType {
-    fn from(_: &str) -> Self {
-        VectorLineStringGeometryType::LineString
-    }
-}
-
-/// Vector MultiLineString type for geometry
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
-pub enum VectorMultiLineStringGeometryType {
-    /// Point Type
-    #[default]
+    /// MultiLineString
     MultiLineString,
-}
-impl From<&str> for VectorMultiLineStringGeometryType {
-    fn from(_: &str) -> Self {
-        VectorMultiLineStringGeometryType::MultiLineString
-    }
-}
-
-/// Vector Polygon type for geometry
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
-pub enum VectorPolygonGeometryType {
-    /// Point Type
-    #[default]
+    /// Polygon
     Polygon,
-}
-impl From<&str> for VectorPolygonGeometryType {
-    fn from(_: &str) -> Self {
-        VectorPolygonGeometryType::Polygon
-    }
-}
-
-/// Vector MultiPolygon type for geometry
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
-pub enum VectorMultiPolygonGeometryType {
-    /// Point Type
-    #[default]
+    /// MultiPolygon
     MultiPolygon,
 }
-impl From<&str> for VectorMultiPolygonGeometryType {
-    fn from(_: &str) -> Self {
-        VectorMultiPolygonGeometryType::MultiPolygon
+impl From<&str> for VectorGeometryType {
+    fn from(s: &str) -> Self {
+        match s {
+            "Point" => VectorGeometryType::Point,
+            "MultiPoint" => VectorGeometryType::MultiPoint,
+            "LineString" => VectorGeometryType::LineString,
+            "MultiLineString" => VectorGeometryType::MultiLineString,
+            "Polygon" => VectorGeometryType::Polygon,
+            "MultiPolygon" => VectorGeometryType::MultiPolygon,
+            _ => panic!("Invalid vector geometry type: {}", s),
+        }
     }
 }
 
@@ -95,7 +48,7 @@ pub type VectorPolygon<M = MValue> = Vec<VectorLineString<M>>;
 pub type VectorMultiPolygon<M = MValue> = Vec<VectorPolygon<M>>;
 
 /// All possible geometry shapes
-#[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Clone, Serialize, Debug, PartialEq)]
 #[serde(untagged)]
 pub enum VectorGeometry<M: MValueCompatible = MValue> {
     /// Point Shape
@@ -111,6 +64,132 @@ pub enum VectorGeometry<M: MValueCompatible = MValue> {
     /// MultiPolygon Shape
     MultiPolygon(VectorMultiPolygonGeometry<M>),
 }
+#[doc(hidden)]
+#[allow(unused_extern_crates, clippy::useless_attribute)]
+extern crate serde as _serde;
+#[automatically_derived]
+impl<'de, M: MValueCompatible> _serde::Deserialize<'de> for VectorGeometry<M>
+where
+    M: _serde::Deserialize<'de>,
+{
+    fn deserialize<__D>(__deserializer: __D) -> _serde::__private::Result<Self, __D::Error>
+    where
+        __D: _serde::Deserializer<'de>,
+    {
+        let __content =
+            <_serde::__private::de::Content as _serde::Deserialize>::deserialize(__deserializer)?;
+        let __deserializer =
+            _serde::__private::de::ContentRefDeserializer::<__D::Error>::new(&__content);
+        if let _serde::__private::Ok(__ok) = _serde::__private::Result::map(
+            <VectorPointGeometry<M> as _serde::Deserialize>::deserialize(__deserializer),
+            VectorGeometry::Point,
+        ) {
+            return _serde::__private::Ok(__ok);
+        }
+        // Attempt to deserialize as MultiPoint, then check for LineString
+        if let _serde::__private::Ok(__ok) = _serde::__private::Result::map(
+            <VectorMultiPointGeometry<M> as _serde::Deserialize>::deserialize(__deserializer),
+            VectorGeometry::MultiPoint,
+        ) {
+            // If deserialization succeeds as MultiPoint, check if content is LineString
+            if let _serde::__private::Ok(__ok2) = _serde::__private::Result::map(
+                <VectorLineStringGeometry<M> as _serde::Deserialize>::deserialize(__deserializer),
+                VectorGeometry::LineString,
+            ) {
+                // If LineString is found, return LineString variant
+                return _serde::__private::Ok(__ok2);
+            }
+            return _serde::__private::Ok(__ok);
+        }
+        // Attempt to deserialize as MultiLineString, then check for Polygon
+        if let _serde::__private::Ok(__ok) = _serde::__private::Result::map(
+            <VectorMultiLineStringGeometry<M> as _serde::Deserialize>::deserialize(__deserializer),
+            VectorGeometry::MultiLineString,
+        ) {
+            // If deserialization succeeds as MultiLineString, check if content is Polygon
+            if let _serde::__private::Ok(__ok2) = _serde::__private::Result::map(
+                <VectorPolygonGeometry<M> as _serde::Deserialize>::deserialize(__deserializer),
+                VectorGeometry::Polygon,
+            ) {
+                // If Polygon is found, return Polygon variant
+                return _serde::__private::Ok(__ok2);
+            }
+            return _serde::__private::Ok(__ok);
+        }
+        if let _serde::__private::Ok(__ok) = _serde::__private::Result::map(
+            <VectorMultiPolygonGeometry<M> as _serde::Deserialize>::deserialize(__deserializer),
+            VectorGeometry::MultiPolygon,
+        ) {
+            return _serde::__private::Ok(__ok);
+        }
+        _serde::__private::Err(_serde::de::Error::custom(
+            "data did not match any variant of untagged enum VectorGeometry",
+        ))
+    }
+}
+// impl<'de, M> Deserialize<'de> for VectorGeometry<M>
+// where
+//     M: MValueCompatible + Deserialize<'de>, // Ensure that M is deserializable
+// {
+//     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+//     where
+//         D: Deserializer<'de>,
+//     {
+//         println!("BEGIN");
+//         // First, try to deserialize each variant directly
+//         // let base_geometry: VectorBaseGeometry = Deserialize::deserialize(deserializer)?;
+//         let __content = <serde::__private::de::Content as Deserialize>::deserialize(deserializer)?;
+//         println!("AAAAAAA");
+//         let __deserializer =
+//             serde::__private::de::ContentRefDeserializer::<D::Error>::new(&__content);
+//         println!("BBBBBBB");
+//         let base_geometry: VectorBaseGeometry = Deserialize::deserialize(__deserializer)?;
+//         println!("base_geometry: {:#?}", base_geometry);
+
+//         match base_geometry._type {
+//             VectorGeometryType::Point => {
+//                 let point: VectorPointGeometry<M> = Deserialize::deserialize(__deserializer)?;
+//                 Ok(VectorGeometry::Point(point))
+//             }
+//             VectorGeometryType::MultiPoint => {
+//                 let multipoint: VectorMultiPointGeometry<M> =
+//                     Deserialize::deserialize(__deserializer)?;
+//                 Ok(VectorGeometry::MultiPoint(multipoint))
+//             }
+//             VectorGeometryType::LineString => {
+//                 // let linestring: VectorLineStringGeometry<M> =
+//                 //     Deserialize::deserialize(__deserializer)?;
+//                 // Ok(VectorGeometry::LineString(linestring))
+//                 if let serde::__private::Ok(__ok) = serde::__private::Result::map(
+//                     <VectorLineStringGeometry<M> as serde::Deserialize>::deserialize(
+//                         __deserializer,
+//                     ),
+//                     VectorGeometry::LineString,
+//                 ) {
+//                     serde::__private::Ok(__ok)
+//                 } else {
+//                     serde::__private::Err(serde::de::Error::custom(
+//                         "data did not match any variant of untagged enum VectorGeometry",
+//                     ))
+//                 }
+//             }
+//             VectorGeometryType::MultiLineString => {
+//                 let multiline: VectorMultiLineStringGeometry<M> =
+//                     Deserialize::deserialize(__deserializer)?;
+//                 Ok(VectorGeometry::MultiLineString(multiline))
+//             }
+//             VectorGeometryType::Polygon => {
+//                 let polygon: VectorPolygonGeometry<M> = Deserialize::deserialize(__deserializer)?;
+//                 Ok(VectorGeometry::Polygon(polygon))
+//             }
+//             VectorGeometryType::MultiPolygon => {
+//                 let multipolygon: VectorMultiPolygonGeometry<M> =
+//                     Deserialize::deserialize(__deserializer)?;
+//                 Ok(VectorGeometry::MultiPolygon(multipolygon))
+//             }
+//         }
+//     }
+// }
 impl<M: MValueCompatible> VectorGeometry<M> {
     /// Get the vec_bbox of the geometry
     pub fn vec_bbox(&self) -> &Option<BBox3D> {
@@ -127,7 +206,7 @@ impl<M: MValueCompatible> VectorGeometry<M> {
     /// Create a new point
     pub fn new_point(coordinates: VectorPoint<M>, bbox: Option<BBox3D>) -> Self {
         VectorGeometry::Point(VectorPointGeometry {
-            _type: VectorPointGeometryType::default(),
+            _type: VectorGeometryType::Point,
             is_3d: coordinates.z.is_some(),
             coordinates,
             bbox,
@@ -138,7 +217,7 @@ impl<M: MValueCompatible> VectorGeometry<M> {
     /// Create a new multipoint
     pub fn new_multipoint(coordinates: VectorMultiPoint<M>, bbox: Option<BBox3D>) -> Self {
         VectorGeometry::MultiPoint(VectorMultiPointGeometry {
-            _type: VectorMultiPointGeometryType::default(),
+            _type: VectorGeometryType::MultiPoint,
             is_3d: coordinates[0].z.is_some(),
             coordinates,
             bbox,
@@ -149,7 +228,7 @@ impl<M: MValueCompatible> VectorGeometry<M> {
     /// Create a new linestring
     pub fn new_linestring(coordinates: VectorLineString<M>, bbox: Option<BBox3D>) -> Self {
         VectorGeometry::LineString(VectorLineStringGeometry {
-            _type: VectorLineStringGeometryType::default(),
+            _type: VectorGeometryType::LineString,
             is_3d: coordinates[0].z.is_some(),
             coordinates,
             bbox,
@@ -163,7 +242,7 @@ impl<M: MValueCompatible> VectorGeometry<M> {
         bbox: Option<BBox3D>,
     ) -> Self {
         VectorGeometry::MultiLineString(VectorMultiLineStringGeometry {
-            _type: VectorMultiLineStringGeometryType::default(),
+            _type: VectorGeometryType::MultiLineString,
             is_3d: coordinates[0][0].z.is_some(),
             coordinates,
             bbox,
@@ -174,7 +253,7 @@ impl<M: MValueCompatible> VectorGeometry<M> {
     /// Create a new polygon
     pub fn new_polygon(coordinates: VectorPolygon<M>, bbox: Option<BBox3D>) -> Self {
         VectorGeometry::Polygon(VectorPolygonGeometry {
-            _type: VectorPolygonGeometryType::default(),
+            _type: VectorGeometryType::Polygon,
             is_3d: coordinates[0][0].z.is_some(),
             coordinates,
             bbox,
@@ -185,7 +264,7 @@ impl<M: MValueCompatible> VectorGeometry<M> {
     /// Create a new multipolygon
     pub fn new_multipolygon(coordinates: VectorMultiPolygon<M>, bbox: Option<BBox3D>) -> Self {
         VectorGeometry::MultiPolygon(VectorMultiPolygonGeometry {
-            _type: VectorMultiPolygonGeometryType::default(),
+            _type: VectorGeometryType::MultiPolygon,
             is_3d: coordinates[0][0][0].z.is_some(),
             coordinates,
             bbox,
@@ -201,10 +280,10 @@ impl<M: MValueCompatible> Default for VectorGeometry<M> {
 
 /// BaseGeometry is the a generic geometry type
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
-pub struct VectorBaseGeometry<T = PointGeometryType, G = VectorGeometry, O = VectorOffsets> {
+pub struct VectorBaseGeometry<G = VectorGeometry, O = VectorOffsets> {
     /// The geometry type
     #[serde(rename = "type")]
-    pub _type: T,
+    pub _type: VectorGeometryType,
     /// Specifies if the geometry is 3D or 2D
     #[serde(rename = "is3D")]
     pub is_3d: bool,
@@ -252,26 +331,19 @@ pub type VectorPolygonOffset = VectorMultiLineOffset;
 pub type VectorMultiPolygonOffset = Vec<VectorPolygonOffset>;
 
 /// PointGeometry is a point
-pub type VectorPointGeometry<M = MValue> =
-    VectorBaseGeometry<VectorPointGeometryType, VectorPoint<M>>;
+pub type VectorPointGeometry<M = MValue> = VectorBaseGeometry<VectorPoint<M>>;
 /// MultiPointGeometry contains multiple points
 pub type VectorMultiPointGeometry<M = MValue> =
-    VectorBaseGeometry<VectorMultiPointGeometryType, VectorMultiPoint<M>, VectorLineOffset>;
+    VectorBaseGeometry<VectorMultiPoint<M>, VectorLineOffset>;
 /// LineStringGeometry is a line
 pub type VectorLineStringGeometry<M = MValue> =
-    VectorBaseGeometry<VectorLineStringGeometryType, VectorLineString<M>, VectorLineOffset>;
+    VectorBaseGeometry<VectorLineString<M>, VectorLineOffset>;
 /// MultiLineStringGeometry contains multiple lines
-pub type VectorMultiLineStringGeometry<M = MValue> = VectorBaseGeometry<
-    VectorMultiLineStringGeometryType,
-    VectorMultiLineString<M>,
-    VectorMultiLineOffset,
->;
+pub type VectorMultiLineStringGeometry<M = MValue> =
+    VectorBaseGeometry<VectorMultiLineString<M>, VectorMultiLineOffset>;
 /// PolygonGeometry is a polygon with potential holes
 pub type VectorPolygonGeometry<M = MValue> =
-    VectorBaseGeometry<VectorPolygonGeometryType, VectorPolygon<M>, VectorPolygonOffset>;
+    VectorBaseGeometry<VectorPolygon<M>, VectorPolygonOffset>;
 /// MultiPolygonGeometry is a polygon with multiple polygons with their own potential holes
-pub type VectorMultiPolygonGeometry<M = MValue> = VectorBaseGeometry<
-    VectorMultiPolygonGeometryType,
-    VectorMultiPolygon<M>,
-    VectorMultiPolygonOffset,
->;
+pub type VectorMultiPolygonGeometry<M = MValue> =
+    VectorBaseGeometry<VectorMultiPolygon<M>, VectorMultiPolygonOffset>;

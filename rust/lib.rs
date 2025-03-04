@@ -1,4 +1,4 @@
-#![no_std]
+// #![no_std]
 #![deny(missing_docs)]
 
 //! The `s2json` Rust crate provides functionalities to read and write S2JSON Spec data structures.
@@ -661,5 +661,20 @@ mod tests {
 
         let feature: VectorFeature = serde_json::from_str(json_string).unwrap();
         assert_eq!(feature._type, "VectorFeature".into());
+        let geometry = feature.geometry;
+        assert_eq!(
+            geometry,
+            VectorGeometry::LineString(VectorLineStringGeometry {
+                _type: VectorGeometryType::LineString,
+                is_3d: false,
+                coordinates: vec![
+                    VectorPoint::from_xy(-13.292352825505162, 54.34883408204476),
+                    VectorPoint::from_xy(36.83102287804303, 59.56941785818924),
+                    VectorPoint::from_xy(50.34083898563978, 16.040052775278994),
+                    VectorPoint::from_xy(76.38149901912357, 35.155968522292056),
+                ],
+                ..Default::default()
+            })
+        )
     }
 }

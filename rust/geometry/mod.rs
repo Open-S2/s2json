@@ -1279,16 +1279,4 @@ mod tests {
         let point_or_point3d: PointOrPoint3D = point.into();
         assert_eq!(point_or_point3d, PointOrPoint3D(0., 1., Some(2.)));
     }
-
-    #[test]
-    fn multi_line_string_geometry_type_from() {
-        let multi_type: MultiLineStringGeometryType = "MultiLineString".into();
-        assert_eq!(multi_type, MultiLineStringGeometryType::MultiLineString);
-    }
-
-    #[test]
-    fn multi_line_string_3d_geometry_type_from() {
-        let multi_type: MultiLineString3DGeometryType = "MultiLineString3D".into();
-        assert_eq!(multi_type, MultiLineString3DGeometryType::MultiLineString3D);
-    }
 }
