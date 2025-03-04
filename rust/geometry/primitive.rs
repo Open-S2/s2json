@@ -5,52 +5,159 @@ use alloc::vec::Vec;
 /// Importing necessary types (equivalent to importing from 'values')
 use crate::*;
 
-/// Enum to represent specific geometry types as strings
-#[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Default)]
-pub enum GeometryType {
-    /// Point
+/// Point type for geometry
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
+pub enum PointGeometryType {
+    /// Point Type
     #[default]
     Point,
-    /// MultiPoint
+}
+impl From<&str> for PointGeometryType {
+    fn from(_: &str) -> Self {
+        PointGeometryType::Point
+    }
+}
+
+/// MultiPoint type for geometry
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
+pub enum MultiPointGeometryType {
+    /// MultiPoint Type
+    #[default]
     MultiPoint,
-    /// LineString
+}
+impl From<&str> for MultiPointGeometryType {
+    fn from(_: &str) -> Self {
+        MultiPointGeometryType::MultiPoint
+    }
+}
+
+/// LineString type for geometry
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
+pub enum LineStringGeometryType {
+    /// Point Type
+    #[default]
     LineString,
-    /// MultiLineString
+}
+impl From<&str> for LineStringGeometryType {
+    fn from(_: &str) -> Self {
+        LineStringGeometryType::LineString
+    }
+}
+
+/// MultiLineString type for geometry
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
+pub enum MultiLineStringGeometryType {
+    /// Point Type
+    #[default]
     MultiLineString,
-    /// Polygon
+}
+impl From<&str> for MultiLineStringGeometryType {
+    fn from(_: &str) -> Self {
+        MultiLineStringGeometryType::MultiLineString
+    }
+}
+
+/// Polygon type for geometry
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
+pub enum PolygonGeometryType {
+    /// Point Type
+    #[default]
     Polygon,
-    /// MultiPolygon
+}
+impl From<&str> for PolygonGeometryType {
+    fn from(_: &str) -> Self {
+        PolygonGeometryType::Polygon
+    }
+}
+
+/// MultiPolygon type for geometry
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
+pub enum MultiPolygonGeometryType {
+    /// Point Type
+    #[default]
     MultiPolygon,
-    /// 3D Point
+}
+impl From<&str> for MultiPolygonGeometryType {
+    fn from(_: &str) -> Self {
+        MultiPolygonGeometryType::MultiPolygon
+    }
+}
+
+/// Point3D type for geometry
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
+pub enum Point3DGeometryType {
+    /// Point Type
+    #[default]
     Point3D,
-    /// 3D MultiPoint
+}
+impl From<&str> for Point3DGeometryType {
+    fn from(_: &str) -> Self {
+        Point3DGeometryType::Point3D
+    }
+}
+
+/// MultiPoint3D type for geometry
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
+pub enum MultiPoint3DGeometryType {
+    /// Point Type
+    #[default]
     MultiPoint3D,
-    /// 3D LineString
+}
+impl From<&str> for MultiPoint3DGeometryType {
+    fn from(_: &str) -> Self {
+        MultiPoint3DGeometryType::MultiPoint3D
+    }
+}
+
+/// LineString3D type for geometry
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
+pub enum LineString3DGeometryType {
+    /// Point Type
+    #[default]
     LineString3D,
-    /// 3D MultiLineString
+}
+impl From<&str> for LineString3DGeometryType {
+    fn from(_: &str) -> Self {
+        LineString3DGeometryType::LineString3D
+    }
+}
+
+/// MultiLineString3D type for geometry
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
+pub enum MultiLineString3DGeometryType {
+    /// Point Type
+    #[default]
     MultiLineString3D,
-    /// 3D Polygon
+}
+impl From<&str> for MultiLineString3DGeometryType {
+    fn from(_: &str) -> Self {
+        MultiLineString3DGeometryType::MultiLineString3D
+    }
+}
+
+/// Polygon3D type for geometry
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
+pub enum Polygon3DGeometryType {
+    /// Point Type
+    #[default]
     Polygon3D,
-    /// 3D MultiPolygon
+}
+impl From<&str> for Polygon3DGeometryType {
+    fn from(_: &str) -> Self {
+        Polygon3DGeometryType::Polygon3D
+    }
+}
+
+/// MultiPolygon3D type for geometry
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
+pub enum MultiPolygon3DGeometryType {
+    /// Point Type
+    #[default]
     MultiPolygon3D,
 }
-impl From<&str> for GeometryType {
-    fn from(s: &str) -> Self {
-        match s {
-            "Point" => GeometryType::Point,
-            "MultiPoint" => GeometryType::MultiPoint,
-            "LineString" => GeometryType::LineString,
-            "MultiLineString" => GeometryType::MultiLineString,
-            "Polygon" => GeometryType::Polygon,
-            "MultiPolygon" => GeometryType::MultiPolygon,
-            "Point3D" => GeometryType::Point3D,
-            "MultiPoint3D" => GeometryType::MultiPoint3D,
-            "LineString3D" => GeometryType::LineString3D,
-            "MultiLineString3D" => GeometryType::MultiLineString3D,
-            "Polygon3D" => GeometryType::Polygon3D,
-            "MultiPolygon3D" => GeometryType::MultiPolygon3D,
-            _ => unreachable!(),
-        }
+impl From<&str> for MultiPolygon3DGeometryType {
+    fn from(_: &str) -> Self {
+        MultiPolygon3DGeometryType::MultiPolygon3D
     }
 }
 
@@ -133,10 +240,10 @@ impl<M: MValueCompatible> Default for Geometry<M> {
 
 /// BaseGeometry is the a generic geometry type
 #[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Default)]
-pub struct BaseGeometry<M = MValue, G = Geometry<M>, B = BBOX> {
+pub struct BaseGeometry<T, M = MValue, G = Geometry<M>, B = BBOX> {
     /// The geometry type
     #[serde(rename = "type")]
-    pub _type: GeometryType,
+    pub _type: T,
     /// The geometry shape
     pub coordinates: G,
     /// The M-Values shape
@@ -148,32 +255,40 @@ pub struct BaseGeometry<M = MValue, G = Geometry<M>, B = BBOX> {
 }
 
 /// PointGeometry is a point
-pub type PointGeometry<M = MValue> = BaseGeometry<M, Point, BBox>;
+pub type PointGeometry<M = MValue> = BaseGeometry<PointGeometryType, M, Point, BBox>;
 /// MultiPointGeometry contains multiple points
-pub type MultiPointGeometry<M = MValue> = BaseGeometry<LineStringMValues<M>, MultiPoint, BBox>;
+pub type MultiPointGeometry<M = MValue> =
+    BaseGeometry<MultiPointGeometryType, LineStringMValues<M>, MultiPoint, BBox>;
 /// LineStringGeometry is a line
-pub type LineStringGeometry<M = MValue> = BaseGeometry<LineStringMValues<M>, LineString, BBox>;
+pub type LineStringGeometry<M = MValue> =
+    BaseGeometry<LineStringGeometryType, LineStringMValues<M>, LineString, BBox>;
 /// MultiLineStringGeometry contains multiple lines
 pub type MultiLineStringGeometry<M = MValue> =
-    BaseGeometry<MultiLineStringMValues<M>, MultiLineString, BBox>;
+    BaseGeometry<MultiLineStringGeometryType, MultiLineStringMValues<M>, MultiLineString, BBox>;
 /// PolygonGeometry is a polygon with potential holes
-pub type PolygonGeometry<M = MValue> = BaseGeometry<PolygonMValues<M>, Polygon, BBox>;
+pub type PolygonGeometry<M = MValue> =
+    BaseGeometry<PolygonGeometryType, PolygonMValues<M>, Polygon, BBox>;
 /// MultiPolygonGeometry is a polygon with multiple polygons with their own potential holes
 pub type MultiPolygonGeometry<M = MValue> =
-    BaseGeometry<MultiPolygonMValues<M>, MultiPolygon, BBox>;
+    BaseGeometry<MultiPolygonGeometryType, MultiPolygonMValues<M>, MultiPolygon, BBox>;
 /// Point3DGeometry is a 3D point
-pub type Point3DGeometry<M = MValue> = BaseGeometry<M, Point3D, BBox3D>;
+pub type Point3DGeometry<M = MValue> = BaseGeometry<Point3DGeometryType, M, Point3D, BBox3D>;
 /// MultiPoint3DGeometry contains multiple 3D points
 pub type MultiPoint3DGeometry<M = MValue> =
-    BaseGeometry<LineStringMValues<M>, MultiPoint3D, BBox3D>;
+    BaseGeometry<MultiPoint3DGeometryType, LineStringMValues<M>, MultiPoint3D, BBox3D>;
 /// LineString3DGeometry is a 3D line
 pub type LineString3DGeometry<M = MValue> =
-    BaseGeometry<LineStringMValues<M>, LineString3D, BBox3D>;
+    BaseGeometry<LineString3DGeometryType, LineStringMValues<M>, LineString3D, BBox3D>;
 /// MultiLineString3DGeometry contains multiple 3D lines
-pub type MultiLineString3DGeometry<M = MValue> =
-    BaseGeometry<MultiLineStringMValues<M>, MultiLineString3D, BBox3D>;
+pub type MultiLineString3DGeometry<M = MValue> = BaseGeometry<
+    MultiLineString3DGeometryType,
+    MultiLineStringMValues<M>,
+    MultiLineString3D,
+    BBox3D,
+>;
 /// Polygon3DGeometry is a 3D polygon with potential holes
-pub type Polygon3DGeometry<M = MValue> = BaseGeometry<PolygonMValues<M>, Polygon3D, BBox3D>;
+pub type Polygon3DGeometry<M = MValue> =
+    BaseGeometry<Polygon3DGeometryType, PolygonMValues<M>, Polygon3D, BBox3D>;
 /// MultiPolygon3DGeometry is a 3D polygon with multiple polygons with their own potential holes
 pub type MultiPolygon3DGeometry<M = MValue> =
-    BaseGeometry<MultiPolygonMValues<M>, MultiPolygon3D, BBox3D>;
+    BaseGeometry<MultiPolygon3DGeometryType, MultiPolygonMValues<M>, MultiPolygon3D, BBox3D>;

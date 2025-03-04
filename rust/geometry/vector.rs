@@ -5,34 +5,81 @@ use alloc::vec::Vec;
 /// Importing necessary types (equivalent to importing from 'values')
 use crate::*;
 
-/// Enum to represent specific vector geometry types as strings
-#[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Default)]
-pub enum VectorGeometryType {
-    /// Point
+/// Vector Point type for geometry
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
+pub enum VectorPointGeometryType {
+    /// Point Type
     #[default]
     Point,
-    /// MultiPoint
+}
+impl From<&str> for VectorPointGeometryType {
+    fn from(_: &str) -> Self {
+        VectorPointGeometryType::Point
+    }
+}
+
+/// Vector MultiPoint type for geometry
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
+pub enum VectorMultiPointGeometryType {
+    /// Point Type
+    #[default]
     MultiPoint,
-    /// LineString
+}
+impl From<&str> for VectorMultiPointGeometryType {
+    fn from(_: &str) -> Self {
+        VectorMultiPointGeometryType::MultiPoint
+    }
+}
+
+/// Vector LineString type for geometry
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
+pub enum VectorLineStringGeometryType {
+    /// Point Type
+    #[default]
     LineString,
-    /// MultiLineString
+}
+impl From<&str> for VectorLineStringGeometryType {
+    fn from(_: &str) -> Self {
+        VectorLineStringGeometryType::LineString
+    }
+}
+
+/// Vector MultiLineString type for geometry
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
+pub enum VectorMultiLineStringGeometryType {
+    /// Point Type
+    #[default]
     MultiLineString,
-    /// Polygon
+}
+impl From<&str> for VectorMultiLineStringGeometryType {
+    fn from(_: &str) -> Self {
+        VectorMultiLineStringGeometryType::MultiLineString
+    }
+}
+
+/// Vector Polygon type for geometry
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
+pub enum VectorPolygonGeometryType {
+    /// Point Type
+    #[default]
     Polygon,
-    /// MultiPolygon
+}
+impl From<&str> for VectorPolygonGeometryType {
+    fn from(_: &str) -> Self {
+        VectorPolygonGeometryType::Polygon
+    }
+}
+
+/// Vector MultiPolygon type for geometry
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
+pub enum VectorMultiPolygonGeometryType {
+    /// Point Type
+    #[default]
     MultiPolygon,
 }
-impl From<&str> for VectorGeometryType {
-    fn from(s: &str) -> Self {
-        match s {
-            "Point" => VectorGeometryType::Point,
-            "MultiPoint" => VectorGeometryType::MultiPoint,
-            "LineString" => VectorGeometryType::LineString,
-            "MultiLineString" => VectorGeometryType::MultiLineString,
-            "Polygon" => VectorGeometryType::Polygon,
-            "MultiPolygon" => VectorGeometryType::MultiPolygon,
-            _ => panic!("Invalid vector geometry type: {}", s),
-        }
+impl From<&str> for VectorMultiPolygonGeometryType {
+    fn from(_: &str) -> Self {
+        VectorMultiPolygonGeometryType::MultiPolygon
     }
 }
 
@@ -49,6 +96,7 @@ pub type VectorMultiPolygon<M = MValue> = Vec<VectorPolygon<M>>;
 
 /// All possible geometry shapes
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
+#[serde(untagged)]
 pub enum VectorGeometry<M: MValueCompatible = MValue> {
     /// Point Shape
     Point(VectorPointGeometry<M>),
@@ -79,7 +127,7 @@ impl<M: MValueCompatible> VectorGeometry<M> {
     /// Create a new point
     pub fn new_point(coordinates: VectorPoint<M>, bbox: Option<BBox3D>) -> Self {
         VectorGeometry::Point(VectorPointGeometry {
-            _type: VectorGeometryType::Point,
+            _type: VectorPointGeometryType::default(),
             is_3d: coordinates.z.is_some(),
             coordinates,
             bbox,
@@ -90,7 +138,7 @@ impl<M: MValueCompatible> VectorGeometry<M> {
     /// Create a new multipoint
     pub fn new_multipoint(coordinates: VectorMultiPoint<M>, bbox: Option<BBox3D>) -> Self {
         VectorGeometry::MultiPoint(VectorMultiPointGeometry {
-            _type: VectorGeometryType::MultiPoint,
+            _type: VectorMultiPointGeometryType::default(),
             is_3d: coordinates[0].z.is_some(),
             coordinates,
             bbox,
@@ -101,7 +149,7 @@ impl<M: MValueCompatible> VectorGeometry<M> {
     /// Create a new linestring
     pub fn new_linestring(coordinates: VectorLineString<M>, bbox: Option<BBox3D>) -> Self {
         VectorGeometry::LineString(VectorLineStringGeometry {
-            _type: VectorGeometryType::LineString,
+            _type: VectorLineStringGeometryType::default(),
             is_3d: coordinates[0].z.is_some(),
             coordinates,
             bbox,
@@ -115,7 +163,7 @@ impl<M: MValueCompatible> VectorGeometry<M> {
         bbox: Option<BBox3D>,
     ) -> Self {
         VectorGeometry::MultiLineString(VectorMultiLineStringGeometry {
-            _type: VectorGeometryType::MultiLineString,
+            _type: VectorMultiLineStringGeometryType::default(),
             is_3d: coordinates[0][0].z.is_some(),
             coordinates,
             bbox,
@@ -126,7 +174,7 @@ impl<M: MValueCompatible> VectorGeometry<M> {
     /// Create a new polygon
     pub fn new_polygon(coordinates: VectorPolygon<M>, bbox: Option<BBox3D>) -> Self {
         VectorGeometry::Polygon(VectorPolygonGeometry {
-            _type: VectorGeometryType::Polygon,
+            _type: VectorPolygonGeometryType::default(),
             is_3d: coordinates[0][0].z.is_some(),
             coordinates,
             bbox,
@@ -137,7 +185,7 @@ impl<M: MValueCompatible> VectorGeometry<M> {
     /// Create a new multipolygon
     pub fn new_multipolygon(coordinates: VectorMultiPolygon<M>, bbox: Option<BBox3D>) -> Self {
         VectorGeometry::MultiPolygon(VectorMultiPolygonGeometry {
-            _type: VectorGeometryType::MultiPolygon,
+            _type: VectorMultiPolygonGeometryType::default(),
             is_3d: coordinates[0][0][0].z.is_some(),
             coordinates,
             bbox,
@@ -153,10 +201,10 @@ impl<M: MValueCompatible> Default for VectorGeometry<M> {
 
 /// BaseGeometry is the a generic geometry type
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
-pub struct VectorBaseGeometry<G = VectorGeometry, O = VectorOffsets> {
+pub struct VectorBaseGeometry<T, G = VectorGeometry, O = VectorOffsets> {
     /// The geometry type
     #[serde(rename = "type")]
-    pub _type: VectorGeometryType,
+    pub _type: T,
     /// Specifies if the geometry is 3D or 2D
     #[serde(rename = "is3D")]
     pub is_3d: bool,
@@ -204,19 +252,26 @@ pub type VectorPolygonOffset = VectorMultiLineOffset;
 pub type VectorMultiPolygonOffset = Vec<VectorPolygonOffset>;
 
 /// PointGeometry is a point
-pub type VectorPointGeometry<M = MValue> = VectorBaseGeometry<VectorPoint<M>>;
+pub type VectorPointGeometry<M = MValue> =
+    VectorBaseGeometry<VectorPointGeometryType, VectorPoint<M>>;
 /// MultiPointGeometry contains multiple points
 pub type VectorMultiPointGeometry<M = MValue> =
-    VectorBaseGeometry<VectorMultiPoint<M>, VectorLineOffset>;
+    VectorBaseGeometry<VectorMultiPointGeometryType, VectorMultiPoint<M>, VectorLineOffset>;
 /// LineStringGeometry is a line
 pub type VectorLineStringGeometry<M = MValue> =
-    VectorBaseGeometry<VectorLineString<M>, VectorLineOffset>;
+    VectorBaseGeometry<VectorLineStringGeometryType, VectorLineString<M>, VectorLineOffset>;
 /// MultiLineStringGeometry contains multiple lines
-pub type VectorMultiLineStringGeometry<M = MValue> =
-    VectorBaseGeometry<VectorMultiLineString<M>, VectorMultiLineOffset>;
+pub type VectorMultiLineStringGeometry<M = MValue> = VectorBaseGeometry<
+    VectorMultiLineStringGeometryType,
+    VectorMultiLineString<M>,
+    VectorMultiLineOffset,
+>;
 /// PolygonGeometry is a polygon with potential holes
 pub type VectorPolygonGeometry<M = MValue> =
-    VectorBaseGeometry<VectorPolygon<M>, VectorPolygonOffset>;
+    VectorBaseGeometry<VectorPolygonGeometryType, VectorPolygon<M>, VectorPolygonOffset>;
 /// MultiPolygonGeometry is a polygon with multiple polygons with their own potential holes
-pub type VectorMultiPolygonGeometry<M = MValue> =
-    VectorBaseGeometry<VectorMultiPolygon<M>, VectorMultiPolygonOffset>;
+pub type VectorMultiPolygonGeometry<M = MValue> = VectorBaseGeometry<
+    VectorMultiPolygonGeometryType,
+    VectorMultiPolygon<M>,
+    VectorMultiPolygonOffset,
+>;

@@ -25,9 +25,9 @@ pub use value::*;
 pub use vector_point::*;
 
 use serde::{Deserialize, Serialize};
+use serde_repr::{Deserialize_repr, Serialize_repr};
 
 use alloc::string::String;
-use alloc::string::ToString;
 use alloc::vec::Vec;
 
 /// All projections that can be used
@@ -43,7 +43,10 @@ pub enum Projection {
 //? S2 specific type
 
 /// Cube-face on the S2 sphere
-#[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Default)]
+#[derive(
+    Serialize_repr, Deserialize_repr, Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Default,
+)]
+#[repr(u8)]
 pub enum Face {
     /// Face 0
     #[default]
@@ -77,21 +80,29 @@ impl From<u8> for Face {
     }
 }
 
-/// FeatureCollection or S2FeatureCollection type string
+/// FeatureCollection type string
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
 pub enum FeatureCollectionType {
     /// WM FeatureCollection
     #[default]
     FeatureCollection,
-    /// S2 FeatureCollection
-    S2FeatureCollection,
 }
 impl From<&str> for FeatureCollectionType {
-    fn from(s: &str) -> Self {
-        match s {
-            "S2FeatureCollection" => FeatureCollectionType::S2FeatureCollection,
-            _ => FeatureCollectionType::FeatureCollection,
-        }
+    fn from(_: &str) -> Self {
+        FeatureCollectionType::FeatureCollection
+    }
+}
+
+/// FeatureCollection type string
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
+pub enum S2FeatureCollectionType {
+    /// WM FeatureCollection
+    #[default]
+    S2FeatureCollection,
+}
+impl From<&str> for S2FeatureCollectionType {
+    fn from(_: &str) -> Self {
+        S2FeatureCollectionType::S2FeatureCollection
     }
 }
 
@@ -136,7 +147,7 @@ pub struct S2FeatureCollection<
 > {
     /// Type will always be "S2FeatureCollection"
     #[serde(rename = "type")]
-    pub _type: FeatureCollectionType,
+    pub _type: S2FeatureCollectionType,
     /// Collection of S2 features
     pub features: Vec<VectorFeature<M, P, D>>,
     /// Track the faces that were used to generate the features
@@ -177,12 +188,25 @@ impl<M, P: MValueCompatible, D: MValueCompatible> S2FeatureCollection<M, P, D> {
 
 //? Features
 
+/// Feature type string
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
+pub enum FeatureType {
+    /// WM Feature
+    #[default]
+    Feature,
+}
+impl From<&str> for FeatureType {
+    fn from(_: &str) -> Self {
+        FeatureType::Feature
+    }
+}
+
 /// Component to build an WM Feature
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct Feature<M = (), P: MValueCompatible = Properties, D: MValueCompatible = MValue> {
     /// Type will always be "Feature"
     #[serde(rename = "type")]
-    pub _type: String,
+    pub _type: FeatureType,
     /// Unique identifier
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<u64>,
@@ -197,17 +221,35 @@ pub struct Feature<M = (), P: MValueCompatible = Properties, D: MValueCompatible
 impl<M, P: MValueCompatible, D: MValueCompatible> Feature<M, P, D> {
     /// Create a new Feature
     pub fn new(id: Option<u64>, properties: P, geometry: Geometry<D>, metadata: Option<M>) -> Self {
-        Self { _type: "Feature".to_string(), id, properties, geometry, metadata }
+        Self { _type: "Feature".into(), id, properties, geometry, metadata }
     }
 }
 impl<M, P: MValueCompatible, D: MValueCompatible> Default for Feature<M, P, D> {
     fn default() -> Self {
         Self {
-            _type: "Feature".to_string(),
+            _type: "Feature".into(),
             id: None,
             properties: Default::default(),
             geometry: Default::default(),
             metadata: None,
+        }
+    }
+}
+
+/// Feature type string
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
+pub enum VectorFeatureType {
+    /// WM Feature
+    #[default]
+    VectorFeature,
+    /// S2 Feature
+    S2Feature,
+}
+impl From<&str> for VectorFeatureType {
+    fn from(s: &str) -> Self {
+        match s {
+            "S2Feature" => VectorFeatureType::S2Feature,
+            _ => VectorFeatureType::VectorFeature,
         }
     }
 }
@@ -217,7 +259,7 @@ impl<M, P: MValueCompatible, D: MValueCompatible> Default for Feature<M, P, D> {
 pub struct VectorFeature<M = (), P: MValueCompatible = Properties, D: MValueCompatible = MValue> {
     /// Type will always be "VectorFeature"
     #[serde(rename = "type")]
-    pub _type: String,
+    pub _type: VectorFeatureType,
     /// Unique identifier
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<u64>,
@@ -234,7 +276,7 @@ pub struct VectorFeature<M = (), P: MValueCompatible = Properties, D: MValueComp
 impl<M, P: MValueCompatible, D: MValueCompatible> Default for VectorFeature<M, P, D> {
     fn default() -> Self {
         Self {
-            _type: "VectorFeature".to_string(),
+            _type: "VectorFeature".into(),
             face: 0.into(),
             id: None,
             properties: Default::default(),
@@ -251,14 +293,7 @@ impl<M, P: MValueCompatible, D: MValueCompatible> VectorFeature<M, P, D> {
         geometry: VectorGeometry<D>,
         metadata: Option<M>,
     ) -> Self {
-        Self {
-            _type: "VectorFeature".to_string(),
-            face: 0.into(),
-            id,
-            properties,
-            geometry,
-            metadata,
-        }
+        Self { _type: "VectorFeature".into(), face: 0.into(), id, properties, geometry, metadata }
     }
 
     /// Create a new VectorFeature in the WM format
@@ -269,7 +304,7 @@ impl<M, P: MValueCompatible, D: MValueCompatible> VectorFeature<M, P, D> {
         geometry: VectorGeometry<D>,
         metadata: Option<M>,
     ) -> Self {
-        Self { _type: "S2Feature".to_string(), face, id, properties, geometry, metadata }
+        Self { _type: "S2Feature".into(), face, id, properties, geometry, metadata }
     }
 
     /// Create a new VectorFeature using an input VectorFeature. Assign new geometry if provided
@@ -344,6 +379,7 @@ pub enum JSONCollection<M = (), P: MValueCompatible = Properties, D: MValueCompa
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::string::ToString;
     use alloc::vec;
 
     #[test]
@@ -372,14 +408,14 @@ mod tests {
     #[test]
     fn defaults() {
         let f: Feature = Default::default();
-        assert_eq!(f._type, "Feature");
+        assert_eq!(f._type, "Feature".into());
         assert_eq!(f.id, None);
         assert_eq!(f.properties, Properties::default());
         assert_eq!(f.geometry, Geometry::default());
         assert_eq!(f.metadata, None);
 
         let f: VectorFeature = Default::default();
-        assert_eq!(f._type, "VectorFeature");
+        assert_eq!(f._type, "VectorFeature".into());
         assert_eq!(f.id, None);
         assert_eq!(f.face, 0.into());
         assert_eq!(f.properties, Properties::default());
@@ -410,7 +446,7 @@ mod tests {
         let mut attributions = Attributions::new();
         attributions.insert("Open S2".to_string(), "https://opens2.com/legal/data".to_string());
         let mut fc = S2FeatureCollection::new(Some(attributions.clone()));
-        assert_eq!(fc._type, FeatureCollectionType::S2FeatureCollection);
+        assert_eq!(fc._type, S2FeatureCollectionType::S2FeatureCollection);
         assert_eq!(fc.features.len(), 0);
         assert_eq!(fc.attributions, Some(attributions.clone()));
         // update_bbox
@@ -422,7 +458,7 @@ mod tests {
         assert_eq!(fc.faces, vec![0.into(), 3.into()]);
 
         let string = serde_json::to_string(&fc).unwrap();
-        assert_eq!(string, "{\"type\":\"S2FeatureCollection\",\"features\":[],\"faces\":[\"Face0\",\"Face3\"],\"attributions\":{\"Open S2\":\"https://opens2.com/legal/data\"},\"bbox\":[5.0,-2.0,35.0,2.2]}");
+        assert_eq!(string, "{\"type\":\"S2FeatureCollection\",\"features\":[],\"faces\":[0,3],\"attributions\":{\"Open S2\":\"https://opens2.com/legal/data\"},\"bbox\":[5.0,-2.0,35.0,2.2]}");
         let back_to_fc: S2FeatureCollection = serde_json::from_str(&string).unwrap();
         assert_eq!(back_to_fc, fc);
     }
@@ -441,7 +477,7 @@ mod tests {
             None,
         );
         assert_eq!(fc.id, Some(22));
-        assert_eq!(fc._type, "Feature");
+        assert_eq!(fc._type, "Feature".into());
         assert_eq!(
             fc.geometry,
             Geometry::Point(PointGeometry {
@@ -473,7 +509,7 @@ mod tests {
             None,
         );
         assert_eq!(fc.id, Some(55));
-        assert_eq!(fc._type, "VectorFeature");
+        assert_eq!(fc._type, "VectorFeature".into());
         assert_eq!(
             fc.geometry,
             VectorGeometry::Point(VectorPointGeometry {
@@ -493,7 +529,7 @@ mod tests {
 
         // S2
 
-        #[derive(PartialEq, Clone, Debug)]
+        #[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
         struct MetaTest {
             name: String,
             value: String,
@@ -516,7 +552,7 @@ mod tests {
             Some(MetaTest { name: "test".to_string(), value: "value".to_string() }),
         );
         assert_eq!(fc.id, Some(55));
-        assert_eq!(fc._type, "S2Feature");
+        assert_eq!(fc._type, "S2Feature".into());
         assert_eq!(
             fc.geometry,
             VectorGeometry::Point(VectorPointGeometry {
@@ -537,6 +573,14 @@ mod tests {
         );
         assert_eq!(fc.face, 3.into());
 
+        let fc_to_str = serde_json::to_string(&fc).unwrap();
+        assert_eq!(
+            fc_to_str,
+            "{\"type\":\"S2Feature\",\"id\":55,\"face\":3,\"properties\":{},\"geometry\":{\"type\"\
+             :\"Point\",\"is3D\":true,\"coordinates\":{\"x\":0.0,\"y\":1.0,\"z\":3.0},\"indices\":\
+             null,\"tesselation\":null},\"metadata\":{\"name\":\"test\",\"value\":\"value\"}}"
+        );
+
         // from_vector_feature
 
         let new_geo = VectorGeometry::Point(VectorPointGeometry {
@@ -553,5 +597,69 @@ mod tests {
             VectorFeature::<MetaTest>::from_vector_feature(&fc, Some(new_geo.clone()));
 
         assert_eq!(fc_clone_new_geometry.geometry, new_geo);
+    }
+
+    #[test]
+    fn parse_feature_linestring() {
+        let json_string = r#"{
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [-13.292352825505162, 54.34883408204476],
+                    [36.83102287804303, 59.56941785818924],
+                    [50.34083898563978, 16.040052775278994],
+                    [76.38149901912357, 35.155968522292056]
+                ]
+            }
+        }"#;
+
+        let feature: Feature = serde_json::from_str(json_string).unwrap();
+        assert_eq!(feature._type, "Feature".into());
+        assert_eq!(
+            feature.geometry,
+            Geometry::LineString(LineStringGeometry {
+                _type: "LineString".into(),
+                coordinates: vec![
+                    Point(-13.292352825505162, 54.34883408204476),
+                    Point(36.83102287804303, 59.56941785818924),
+                    Point(50.34083898563978, 16.040052775278994),
+                    Point(76.38149901912357, 35.155968522292056),
+                ],
+                ..Default::default()
+            })
+        );
+
+        let back_to_str = serde_json::to_string(&feature).unwrap();
+        assert_eq!(
+            back_to_str,
+            "{\"type\":\"Feature\",\"properties\":{},\"geometry\":{\"type\":\"LineString\",\"\
+             coordinates\":[[-13.292352825505162,54.34883408204476],[36.83102287804303,59.\
+             56941785818924],[50.34083898563978,16.040052775278994],[76.38149901912357,35.\
+             155968522292056]]}}"
+        );
+    }
+
+    #[test]
+    fn parse_vector_feature_linestring() {
+        let json_string = r#"{
+            "type": "VectorFeature",
+            "face": 0,
+            "properties": {},
+            "geometry": {
+                "type": "LineString",
+                "is3D": false,
+                "coordinates": [
+                    { "x": -13.292352825505162, "y": 54.34883408204476 },
+                    { "x": 36.83102287804303, "y": 59.56941785818924 },
+                    { "x": 50.34083898563978, "y": 16.040052775278994 },
+                    { "x": 76.38149901912357, "y": 35.155968522292056 }
+                ]
+            }
+        }"#;
+
+        let feature: VectorFeature = serde_json::from_str(json_string).unwrap();
+        assert_eq!(feature._type, "VectorFeature".into());
     }
 }

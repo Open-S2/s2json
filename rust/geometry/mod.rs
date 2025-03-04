@@ -42,6 +42,7 @@ mod tests {
     use crate::*;
 
     use super::*;
+    use alloc::string::ToString;
     use alloc::vec;
     use serde_json::json;
 
@@ -799,35 +800,6 @@ mod tests {
     }
 
     #[test]
-    fn test_vector_geometry_type() {
-        let vgt_point: VectorGeometryType = "Point".into();
-        assert_eq!(vgt_point, VectorGeometryType::Point);
-        let vgt_line_string: VectorGeometryType = "LineString".into();
-        assert_eq!(vgt_line_string, VectorGeometryType::LineString);
-        let vgt_polygon: VectorGeometryType = "Polygon".into();
-        assert_eq!(vgt_polygon, VectorGeometryType::Polygon);
-        let vgt_multi_point: VectorGeometryType = "MultiPoint".into();
-        assert_eq!(vgt_multi_point, VectorGeometryType::MultiPoint);
-        let vgt_multi_line_string: VectorGeometryType = "MultiLineString".into();
-        assert_eq!(vgt_multi_line_string, VectorGeometryType::MultiLineString);
-        let vgt_multi_polygon: VectorGeometryType = "MultiPolygon".into();
-        assert_eq!(vgt_multi_polygon, VectorGeometryType::MultiPolygon);
-
-        let default = VectorGeometryType::default();
-        assert_eq!(default, VectorGeometryType::Point);
-
-        let default_instance: VectorGeometryType = Default::default();
-        assert_eq!(default, default_instance);
-    }
-
-    #[test]
-    #[should_panic(expected = "Invalid vector geometry type")]
-    fn test_invalid_vector_geometry_type() {
-        // This should panic when an invalid string is passed
-        let _ = VectorGeometryType::from("Pant");
-    }
-
-    #[test]
     fn test_vector_geometry_bbox() {
         let vgt_point: VectorGeometry = VectorGeometry::Point(VectorPointGeometry {
             _type: "Point".into(),
@@ -1032,7 +1004,7 @@ mod tests {
             assert_eq!(fc.features.len(), 4);
             if let WMFeature::Feature(first_feature) = &fc.features[0] {
                 assert_eq!(first_feature.id, None);
-                assert_eq!(first_feature._type, "Feature");
+                assert_eq!(first_feature._type, "Feature".into());
                 assert_eq!(
                     first_feature.geometry,
                     Geometry::Point(PointGeometry {
@@ -1306,5 +1278,17 @@ mod tests {
         let point = Point3D(0., 1., 2.);
         let point_or_point3d: PointOrPoint3D = point.into();
         assert_eq!(point_or_point3d, PointOrPoint3D(0., 1., Some(2.)));
+    }
+
+    #[test]
+    fn multi_line_string_geometry_type_from() {
+        let multi_type: MultiLineStringGeometryType = "MultiLineString".into();
+        assert_eq!(multi_type, MultiLineStringGeometryType::MultiLineString);
+    }
+
+    #[test]
+    fn multi_line_string_3d_geometry_type_from() {
+        let multi_type: MultiLineString3DGeometryType = "MultiLineString3D".into();
+        assert_eq!(multi_type, MultiLineString3DGeometryType::MultiLineString3D);
     }
 }

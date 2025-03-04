@@ -1,6 +1,6 @@
 [package]
 name = "s2json"
-version = "1.10.6"
+version = "1.11.0"
 edition = "2021"
 authors = ["Craig O'Connor <oconnorct1@gmail.com>"]
 description = "This library supports the S2JSON 1.0 Specification"
@@ -23,6 +23,7 @@ bench = true
 libm = "0.2"
 serde = { version = "1.0", default-features = false, features = ["alloc", "derive"] }
 serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
+serde_repr = "0.1"
 
 [dev-dependencies]
 
