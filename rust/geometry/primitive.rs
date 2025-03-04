@@ -153,13 +153,18 @@ where
             <MultiPointGeometry<M> as _serde::Deserialize>::deserialize(__deserializer),
             Geometry::MultiPoint,
         ) {
-            // If deserialization succeeds as MultiPoint, check if content is LineString
-            if let _serde::__private::Ok(__ok2) = _serde::__private::Result::map(
-                <LineStringGeometry<M> as _serde::Deserialize>::deserialize(__deserializer),
-                Geometry::LineString,
-            ) {
-                // If LineString is found, return LineString variant
-                return _serde::__private::Ok(__ok2);
+            // pull out the MultiPoint variant
+            if let Geometry::MultiPoint(multipoint) = &__ok {
+                if multipoint._type == GeometryType::LineString {
+                    // If deserialization succeeds as MultiPoint, check if content is LineString
+                    if let _serde::__private::Ok(__ok2) = _serde::__private::Result::map(
+                        <LineStringGeometry<M> as _serde::Deserialize>::deserialize(__deserializer),
+                        Geometry::LineString,
+                    ) {
+                        // If LineString is found, return LineString variant
+                        return _serde::__private::Ok(__ok2);
+                    }
+                }
             }
             return _serde::__private::Ok(__ok);
         }
@@ -167,11 +172,16 @@ where
             <MultiLineStringGeometry<M> as _serde::Deserialize>::deserialize(__deserializer),
             Geometry::MultiLineString,
         ) {
-            if let _serde::__private::Ok(__ok2) = _serde::__private::Result::map(
-                <PolygonGeometry<M> as _serde::Deserialize>::deserialize(__deserializer),
-                Geometry::Polygon,
-            ) {
-                return _serde::__private::Ok(__ok2);
+            // pull out the MultiLineString variant
+            if let Geometry::MultiLineString(multilinestring) = &__ok {
+                if multilinestring._type == GeometryType::Polygon {
+                    if let _serde::__private::Ok(__ok2) = _serde::__private::Result::map(
+                        <PolygonGeometry<M> as _serde::Deserialize>::deserialize(__deserializer),
+                        Geometry::Polygon,
+                    ) {
+                        return _serde::__private::Ok(__ok2);
+                    }
+                }
             }
             return _serde::__private::Ok(__ok);
         }
@@ -191,11 +201,18 @@ where
             <MultiPoint3DGeometry<M> as _serde::Deserialize>::deserialize(__deserializer),
             Geometry::MultiPoint3D,
         ) {
-            if let _serde::__private::Ok(__ok2) = _serde::__private::Result::map(
-                <LineString3DGeometry<M> as _serde::Deserialize>::deserialize(__deserializer),
-                Geometry::LineString3D,
-            ) {
-                return _serde::__private::Ok(__ok2);
+            // pull out the MultiPoint3D variant
+            if let Geometry::MultiPoint3D(multipoint3d) = &__ok {
+                if multipoint3d._type == GeometryType::LineString3D {
+                    if let _serde::__private::Ok(__ok2) = _serde::__private::Result::map(
+                        <LineString3DGeometry<M> as _serde::Deserialize>::deserialize(
+                            __deserializer,
+                        ),
+                        Geometry::LineString3D,
+                    ) {
+                        return _serde::__private::Ok(__ok2);
+                    }
+                }
             }
             return _serde::__private::Ok(__ok);
         }
@@ -203,11 +220,16 @@ where
             <MultiLineString3DGeometry<M> as _serde::Deserialize>::deserialize(__deserializer),
             Geometry::MultiLineString3D,
         ) {
-            if let _serde::__private::Ok(__ok2) = _serde::__private::Result::map(
-                <Polygon3DGeometry<M> as _serde::Deserialize>::deserialize(__deserializer),
-                Geometry::Polygon3D,
-            ) {
-                return _serde::__private::Ok(__ok2);
+            // pull out the MultiLineString3D variant
+            if let Geometry::MultiLineString3D(multilinestring3d) = &__ok {
+                if multilinestring3d._type == GeometryType::Polygon3D {
+                    if let _serde::__private::Ok(__ok2) = _serde::__private::Result::map(
+                        <Polygon3DGeometry<M> as _serde::Deserialize>::deserialize(__deserializer),
+                        Geometry::Polygon3D,
+                    ) {
+                        return _serde::__private::Ok(__ok2);
+                    }
+                }
             }
             return _serde::__private::Ok(__ok);
         }

@@ -91,13 +91,20 @@ where
             <VectorMultiPointGeometry<M> as _serde::Deserialize>::deserialize(__deserializer),
             VectorGeometry::MultiPoint,
         ) {
-            // If deserialization succeeds as MultiPoint, check if content is LineString
-            if let _serde::__private::Ok(__ok2) = _serde::__private::Result::map(
-                <VectorLineStringGeometry<M> as _serde::Deserialize>::deserialize(__deserializer),
-                VectorGeometry::LineString,
-            ) {
-                // If LineString is found, return LineString variant
-                return _serde::__private::Ok(__ok2);
+            // pull out the MultiPoint variant
+            if let VectorGeometry::MultiPoint(multipoint) = &__ok {
+                if multipoint._type == VectorGeometryType::LineString {
+                    // If deserialization succeeds as MultiPoint, check if content is LineString
+                    if let _serde::__private::Ok(__ok2) = _serde::__private::Result::map(
+                        <VectorLineStringGeometry<M> as _serde::Deserialize>::deserialize(
+                            __deserializer,
+                        ),
+                        VectorGeometry::LineString,
+                    ) {
+                        // If LineString is found, return LineString variant
+                        return _serde::__private::Ok(__ok2);
+                    }
+                }
             }
             return _serde::__private::Ok(__ok);
         }
@@ -106,13 +113,20 @@ where
             <VectorMultiLineStringGeometry<M> as _serde::Deserialize>::deserialize(__deserializer),
             VectorGeometry::MultiLineString,
         ) {
-            // If deserialization succeeds as MultiLineString, check if content is Polygon
-            if let _serde::__private::Ok(__ok2) = _serde::__private::Result::map(
-                <VectorPolygonGeometry<M> as _serde::Deserialize>::deserialize(__deserializer),
-                VectorGeometry::Polygon,
-            ) {
-                // If Polygon is found, return Polygon variant
-                return _serde::__private::Ok(__ok2);
+            // pull out the MultiLineString variant
+            if let VectorGeometry::MultiLineString(multilinestring) = &__ok {
+                if multilinestring._type == VectorGeometryType::Polygon {
+                    // If deserialization succeeds as MultiLineString, check if content is Polygon
+                    if let _serde::__private::Ok(__ok2) = _serde::__private::Result::map(
+                        <VectorPolygonGeometry<M> as _serde::Deserialize>::deserialize(
+                            __deserializer,
+                        ),
+                        VectorGeometry::Polygon,
+                    ) {
+                        // If Polygon is found, return Polygon variant
+                        return _serde::__private::Ok(__ok2);
+                    }
+                }
             }
             return _serde::__private::Ok(__ok);
         }
