@@ -44,7 +44,7 @@ impl<T> BBox<T> {
     }
 
     /// Merges another bounding box with this one
-    pub fn merge(&self, other: &BBox<T>) -> BBox<T>
+    pub fn merge(&self, other: &Self) -> Self
     where
         T: PartialOrd + Copy,
     {
@@ -56,6 +56,17 @@ impl<T> BBox<T> {
         new_bbox.top = if new_bbox.top > other.top { new_bbox.top } else { other.top };
 
         new_bbox
+    }
+
+    /// Merges in place another bounding box with this one
+    pub fn merge_in_place(&mut self, other: &Self)
+    where
+        T: PartialOrd + Copy,
+    {
+        self.left = if self.left < other.left { self.left } else { other.left };
+        self.bottom = if self.bottom < other.bottom { self.bottom } else { other.bottom };
+        self.right = if self.right > other.right { self.right } else { other.right };
+        self.top = if self.top > other.top { self.top } else { other.top };
     }
 
     /// Checks if another bounding box overlaps with this one and returns the overlap
@@ -147,7 +158,7 @@ impl BBox<f64> {
 
     /// Extends the bounding box with a point
     pub fn extend_from_point<M: MValueCompatible>(&mut self, point: &VectorPoint<M>) {
-        *self = self.merge(&BBox::from_point(point));
+        self.merge_in_place(&BBox::from_point(point));
     }
 
     /// Creates a new BBox from zoom-uv coordinates
@@ -290,6 +301,19 @@ impl<T> BBox3D<T> {
         new_bbox
     }
 
+    /// Merges in place another bounding box with this one
+    pub fn merge_in_place(&mut self, other: &Self)
+    where
+        T: PartialOrd + Copy,
+    {
+        self.left = if self.left < other.left { self.left } else { other.left };
+        self.bottom = if self.bottom < other.bottom { self.bottom } else { other.bottom };
+        self.right = if self.right > other.right { self.right } else { other.right };
+        self.top = if self.top > other.top { self.top } else { other.top };
+        self.near = if self.near < other.near { self.near } else { other.near };
+        self.far = if self.far > other.far { self.far } else { other.far };
+    }
+
     /// Checks if another bounding box overlaps with this one and returns the overlap
     pub fn overlap(&self, other: &BBox3D<T>) -> Option<BBox3D<T>>
     where
@@ -421,7 +445,7 @@ impl BBox3D<f64> {
 
     /// Extends the bounding box with a point
     pub fn extend_from_point<M: MValueCompatible>(&mut self, point: &VectorPoint<M>) {
-        *self = self.merge(&BBox3D::from_point(point));
+        self.merge_in_place(&BBox3D::from_point(point));
     }
 
     /// Creates a new BBox3D from zoom-uv coordinates
