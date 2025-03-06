@@ -804,7 +804,14 @@ mod tests {
         let vgt_point: VectorGeometry = VectorGeometry::Point(VectorPointGeometry {
             _type: "Point".into(),
             coordinates: VectorPoint { x: 0.0, y: 1.0, z: Some(2.0), m: None, t: None },
-            bbox: None,
+            bbox: Some(BBox3D {
+                left: -1.0,
+                bottom: -2.0,
+                right: -3.0,
+                top: -4.0,
+                near: -5.0,
+                far: -6.0,
+            }),
             is_3d: true,
             offset: None,
             vec_bbox: Some(BBox3D {
@@ -818,56 +825,20 @@ mod tests {
             indices: None,
             tesselation: None,
         });
+        assert_eq!(vgt_point.bbox().unwrap(), BBox3D::new(-1.0, -2.0, -3.0, -4.0, -5.0, -6.0));
         assert_eq!(vgt_point.vec_bbox().unwrap(), BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 2.0));
         let vgt_multi_point: VectorGeometry =
             VectorGeometry::MultiPoint(VectorMultiPointGeometry {
                 _type: "MultiPoint".into(),
                 coordinates: vec![VectorPoint { x: 0.0, y: 1.0, z: Some(2.0), m: None, t: None }],
-                bbox: None,
-                is_3d: true,
-                offset: None,
-                vec_bbox: Some(BBox3D {
-                    left: 0.0,
-                    bottom: 1.0,
-                    right: 0.0,
-                    top: 1.0,
-                    near: 2.0,
-                    far: 2.0,
+                bbox: Some(BBox3D {
+                    left: -1.0,
+                    bottom: -2.0,
+                    right: -3.0,
+                    top: -4.0,
+                    near: -5.0,
+                    far: -6.0,
                 }),
-                indices: None,
-                tesselation: None,
-            });
-        assert_eq!(vgt_multi_point.vec_bbox().unwrap(), BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 2.0));
-        let vgt_line_string: VectorGeometry =
-            VectorGeometry::LineString(VectorLineStringGeometry {
-                _type: "LineString".into(),
-                coordinates: vec![VectorPoint { x: 0.0, y: 1.0, z: Some(2.0), m: None, t: None }],
-                bbox: None,
-                is_3d: true,
-                offset: None,
-                vec_bbox: Some(BBox3D {
-                    left: 0.0,
-                    bottom: 1.0,
-                    right: 0.0,
-                    top: 1.0,
-                    near: 2.0,
-                    far: 2.0,
-                }),
-                indices: None,
-                tesselation: None,
-            });
-        assert_eq!(vgt_line_string.vec_bbox().unwrap(), BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 2.0));
-        let vgt_multi_line_string: VectorGeometry =
-            VectorGeometry::MultiLineString(VectorMultiLineStringGeometry {
-                _type: "MultiLineString".into(),
-                coordinates: vec![vec![VectorPoint {
-                    x: 0.0,
-                    y: 1.0,
-                    z: Some(2.0),
-                    m: None,
-                    t: None,
-                }]],
-                bbox: None,
                 is_3d: true,
                 offset: None,
                 vec_bbox: Some(BBox3D {
@@ -882,38 +853,22 @@ mod tests {
                 tesselation: None,
             });
         assert_eq!(
-            vgt_multi_line_string.vec_bbox().unwrap(),
-            BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 2.0)
+            vgt_multi_point.bbox().unwrap(),
+            BBox3D::new(-1.0, -2.0, -3.0, -4.0, -5.0, -6.0)
         );
-        let vgt_polygon: VectorGeometry = VectorGeometry::Polygon(VectorPolygonGeometry {
-            _type: "Polygon".into(),
-            coordinates: vec![vec![VectorPoint { x: 0.0, y: 1.0, z: Some(2.0), m: None, t: None }]],
-            bbox: None,
-            is_3d: true,
-            offset: None,
-            vec_bbox: Some(BBox3D {
-                left: 0.0,
-                bottom: 1.0,
-                right: 0.0,
-                top: 1.0,
-                near: 2.0,
-                far: 2.0,
-            }),
-            indices: None,
-            tesselation: None,
-        });
-        assert_eq!(vgt_polygon.vec_bbox().unwrap(), BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 2.0));
-        let vgt_multi_polygon: VectorGeometry =
-            VectorGeometry::MultiPolygon(VectorMultiPolygonGeometry {
-                _type: "MultiPolygon".into(),
-                coordinates: vec![vec![vec![VectorPoint {
-                    x: 0.0,
-                    y: 1.0,
-                    z: Some(2.0),
-                    m: None,
-                    t: None,
-                }]]],
-                bbox: None,
+        assert_eq!(vgt_multi_point.vec_bbox().unwrap(), BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 2.0));
+        let vgt_line_string: VectorGeometry =
+            VectorGeometry::LineString(VectorLineStringGeometry {
+                _type: "LineString".into(),
+                coordinates: vec![VectorPoint { x: 0.0, y: 1.0, z: Some(2.0), m: None, t: None }],
+                bbox: Some(BBox3D {
+                    left: -1.0,
+                    bottom: -2.0,
+                    right: -3.0,
+                    top: -4.0,
+                    near: -5.0,
+                    far: -6.0,
+                }),
                 is_3d: true,
                 offset: None,
                 vec_bbox: Some(BBox3D {
@@ -927,6 +882,111 @@ mod tests {
                 indices: None,
                 tesselation: None,
             });
+        assert_eq!(
+            vgt_line_string.bbox().unwrap(),
+            BBox3D::new(-1.0, -2.0, -3.0, -4.0, -5.0, -6.0)
+        );
+        assert_eq!(vgt_line_string.vec_bbox().unwrap(), BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 2.0));
+        let vgt_multi_line_string: VectorGeometry =
+            VectorGeometry::MultiLineString(VectorMultiLineStringGeometry {
+                _type: "MultiLineString".into(),
+                coordinates: vec![vec![VectorPoint {
+                    x: 0.0,
+                    y: 1.0,
+                    z: Some(2.0),
+                    m: None,
+                    t: None,
+                }]],
+                bbox: Some(BBox3D {
+                    left: -1.0,
+                    bottom: -2.0,
+                    right: -3.0,
+                    top: -4.0,
+                    near: -5.0,
+                    far: -6.0,
+                }),
+                is_3d: true,
+                offset: None,
+                vec_bbox: Some(BBox3D {
+                    left: 0.0,
+                    bottom: 1.0,
+                    right: 0.0,
+                    top: 1.0,
+                    near: 2.0,
+                    far: 2.0,
+                }),
+                indices: None,
+                tesselation: None,
+            });
+        assert_eq!(
+            vgt_multi_line_string.bbox().unwrap(),
+            BBox3D::new(-1.0, -2.0, -3.0, -4.0, -5.0, -6.0)
+        );
+        assert_eq!(
+            vgt_multi_line_string.vec_bbox().unwrap(),
+            BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 2.0)
+        );
+        let vgt_polygon: VectorGeometry = VectorGeometry::Polygon(VectorPolygonGeometry {
+            _type: "Polygon".into(),
+            coordinates: vec![vec![VectorPoint { x: 0.0, y: 1.0, z: Some(2.0), m: None, t: None }]],
+            bbox: Some(BBox3D {
+                left: -1.0,
+                bottom: -2.0,
+                right: -3.0,
+                top: -4.0,
+                near: -5.0,
+                far: -6.0,
+            }),
+            is_3d: true,
+            offset: None,
+            vec_bbox: Some(BBox3D {
+                left: 0.0,
+                bottom: 1.0,
+                right: 0.0,
+                top: 1.0,
+                near: 2.0,
+                far: 2.0,
+            }),
+            indices: None,
+            tesselation: None,
+        });
+        assert_eq!(vgt_polygon.bbox().unwrap(), BBox3D::new(-1.0, -2.0, -3.0, -4.0, -5.0, -6.0));
+        assert_eq!(vgt_polygon.vec_bbox().unwrap(), BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 2.0));
+        let vgt_multi_polygon: VectorGeometry =
+            VectorGeometry::MultiPolygon(VectorMultiPolygonGeometry {
+                _type: "MultiPolygon".into(),
+                coordinates: vec![vec![vec![VectorPoint {
+                    x: 0.0,
+                    y: 1.0,
+                    z: Some(2.0),
+                    m: None,
+                    t: None,
+                }]]],
+                bbox: Some(BBox3D {
+                    left: -1.0,
+                    bottom: -2.0,
+                    right: -3.0,
+                    top: -4.0,
+                    near: -5.0,
+                    far: -6.0,
+                }),
+                is_3d: true,
+                offset: None,
+                vec_bbox: Some(BBox3D {
+                    left: 0.0,
+                    bottom: 1.0,
+                    right: 0.0,
+                    top: 1.0,
+                    near: 2.0,
+                    far: 2.0,
+                }),
+                indices: None,
+                tesselation: None,
+            });
+        assert_eq!(
+            vgt_multi_polygon.bbox().unwrap(),
+            BBox3D::new(-1.0, -2.0, -3.0, -4.0, -5.0, -6.0)
+        );
         assert_eq!(
             vgt_multi_polygon.vec_bbox().unwrap(),
             BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 2.0)

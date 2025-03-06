@@ -142,70 +142,19 @@ where
         ))
     }
 }
-// impl<'de, M> Deserialize<'de> for VectorGeometry<M>
-// where
-//     M: MValueCompatible + Deserialize<'de>, // Ensure that M is deserializable
-// {
-//     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-//     where
-//         D: Deserializer<'de>,
-//     {
-//         println!("BEGIN");
-//         // First, try to deserialize each variant directly
-//         // let base_geometry: VectorBaseGeometry = Deserialize::deserialize(deserializer)?;
-//         let __content = <serde::__private::de::Content as Deserialize>::deserialize(deserializer)?;
-//         println!("AAAAAAA");
-//         let __deserializer =
-//             serde::__private::de::ContentRefDeserializer::<D::Error>::new(&__content);
-//         println!("BBBBBBB");
-//         let base_geometry: VectorBaseGeometry = Deserialize::deserialize(__deserializer)?;
-//         println!("base_geometry: {:#?}", base_geometry);
-
-//         match base_geometry._type {
-//             VectorGeometryType::Point => {
-//                 let point: VectorPointGeometry<M> = Deserialize::deserialize(__deserializer)?;
-//                 Ok(VectorGeometry::Point(point))
-//             }
-//             VectorGeometryType::MultiPoint => {
-//                 let multipoint: VectorMultiPointGeometry<M> =
-//                     Deserialize::deserialize(__deserializer)?;
-//                 Ok(VectorGeometry::MultiPoint(multipoint))
-//             }
-//             VectorGeometryType::LineString => {
-//                 // let linestring: VectorLineStringGeometry<M> =
-//                 //     Deserialize::deserialize(__deserializer)?;
-//                 // Ok(VectorGeometry::LineString(linestring))
-//                 if let serde::__private::Ok(__ok) = serde::__private::Result::map(
-//                     <VectorLineStringGeometry<M> as serde::Deserialize>::deserialize(
-//                         __deserializer,
-//                     ),
-//                     VectorGeometry::LineString,
-//                 ) {
-//                     serde::__private::Ok(__ok)
-//                 } else {
-//                     serde::__private::Err(serde::de::Error::custom(
-//                         "data did not match any variant of untagged enum VectorGeometry",
-//                     ))
-//                 }
-//             }
-//             VectorGeometryType::MultiLineString => {
-//                 let multiline: VectorMultiLineStringGeometry<M> =
-//                     Deserialize::deserialize(__deserializer)?;
-//                 Ok(VectorGeometry::MultiLineString(multiline))
-//             }
-//             VectorGeometryType::Polygon => {
-//                 let polygon: VectorPolygonGeometry<M> = Deserialize::deserialize(__deserializer)?;
-//                 Ok(VectorGeometry::Polygon(polygon))
-//             }
-//             VectorGeometryType::MultiPolygon => {
-//                 let multipolygon: VectorMultiPolygonGeometry<M> =
-//                     Deserialize::deserialize(__deserializer)?;
-//                 Ok(VectorGeometry::MultiPolygon(multipolygon))
-//             }
-//         }
-//     }
-// }
 impl<M: MValueCompatible> VectorGeometry<M> {
+    /// Get the bbox of the geometry
+    pub fn bbox(&self) -> &Option<BBox3D> {
+        match self {
+            VectorGeometry::Point(g) => &g.bbox,
+            VectorGeometry::MultiPoint(g) => &g.bbox,
+            VectorGeometry::LineString(g) => &g.bbox,
+            VectorGeometry::MultiLineString(g) => &g.bbox,
+            VectorGeometry::Polygon(g) => &g.bbox,
+            VectorGeometry::MultiPolygon(g) => &g.bbox,
+        }
+    }
+
     /// Get the vec_bbox of the geometry
     pub fn vec_bbox(&self) -> &Option<BBox3D> {
         match self {
