@@ -26,7 +26,6 @@ pub use value::*;
 pub use vector_point::*;
 
 use serde::{Deserialize, Serialize};
-use serde_repr::{Deserialize_repr, Serialize_repr};
 
 use alloc::string::String;
 use alloc::vec::Vec;
@@ -44,10 +43,7 @@ pub enum Projection {
 //? S2 specific type
 
 /// Cube-face on the S2 sphere
-#[derive(
-    Serialize_repr, Deserialize_repr, Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Default,
-)]
-#[repr(u8)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Default)]
 pub enum Face {
     /// Face 0
     #[default]
@@ -77,6 +73,32 @@ impl From<u8> for Face {
             4 => Face::Face4,
             5 => Face::Face5,
             _ => Face::Face0,
+        }
+    }
+}
+impl serde::Serialize for Face {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_u8(*self as u8)
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for Face {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let value = u8::deserialize(deserializer)?;
+        match value {
+            0 => Ok(Face::Face0),
+            1 => Ok(Face::Face1),
+            2 => Ok(Face::Face2),
+            3 => Ok(Face::Face3),
+            4 => Ok(Face::Face4),
+            5 => Ok(Face::Face5),
+            _ => Err(serde::de::Error::custom("Invalid face value")),
         }
     }
 }
@@ -756,5 +778,50 @@ mod tests {
                 ..Default::default()
             })
         )
+    }
+
+    #[test]
+    fn serde_face() {
+        let face_0 = Face::Face0;
+        let serialized = serde_json::to_string(&face_0).unwrap();
+        assert_eq!(serialized, "0");
+        let deserialize = serde_json::from_str::<Face>(&serialized).unwrap();
+        assert_eq!(deserialize, Face::Face0);
+
+        let face_1 = Face::Face1;
+        let serialized = serde_json::to_string(&face_1).unwrap();
+        assert_eq!(serialized, "1");
+        let deserialize = serde_json::from_str::<Face>(&serialized).unwrap();
+        assert_eq!(deserialize, Face::Face1);
+
+        let face_2 = Face::Face2;
+        let serialized = serde_json::to_string(&face_2).unwrap();
+        assert_eq!(serialized, "2");
+        let deserialize = serde_json::from_str::<Face>(&serialized).unwrap();
+        assert_eq!(deserialize, Face::Face2);
+
+        let face_3 = Face::Face3;
+        let serialized = serde_json::to_string(&face_3).unwrap();
+        assert_eq!(serialized, "3");
+        let deserialize = serde_json::from_str::<Face>(&serialized).unwrap();
+        assert_eq!(deserialize, Face::Face3);
+
+        let face_4 = Face::Face4;
+        let serialized = serde_json::to_string(&face_4).unwrap();
+        assert_eq!(serialized, "4");
+        let deserialize = serde_json::from_str::<Face>(&serialized).unwrap();
+        assert_eq!(deserialize, Face::Face4);
+
+        let face_5 = Face::Face5;
+        let serialized = serde_json::to_string(&face_5).unwrap();
+        assert_eq!(serialized, "5");
+        let deserialize = serde_json::from_str::<Face>(&serialized).unwrap();
+        assert_eq!(deserialize, Face::Face5);
+    }
+
+    #[test]
+    #[should_panic(expected = "Invalid face value")]
+    fn serde_face_err() {
+        let _ = serde_json::from_str::<Face>("6").unwrap();
     }
 }
