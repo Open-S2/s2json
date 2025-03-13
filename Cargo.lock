@@ -54,7 +54,7 @@ dependencies = [
 
 [[package]]
 name = "s2json-core"
-version = "1.14.0"
+version = "1.15.0"
 dependencies = [
  "libm",
  "serde",
@@ -63,7 +63,7 @@ dependencies = [
 
 [[package]]
 name = "s2json-derive"
-version = "1.1.0"
+version = "1.2.0"
 dependencies = [
  "proc-macro2",
  "quote",

@@ -327,7 +327,7 @@ macro_rules! impl_from_int {
         )*
     };
 }
-impl_from_int!(u8, u16, u32, u64);
+impl_from_int!(u8, u16, u32, u64, usize);
 // Implement for i8, i16, i32, i64
 macro_rules! impl_from_int {
     ($($t:ty),*) => {
@@ -349,7 +349,7 @@ macro_rules! impl_from_int {
         )*
     };
 }
-impl_from_int!(i8, i16, i32, i64);
+impl_from_int!(i8, i16, i32, i64, isize);
 impl From<f32> for ValueType {
     fn from(v: f32) -> Self {
         ValueType::Primitive(PrimitiveValue::F32(v))
@@ -443,7 +443,24 @@ macro_rules! impl_not_value_type {
         )*
     };
 }
-impl_not_value_type!(u8, u16, u32, u64, i8, i16, i32, i64, f32, f64, String, &str, bool, ());
+impl_not_value_type!(
+    u8,
+    u16,
+    u32,
+    u64,
+    usize,
+    i8,
+    i16,
+    i32,
+    i64,
+    isize,
+    f32,
+    f64,
+    String,
+    &str,
+    bool,
+    ()
+);
 impl<T> From<ValueType> for Option<T>
 where
     T: From<ValueType> + NotValueType, /* This ensures that only types that implement From<ValueType> are allowed */

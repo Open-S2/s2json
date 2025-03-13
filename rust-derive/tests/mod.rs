@@ -41,9 +41,10 @@ mod tests {
             pub b: u16,
             pub c: u32,
             pub d: u64,
+            pub e: usize,
         }
 
-        let test_struct = TestStruct { a: 1, b: 2, c: 3, d: 4 };
+        let test_struct = TestStruct { a: 1, b: 2, c: 3, d: 4, e: 5 };
 
         let mvalue: MValue = test_struct.clone().into(); // Ensure this method exists
         println!("{:?}", mvalue); // Debug output
@@ -54,6 +55,7 @@ mod tests {
                 ("b".into(), ValueType::Primitive(PrimitiveValue::U64(2))),
                 ("c".into(), ValueType::Primitive(PrimitiveValue::U64(3))),
                 ("d".into(), ValueType::Primitive(PrimitiveValue::U64(4))),
+                ("e".into(), ValueType::Primitive(PrimitiveValue::U64(5))),
             ])
         );
 
@@ -69,9 +71,10 @@ mod tests {
             pub b: i16,
             pub c: i32,
             pub d: i64,
+            pub e: isize,
         }
 
-        let test_struct = TestStruct { a: -1, b: 2, c: -3, d: 4 };
+        let test_struct = TestStruct { a: -1, b: 2, c: -3, d: 4, e: -5 };
 
         let mvalue: MValue = test_struct.clone().into(); // Ensure this method exists
         println!("{:?}", mvalue); // Debug output
@@ -82,6 +85,7 @@ mod tests {
                 ("b".into(), ValueType::Primitive(PrimitiveValue::I64(2))),
                 ("c".into(), ValueType::Primitive(PrimitiveValue::I64(-3))),
                 ("d".into(), ValueType::Primitive(PrimitiveValue::I64(4))),
+                ("e".into(), ValueType::Primitive(PrimitiveValue::I64(-5))),
             ])
         );
 
