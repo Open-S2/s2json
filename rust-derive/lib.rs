@@ -23,15 +23,31 @@ fn generate_to_mvalue(ast: &syn::DeriveInput) -> TokenStream {
     let (from_mvalue, into_mvalue) = generate_conversions(fields);
 
     let gen = quote! {
+        /// Starting from an MValue, convert to a struct
         impl From<MValue> for #name {
             fn from(mut m: MValue) -> Self {
                 #from_mvalue
             }
         }
-
+        /// If this struct is nested into another struct, pull out the MValue and let From<MValue> handle
+        impl From<ValueType> for #name {
+            fn from(value: ValueType) -> Self {
+                match value {
+                    ValueType::Nested(v) => v.into(),
+                    _ => #name::default(),
+                }
+            }
+        }
+        /// Starting from a struct, convert to an MValue
         impl From<#name> for MValue {
             fn from(value: #name) -> MValue {
                 #into_mvalue
+            }
+        }
+        /// If this struct is nested into another struct, convert to a ValueType that's nested
+        impl From<#name> for ValueType {
+            fn from(value: #name) -> ValueType {
+                ValueType::Nested(value.into())
             }
         }
     };

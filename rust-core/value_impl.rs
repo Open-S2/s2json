@@ -446,6 +446,41 @@ where
         }
     }
 }
+// TODO: Find a simpler methodology for this
+/// This trait is used to ensure that only types that implement From<ValueType> are allowed
+pub trait NotValueType {}
+/// A macro to implement the `NotValueType` trait for multiple types at once.
+macro_rules! impl_not_value_type {
+    ( $( $t:ty ),* ) => {
+        $(
+            impl NotValueType for $t {}
+        )*
+    };
+}
+impl_not_value_type!(u8, u16, u32, u64, i8, i16, i32, i64, f16, f32, f64, String, &str, bool, ());
+impl<T> From<ValueType> for Option<T>
+where
+    T: From<ValueType> + NotValueType, /* This ensures that only types that implement From<ValueType> are allowed */
+{
+    fn from(v: ValueType) -> Self {
+        match v {
+            ValueType::Primitive(PrimitiveValue::Null) => None,
+            _ => Some(v.into()),
+        }
+    }
+}
+// First, implement the `From<ValueType>` trait for `Option<T>` where T is not ValueType.
+// impl<T> From<ValueType> for Option<T>
+// where
+//     T: From<ValueType>,
+// {
+//     fn from(v: ValueType) -> Self {
+//         match v {
+//             ValueType::Primitive(PrimitiveValue::Null) => None,
+//             v => Some(v.into()), // Use the custom Into implementation
+//         }
+//     }
+// }
 impl From<&JSONValue> for ValueType {
     fn from(v: &JSONValue) -> Self {
         match v {

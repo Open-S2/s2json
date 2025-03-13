@@ -10,7 +10,6 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-        # os: [ubuntu-latest, macos-latest, windows-latest]
 
     steps:
     - name: Checkout code
@@ -35,8 +34,11 @@ jobs:
       with:
         toolchain: nightly
         override: true
-        components: rustfmt, clippy
-    
+        components: llvm-tools-preview, rustfmt, clippy
+
+    - name: Install cargo-llvm-cov
+      run: cargo install cargo-llvm-cov
+
     - name: Build Rust project
       run: cargo build
       shell: bash
@@ -49,12 +51,13 @@ jobs:
       run: cargo fmt -- --check
       shell: bash
 
-    # Install cargo-tarpaulin
-    - name: Install cargo-tarpaulin
-      run: cargo install cargo-tarpaulin
-
-    # Run tarpaulin to calculate and enforce coverage
     - name: Run Coverage and Enforce Threshold
-      # run: cargo tarpaulin # no threshold for now until complete
-      run: cargo tarpaulin -p s2json-core --fail-under 95
+      run: |
+        cargo llvm-cov --lcov --output-path coverage/lcov.info --workspace
+        COVERAGE=$(cargo llvm-cov --summary-only --workspace | grep -oP '\d+\.\d+(?=%)' || echo 0)
+        echo "Code Coverage: $COVERAGE%"
+        if (( $(echo "$COVERAGE < 95" | bc -l) )); then
+          echo "Code coverage is below 95%! Failing..."
+          exit 1
+        fi
       shell: bash

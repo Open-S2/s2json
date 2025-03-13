@@ -89,103 +89,111 @@ mod tests {
         assert_eq!(back_to_struct, test_struct);
     }
 
-    //     #[test]
-    //     fn float_test() {
-    //         #[derive(
-    //             MValueDerive, Serialize, Deserialize, Debug, Clone, PartialEq, Default,
-    //         )]
-    //         pub struct TestStruct {
-    //             pub a: f32,
-    //             pub b: f64,
-    //         }
+    #[test]
+    fn float_test() {
+        #[derive(MValueDerive, Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
+        pub struct TestStruct {
+            pub a: f32,
+            pub b: f64,
+        }
 
-    //         let test_struct = TestStruct { a: 1.0, b: 2.0 };
+        let test_struct = TestStruct { a: 1.0, b: 2.0 };
 
-    //         let mvalue = test_struct.into(); // Ensure this method exists
-    //         println!("{:?}", mvalue); // Debug output
-    //         assert_eq!(
-    //             mvalue,
-    //             Value::from([
-    //                 ("a".into(), ValueType::Primitive(PrimitiveValue::F64(1.0))),
-    //                 ("b".into(), ValueType::Primitive(PrimitiveValue::F64(2.0))),
-    //             ])
-    //         );
-    //     }
+        let mvalue: MValue = test_struct.clone().into(); // Ensure this method exists
+        println!("{:?}", mvalue); // Debug output
+        assert_eq!(
+            mvalue,
+            Value::from([
+                ("a".into(), ValueType::Primitive(PrimitiveValue::F32(1.0))),
+                ("b".into(), ValueType::Primitive(PrimitiveValue::F64(2.0))),
+            ])
+        );
 
-    //     #[test]
-    //     fn bool_test() {
-    //         #[derive(
-    //             MValueDerive, Serialize, Deserialize, Debug, Clone, PartialEq, Default,
-    //         )]
-    //         pub struct TestStruct {
-    //             pub a: bool,
-    //         }
+        let back_to_struct: TestStruct = mvalue.into();
+        assert_eq!(back_to_struct, test_struct);
+    }
 
-    //         let test_struct = TestStruct { a: true };
+    #[test]
+    fn bool_test() {
+        #[derive(MValueDerive, Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
+        pub struct TestStruct {
+            pub a: bool,
+        }
 
-    //         let mvalue = test_struct.into(); // Ensure this method exists
-    //         println!("{:?}", mvalue); // Debug output
-    //         assert_eq!(
-    //             mvalue,
-    //             Value::from([("a".into(), ValueType::Primitive(PrimitiveValue::Bool(true)))]),
-    //         );
-    //     }
+        let test_struct = TestStruct { a: true };
 
-    //     #[test]
-    //     fn nested_object_test() {
-    //         #[derive(MValueDerive, Serialize, Deserialize, Debug)]
-    //         pub struct NestedStruct {
-    //             a: String,
-    //             b: u32,
-    //         }
-    //         #[derive(MValueDerive, Serialize, Deserialize, Debug)]
-    //         pub struct TestStruct {
-    //             pub a: NestedStruct,
-    //             pub b: u32,
-    //         }
+        let mvalue: MValue = test_struct.clone().into(); // Ensure this method exists
+        println!("{:?}", mvalue); // Debug output
+        assert_eq!(
+            mvalue,
+            Value::from([("a".into(), ValueType::Primitive(PrimitiveValue::Bool(true)))]),
+        );
 
-    //         let test_struct = TestStruct { a: NestedStruct { a: "a".into(), b: 1 }, b: 2 };
+        let back_to_struct: TestStruct = mvalue.into();
+        assert_eq!(back_to_struct, test_struct);
+    }
 
-    //         let mvalue = test_struct.into(); // Ensure this method exists
-    //         println!("{:?}", mvalue); // Debug output
-    //         assert_eq!(
-    //             mvalue,
-    //             Value::from([
-    //                 (
-    //                     "a".into(),
-    //                     ValueType::Nested(Value::from([
-    //                         ("a".into(), ValueType::Primitive(PrimitiveValue::String("a".into()))),
-    //                         ("b".into(), ValueType::Primitive(PrimitiveValue::U64(1))),
-    //                     ])),
-    //                 ),
-    //                 ("b".into(), ValueType::Primitive(PrimitiveValue::U64(2))),
-    //             ])
-    //         );
-    //     }
+    #[test]
+    fn nested_object_test() {
+        #[derive(MValueDerive, Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
+        pub struct NestedStruct {
+            a: String,
+            b: u32,
+        }
+        #[derive(MValueDerive, Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
+        pub struct TestStruct {
+            pub a: NestedStruct,
+            pub b: u32,
+        }
 
-    //     #[test]
-    //     fn test_option() {
-    //         #[derive(MValueDerive, Serialize, Deserialize, Debug)]
-    //         pub struct TestStruct {
-    //             pub a: Option<u32>,
-    //         }
+        let test_struct = TestStruct { a: NestedStruct { a: "a".into(), b: 1 }, b: 2 };
 
-    //         let test_struct = TestStruct { a: Some(1) };
+        let mvalue: MValue = test_struct.clone().into(); // Ensure this method exists
+        println!("{:?}", mvalue); // Debug output
+        assert_eq!(
+            mvalue,
+            Value::from([
+                (
+                    "a".into(),
+                    ValueType::Nested(Value::from([
+                        ("a".into(), ValueType::Primitive(PrimitiveValue::String("a".into()))),
+                        ("b".into(), ValueType::Primitive(PrimitiveValue::U64(1))),
+                    ])),
+                ),
+                ("b".into(), ValueType::Primitive(PrimitiveValue::U64(2))),
+            ])
+        );
 
-    //         let mvalue = test_struct.into(); // Ensure this method exists
-    //         println!("{:?}", mvalue); // Debug output
-    //         assert_eq!(
-    //             mvalue,
-    //             Value::from([("a".into(), ValueType::Primitive(PrimitiveValue::U64(1)))]),
-    //         );
+        let back_to_struct: TestStruct = mvalue.into();
+        assert_eq!(back_to_struct, test_struct);
+    }
 
-    //         let test_struct = TestStruct { a: None };
+    #[test]
+    fn test_option() {
+        #[derive(MValueDerive, Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
+        pub struct TestStruct {
+            pub a: Option<u32>,
+        }
 
-    //         let mvalue = test_struct.into(); // Ensure this method exists
-    //         println!("{:?}", mvalue); // Debug output
-    //         assert_eq!(
-    //             mvalue,
-    //             Value::from([("a".into(), ValueType::Primitive(PrimitiveValue::Null))]),
-    //         );
-    //     }
+        let test_struct = TestStruct { a: Some(1) };
+
+        let mvalue: MValue = test_struct.clone().into(); // Ensure this method exists
+        println!("{:?}", mvalue); // Debug output
+        assert_eq!(
+            mvalue,
+            Value::from([("a".into(), ValueType::Primitive(PrimitiveValue::U64(1)))]),
+        );
+
+        let back_to_struct: TestStruct = mvalue.into();
+        assert_eq!(back_to_struct, test_struct);
+
+        let test_struct = TestStruct { a: None };
+
+        let mvalue: MValue = test_struct.clone().into(); // Ensure this method exists
+        println!("{:?}", mvalue); // Debug output
+        assert_eq!(mvalue, Value::from([("a".into(), ValueType::Primitive(PrimitiveValue::Null))]));
+
+        let back_to_struct: TestStruct = mvalue.into();
+        assert_eq!(back_to_struct, test_struct);
+    }
 }
