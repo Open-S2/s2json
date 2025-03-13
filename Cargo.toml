@@ -1,5 +1,5 @@
 [workspace]
-members = ["rust", "rust-derive"]
+members = ["rust", "rust-core", "rust-derive"]
 default-members = ["rust"]
 resolver = "2"
 
