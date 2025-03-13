@@ -16,7 +16,7 @@ license = "MIT"
 proc-macro2 = "1.0"
 quote = "1.0"
 syn = { version = "1.0", features = ["derive"] }
-s2json-core = { path = "../rust-core", version = "*" }
+s2json-core = { path = "../rust-core", version = "1" }
 
 [dev-dependencies]
 serde = { version = "1.0", default-features = false, features = ["alloc", "derive"] }
