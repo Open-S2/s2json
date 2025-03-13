@@ -1,3 +1,5 @@
+extern crate s2json_core;
+
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{Data, Fields};
@@ -24,30 +26,30 @@ fn generate_to_mvalue(ast: &syn::DeriveInput) -> TokenStream {
 
     let gen = quote! {
         /// Starting from an MValue, convert to a struct
-        impl From<s2json_core::MValue> for #name {
-            fn from(mut m: s2json_core::MValue) -> Self {
+        impl From<MValue> for #name {
+            fn from(mut m: MValue) -> Self {
                 #from_mvalue
             }
         }
         /// If this struct is nested into another struct, pull out the MValue and let From<MValue> handle
-        impl From<s2json_core::ValueType> for #name {
-            fn from(value: s2json_core::ValueType) -> Self {
+        impl From<ValueType> for #name {
+            fn from(value: ValueType) -> Self {
                 match value {
-                    s2json_core::ValueType::Nested(v) => v.into(),
+                    ValueType::Nested(v) => v.into(),
                     _ => #name::default(),
                 }
             }
         }
         /// Starting from a struct, convert to an MValue
-        impl From<#name> for s2json_core::MValue {
-            fn from(value: #name) -> s2json_core::MValue {
+        impl From<#name> for MValue {
+            fn from(value: #name) -> MValue {
                 #into_mvalue
             }
         }
         /// If this struct is nested into another struct, convert to a ValueType that's nested
-        impl From<#name> for s2json_core::ValueType {
-            fn from(value: #name) -> s2json_core::ValueType {
-                s2json_core::ValueType::Nested(value.into())
+        impl From<#name> for ValueType {
+            fn from(value: #name) -> ValueType {
+                ValueType::Nested(value.into())
             }
         }
     };
@@ -79,7 +81,7 @@ fn generate_conversions(fields: &Fields) -> (proc_macro2::TokenStream, proc_macr
     };
 
     let into_mvalue = quote! {
-        let mut map = s2json_core::MValue::new();
+        let mut map = MValue::new();
         #(#into_insertions)*
         map
     };
