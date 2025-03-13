@@ -200,4 +200,32 @@ mod tests {
         let back_to_struct: TestStruct = mvalue.into();
         assert_eq!(back_to_struct, test_struct);
     }
+
+    #[test]
+    fn test_m_value_nested() {
+        #[derive(MValueDerive, Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
+        pub struct TestStruct {
+            pub a: MValue,
+        }
+
+        let test_struct = TestStruct {
+            a: MValue::from([("b".into(), ValueType::Primitive(PrimitiveValue::U64(1)))]),
+        };
+
+        let mvalue: MValue = test_struct.clone().into(); // Ensure this method exists
+        println!("{:?}", mvalue); // Debug output
+        assert_eq!(
+            mvalue,
+            Value::from([(
+                "a".into(),
+                ValueType::Nested(Value::from([(
+                    "b".into(),
+                    ValueType::Primitive(PrimitiveValue::U64(1))
+                )]))
+            )]),
+        );
+
+        let back_to_struct: TestStruct = mvalue.into();
+        assert_eq!(back_to_struct, test_struct);
+    }
 }

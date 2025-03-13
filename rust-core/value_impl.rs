@@ -421,6 +421,14 @@ impl From<Value> for ValueType {
         ValueType::Nested(v)
     }
 }
+impl From<ValueType> for Value {
+    fn from(v: ValueType) -> Self {
+        match v {
+            ValueType::Nested(v) => v,
+            _ => Value::default(),
+        }
+    }
+}
 impl<T> From<Option<T>> for ValueType
 where
     T: Into<ValueType>,
