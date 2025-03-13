@@ -79,7 +79,7 @@ fn generate_conversions(fields: &Fields) -> (proc_macro2::TokenStream, proc_macr
     };
 
     let into_mvalue = quote! {
-        let mut map = MValue::new();
+        let mut map = s2json_core::MValue::new();
         #(#into_insertions)*
         map
     };
