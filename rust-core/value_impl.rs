@@ -350,20 +350,6 @@ macro_rules! impl_from_int {
     };
 }
 impl_from_int!(i8, i16, i32, i64);
-
-impl From<f16> for ValueType {
-    fn from(v: f16) -> Self {
-        ValueType::Primitive(PrimitiveValue::F32(v as f32))
-    }
-}
-impl From<ValueType> for f16 {
-    fn from(v: ValueType) -> Self {
-        match v {
-            ValueType::Primitive(PrimitiveValue::F32(v)) => v as f16,
-            _ => 0.0,
-        }
-    }
-}
 impl From<f32> for ValueType {
     fn from(v: f32) -> Self {
         ValueType::Primitive(PrimitiveValue::F32(v))
@@ -457,7 +443,7 @@ macro_rules! impl_not_value_type {
         )*
     };
 }
-impl_not_value_type!(u8, u16, u32, u64, i8, i16, i32, i64, f16, f32, f64, String, &str, bool, ());
+impl_not_value_type!(u8, u16, u32, u64, i8, i16, i32, i64, f32, f64, String, &str, bool, ());
 impl<T> From<ValueType> for Option<T>
 where
     T: From<ValueType> + NotValueType, /* This ensures that only types that implement From<ValueType> are allowed */

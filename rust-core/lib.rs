@@ -1,6 +1,5 @@
 #![no_std]
 #![feature(coverage_attribute)]
-#![feature(f16)]
 #![deny(missing_docs)]
 
 //! The `s2json` Rust crate provides functionalities to read and write S2JSON Spec data structures.

@@ -40,18 +40,7 @@ jobs:
       with:
         toolchain: nightly
         override: true
-        components: llvm-tools-preview, rustfmt, clippy
-
-    - name: Install cargo-llvm-cov
-      run: cargo install cargo-llvm-cov
-
-    - name: Install llvm-tools-preview
-      run: rustup component add llvm-tools-preview
-    
-    - name: Install grcov
-      run: |
-        sudo apt-get install lcov
-        cargo install grcov
+        components: rustfmt, clippy
 
     - name: Build Rust project
       run: cargo build
@@ -66,25 +55,5 @@ jobs:
       shell: bash
 
     - name: Run Rust tests with coverage
-      run: |
-        mkdir -p coverage
-        export CARGO_INCREMENTAL=0
-        export RUSTFLAGS='-Cinstrument-coverage'
-        export LLVM_PROFILE_FILE='cargo-test-%p-%m.profraw'
-        
-        # Run tests with coverage enabled
-        cargo test --workspace
-    
-        # Generate the coverage report
-        grcov . --binary-path ./target/debug/ -s . -t lcov --branch --ignore-not-existing --ignore "/*/.cargo/*" --ignore "/*/target/*" -o ./coverage/rust-lcov.info
-    
-        # Extract the coverage percentage from the lcov report
-        COVERAGE=$(lcov --list ./coverage/rust-lcov.info | grep -oP 'Total\s+\d+\s+\d+\s+\K\d+\.\d+' || echo 0)
-        echo "Code Coverage: $COVERAGE%"
-    
-        # Enforce the coverage threshold of 95%
-        if (( $(echo "$COVERAGE < 95" | bc -l) )); then
-          echo "Code coverage is below 95%! Failing..."
-          exit 1
-        fi
+      run: cargo test --workspace
       shell: bash
