@@ -1,9 +1,6 @@
-use serde::{Deserialize, Serialize};
-
-use alloc::vec::Vec;
-
-/// Importing necessary types (equivalent to importing from 'values')
 use crate::*;
+use alloc::vec::Vec;
+use serde::{Deserialize, Serialize};
 
 /// Definition of a Point. May represent WebMercator Lon-Lat or S2Geometry S-T
 #[derive(Copy, Clone, Serialize, Deserialize, Debug, PartialEq, Default)]

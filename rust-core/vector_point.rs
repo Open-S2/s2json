@@ -1,11 +1,11 @@
-use serde::{Deserialize, Serialize};
-
-use core::cmp::Ordering;
-use core::f64::consts::PI;
-use core::fmt::Debug;
-use core::ops::{Add, Div, Mul, Neg, Rem, RemAssign, Sub};
-
+use core::{
+    cmp::Ordering,
+    f64::consts::PI,
+    fmt::Debug,
+    ops::{Add, Div, Mul, Neg, Rem, RemAssign, Sub},
+};
 use libm::{atan, fabs, fmod, log, pow, sin, sinh, sqrt};
+use serde::{Deserialize, Serialize};
 
 /// Importing necessary types (equivalent to importing from 'values')
 use crate::*;
@@ -245,11 +245,11 @@ impl<M: MValueCompatible> Ord for VectorPoint<M> {
     fn cmp(&self, other: &VectorPoint<M>) -> Ordering {
         match self.x.partial_cmp(&other.x) {
             Some(Ordering::Equal) => {}
-            other => return other.unwrap_or(Ordering::Greater), // Handle cases where `x` comparison is not equal
+            other => return other.unwrap_or(Ordering::Greater), /* Handle cases where `x` comparison is not equal */
         }
         match self.y.partial_cmp(&other.y) {
             Some(Ordering::Equal) => {}
-            other => return other.unwrap_or(Ordering::Greater), // Handle cases where `y` comparison is not equal
+            other => return other.unwrap_or(Ordering::Greater), /* Handle cases where `y` comparison is not equal */
         }
         match self.z.partial_cmp(&other.z) {
             Some(order) => order,

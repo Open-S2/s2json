@@ -56,5 +56,5 @@ jobs:
     # Run tarpaulin to calculate and enforce coverage
     - name: Run Coverage and Enforce Threshold
       # run: cargo tarpaulin # no threshold for now until complete
-      run: cargo tarpaulin --fail-under 95
+      run: cargo tarpaulin -p s2json-core --fail-under 95
       shell: bash

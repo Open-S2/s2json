@@ -1,9 +1,6 @@
-use serde::{Deserialize, Serialize};
-
-use alloc::vec::Vec;
-
-/// Importing necessary types (equivalent to importing from 'values')
 use crate::*;
+use alloc::vec::Vec;
+use serde::{Deserialize, Serialize};
 
 /// Enum to represent specific vector geometry types as strings
 #[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Default)]
@@ -285,13 +282,13 @@ impl Default for VectorOffsets {
         VectorOffsets::LineOffset(0.0)
     }
 }
-/** An offset defines how far the starting line is from the original starting point pre-slice */
+/// An offset defines how far the starting line is from the original starting point pre-slice
 pub type VectorLineOffset = f64;
-/** A collection of offsets */
+/// A collection of offsets
 pub type VectorMultiLineOffset = Vec<VectorLineOffset>;
-/** A collection of offsets */
+/// A collection of offsets
 pub type VectorPolygonOffset = VectorMultiLineOffset;
-/** A collection of collections of offsets */
+/// A collection of collections of offsets
 pub type VectorMultiPolygonOffset = Vec<VectorPolygonOffset>;
 
 /// PointGeometry is a point

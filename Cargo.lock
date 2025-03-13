@@ -46,7 +46,15 @@ checksum = "6ea1a2d0a644769cc99faa24c3ad26b379b786fe7c36fd3c546254801650e6dd"
 
 [[package]]
 name = "s2json"
-version = "1.13.1"
+version = "1.14.0"
+dependencies = [
+ "s2json-core",
+ "s2json-derive",
+]
+
+[[package]]
+name = "s2json-core"
+version = "1.14.0"
 dependencies = [
  "libm",
  "serde",
@@ -55,11 +63,11 @@ dependencies = [
 
 [[package]]
 name = "s2json-derive"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [
  "proc-macro2",
  "quote",
- "s2json",
+ "s2json-core",
  "serde",
  "serde_json",
  "syn 1.0.109",

@@ -1,8 +1,9 @@
-use alloc::{string::String, string::ToString, vec::Vec};
-
-use libm::round;
-
 use crate::*;
+use alloc::{
+    string::{String, ToString},
+    vec::Vec,
+};
+use libm::round;
 
 // PrimitiveValue
 impl PrimitiveValue {
@@ -283,19 +284,84 @@ impl From<&str> for ValueType {
         ValueType::Primitive(PrimitiveValue::String(s.to_string()))
     }
 }
+impl AsRef<str> for ValueType {
+    fn as_ref(&self) -> &str {
+        match self {
+            ValueType::Primitive(PrimitiveValue::String(s)) => s.as_str(),
+            _ => "",
+        }
+    }
+}
 impl From<String> for ValueType {
     fn from(s: String) -> Self {
         ValueType::Primitive(PrimitiveValue::String(s))
     }
 }
-impl From<u64> for ValueType {
-    fn from(v: u64) -> Self {
-        ValueType::Primitive(PrimitiveValue::U64(v))
+impl From<ValueType> for String {
+    fn from(v: ValueType) -> Self {
+        match v {
+            ValueType::Primitive(PrimitiveValue::String(s)) => s,
+            _ => "".to_string(),
+        }
     }
 }
-impl From<i64> for ValueType {
-    fn from(v: i64) -> Self {
-        ValueType::Primitive(PrimitiveValue::I64(v))
+
+// Implement for u8, u16, u32, u64
+macro_rules! impl_from_int {
+    ($($t:ty),*) => {
+        $(
+            impl From<$t> for ValueType {
+                fn from(v: $t) -> Self {
+                    ValueType::Primitive(PrimitiveValue::U64(v as u64))
+                }
+            }
+
+            impl From<ValueType> for $t {
+                fn from(v: ValueType) -> Self {
+                    match v {
+                        ValueType::Primitive(PrimitiveValue::U64(v)) => v as $t,
+                        _ => 0,
+                    }
+                }
+            }
+        )*
+    };
+}
+impl_from_int!(u8, u16, u32, u64);
+// Implement for i8, i16, i32, i64
+macro_rules! impl_from_int {
+    ($($t:ty),*) => {
+        $(
+            impl From<$t> for ValueType {
+                fn from(v: $t) -> Self {
+                    ValueType::Primitive(PrimitiveValue::I64(v as i64))
+                }
+            }
+
+            impl From<ValueType> for $t {
+                fn from(v: ValueType) -> Self {
+                    match v {
+                        ValueType::Primitive(PrimitiveValue::I64(v)) => v as $t,
+                        _ => 0,
+                    }
+                }
+            }
+        )*
+    };
+}
+impl_from_int!(i8, i16, i32, i64);
+
+impl From<f16> for ValueType {
+    fn from(v: f16) -> Self {
+        ValueType::Primitive(PrimitiveValue::F32(v as f32))
+    }
+}
+impl From<ValueType> for f16 {
+    fn from(v: ValueType) -> Self {
+        match v {
+            ValueType::Primitive(PrimitiveValue::F32(v)) => v as f16,
+            _ => 0.0,
+        }
     }
 }
 impl From<f32> for ValueType {
@@ -303,9 +369,25 @@ impl From<f32> for ValueType {
         ValueType::Primitive(PrimitiveValue::F32(v))
     }
 }
+impl From<ValueType> for f32 {
+    fn from(v: ValueType) -> Self {
+        match v {
+            ValueType::Primitive(PrimitiveValue::F32(v)) => v,
+            _ => 0.0,
+        }
+    }
+}
 impl From<f64> for ValueType {
     fn from(v: f64) -> Self {
         ValueType::Primitive(PrimitiveValue::F64(v))
+    }
+}
+impl From<ValueType> for f64 {
+    fn from(v: ValueType) -> Self {
+        match v {
+            ValueType::Primitive(PrimitiveValue::F64(v)) => v,
+            _ => 0.0,
+        }
     }
 }
 impl From<bool> for ValueType {
@@ -313,10 +395,21 @@ impl From<bool> for ValueType {
         ValueType::Primitive(PrimitiveValue::Bool(v))
     }
 }
+impl From<ValueType> for bool {
+    fn from(v: ValueType) -> Self {
+        match v {
+            ValueType::Primitive(PrimitiveValue::Bool(v)) => v,
+            _ => false,
+        }
+    }
+}
 impl From<()> for ValueType {
     fn from(_: ()) -> Self {
         ValueType::Primitive(PrimitiveValue::Null)
     }
+}
+impl From<ValueType> for () {
+    fn from(_: ValueType) -> Self {}
 }
 impl<T> From<Vec<T>> for ValueType
 where
@@ -324,6 +417,17 @@ where
 {
     fn from(v: Vec<T>) -> Self {
         ValueType::Array(v.into_iter().map(Into::into).collect())
+    }
+}
+impl<T> From<ValueType> for Vec<T>
+where
+    T: From<ValuePrimitiveType>,
+{
+    fn from(v: ValueType) -> Self {
+        match v {
+            ValueType::Array(v) => v.into_iter().map(Into::into).collect(),
+            _ => Vec::new(),
+        }
     }
 }
 impl From<Value> for ValueType {

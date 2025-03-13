@@ -1,11 +1,10 @@
-use serde::de::{self, SeqAccess, Visitor};
-use serde::ser::SerializeTuple;
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
-
-use alloc::fmt;
-
-/// Importing necessary types (equivalent to importing from 'values')
 use crate::*;
+use alloc::fmt;
+use serde::{
+    de::{self, SeqAccess, Visitor},
+    ser::SerializeTuple,
+    Deserialize, Deserializer, Serialize, Serializer,
+};
 
 /// A BBOX is defined in lon-lat space and helps with zooming motion to
 /// see the entire line or polygon

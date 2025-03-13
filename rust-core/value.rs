@@ -1,9 +1,6 @@
-use serde::{Deserialize, Serialize};
-
-use alloc::string::String;
-use alloc::vec::Vec;
-
 use crate::Map;
+use alloc::{string::String, vec::Vec};
+use serde::{Deserialize, Serialize};
 
 /// Primitive types supported by Properties
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]

@@ -5,13 +5,11 @@ pub mod primitive;
 /// Vector geometry types (used by the s2json spec for both WGS84 and S2Geometry)
 pub mod vector;
 
+use crate::{Face, MValue, MValueCompatible};
 pub use bbox::*;
 pub use primitive::*;
-pub use vector::*;
-
 use serde::{Deserialize, Serialize};
-
-use crate::{Face, MValue, MValueCompatible};
+pub use vector::*;
 
 /// The axis to apply an operation to
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
@@ -42,8 +40,7 @@ mod tests {
     use crate::*;
 
     use super::*;
-    use alloc::string::ToString;
-    use alloc::vec;
+    use alloc::{string::ToString, vec};
     use serde_json::json;
 
     #[test]
