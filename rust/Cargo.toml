@@ -20,8 +20,8 @@ bench = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-s2json-core = { path = "../rust-core" }
-s2json-derive = { path = "../rust-derive", optional = true }
+s2json-core = { path = "../rust-core", version = "*" }
+s2json-derive = { path = "../rust-derive", optional = true, version = "*" }
 
 [features]
 default = ["derive"]
