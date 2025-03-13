@@ -11,12 +11,16 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
 
+    # checkout
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
         submodules: recursive
         fetch-depth: 0
+
+    # bun
 
     - name: Set up Bun
       uses: oven-sh/setup-bun@v2
@@ -29,6 +33,8 @@ jobs:
     - name: Run JavaScript/TypeScript tests
       run: bun run test
 
+    # rust
+
     - name: Set up Rust
       uses: actions-rs/toolchain@v1
       with:
@@ -38,6 +44,9 @@ jobs:
 
     - name: Install cargo-llvm-cov
       run: cargo install cargo-llvm-cov
+
+    - name: Install llvm-tools-preview
+      run: rustup component add llvm-tools-preview
 
     - name: Build Rust project
       run: cargo build
@@ -51,11 +60,24 @@ jobs:
       run: cargo fmt -- --check
       shell: bash
 
-    - name: Run Coverage and Enforce Threshold
+    - name: Run Rust tests with coverage
       run: |
-        cargo llvm-cov --lcov --output-path coverage/lcov.info --workspace
-        COVERAGE=$(cargo llvm-cov --summary-only --workspace | grep -oP '\d+\.\d+(?=%)' || echo 0)
+        mkdir -p coverage
+        export CARGO_INCREMENTAL=0
+        export RUSTFLAGS='-Cinstrument-coverage'
+        export LLVM_PROFILE_FILE='cargo-test-%p-%m.profraw'
+        
+        # Run tests with coverage enabled
+        cargo test --workspace
+    
+        # Generate the coverage report
+        grcov . --binary-path ./target/debug/ -s . -t lcov --branch --ignore-not-existing --ignore "/*/.cargo/*" --ignore "/*/target/*" -o ./coverage/rust-lcov.info
+    
+        # Extract the coverage percentage from the lcov report
+        COVERAGE=$(lcov --list ./coverage/rust-lcov.info | grep -oP 'Total\s+\d+\s+\d+\s+\K\d+\.\d+' || echo 0)
         echo "Code Coverage: $COVERAGE%"
+    
+        # Enforce the coverage threshold of 95%
         if (( $(echo "$COVERAGE < 95" | bc -l) )); then
           echo "Code coverage is below 95%! Failing..."
           exit 1
