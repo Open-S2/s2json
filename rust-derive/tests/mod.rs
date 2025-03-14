@@ -2,12 +2,9 @@
 mod tests {
     extern crate alloc;
 
-    // use alloc::vec::Vec;
-    use alloc::string::String;
     use s2json_core::{MValue, PrimitiveValue, Value, ValueType};
     use s2json_derive::MValueCompatible as MValueDerive;
     use serde::{Deserialize, Serialize};
-    use std::str;
 
     #[test]
     fn basic_test() {
@@ -20,7 +17,7 @@ mod tests {
         let test_struct = TestStruct { name: "example".to_string(), value: 42 };
 
         let mvalue: MValue = test_struct.clone().into(); // Ensure this method exists
-        println!("{:?}", mvalue); // Debug output
+                                                         // println!("{:?}", mvalue); // Debug output
         assert_eq!(
             mvalue,
             Value::from([
@@ -47,7 +44,7 @@ mod tests {
         let test_struct = TestStruct { a: 1, b: 2, c: 3, d: 4, e: 5 };
 
         let mvalue: MValue = test_struct.clone().into(); // Ensure this method exists
-        println!("{:?}", mvalue); // Debug output
+                                                         // println!("{:?}", mvalue); // Debug output
         assert_eq!(
             mvalue,
             Value::from([
@@ -77,7 +74,7 @@ mod tests {
         let test_struct = TestStruct { a: -1, b: 2, c: -3, d: 4, e: -5 };
 
         let mvalue: MValue = test_struct.clone().into(); // Ensure this method exists
-        println!("{:?}", mvalue); // Debug output
+                                                         // println!("{:?}", mvalue); // Debug output
         assert_eq!(
             mvalue,
             Value::from([
@@ -104,7 +101,7 @@ mod tests {
         let test_struct = TestStruct { a: 1.0, b: 2.0 };
 
         let mvalue: MValue = test_struct.clone().into(); // Ensure this method exists
-        println!("{:?}", mvalue); // Debug output
+                                                         // println!("{:?}", mvalue); // Debug output
         assert_eq!(
             mvalue,
             Value::from([
@@ -127,7 +124,7 @@ mod tests {
         let test_struct = TestStruct { a: true };
 
         let mvalue: MValue = test_struct.clone().into(); // Ensure this method exists
-        println!("{:?}", mvalue); // Debug output
+                                                         // println!("{:?}", mvalue); // Debug output
         assert_eq!(
             mvalue,
             Value::from([("a".into(), ValueType::Primitive(PrimitiveValue::Bool(true)))]),
@@ -153,7 +150,7 @@ mod tests {
         let test_struct = TestStruct { a: NestedStruct { a: "a".into(), b: 1 }, b: 2 };
 
         let mvalue: MValue = test_struct.clone().into(); // Ensure this method exists
-        println!("{:?}", mvalue); // Debug output
+                                                         // println!("{:?}", mvalue); // Debug output
         assert_eq!(
             mvalue,
             Value::from([
@@ -182,7 +179,7 @@ mod tests {
         let test_struct = TestStruct { a: Some(1) };
 
         let mvalue: MValue = test_struct.clone().into(); // Ensure this method exists
-        println!("{:?}", mvalue); // Debug output
+                                                         // println!("{:?}", mvalue); // Debug output
         assert_eq!(
             mvalue,
             Value::from([("a".into(), ValueType::Primitive(PrimitiveValue::U64(1)))]),
@@ -194,7 +191,7 @@ mod tests {
         let test_struct = TestStruct { a: None };
 
         let mvalue: MValue = test_struct.clone().into(); // Ensure this method exists
-        println!("{:?}", mvalue); // Debug output
+                                                         // println!("{:?}", mvalue); // Debug output
         assert_eq!(mvalue, Value::from([("a".into(), ValueType::Primitive(PrimitiveValue::Null))]));
 
         let back_to_struct: TestStruct = mvalue.into();
@@ -213,7 +210,7 @@ mod tests {
         };
 
         let mvalue: MValue = test_struct.clone().into(); // Ensure this method exists
-        println!("{:?}", mvalue); // Debug output
+                                                         // println!("{:?}", mvalue); // Debug output
         assert_eq!(
             mvalue,
             Value::from([(
