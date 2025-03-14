@@ -1,6 +1,5 @@
 [workspace]
 members = ["rust", "rust-core", "rust-derive"]
-default-members = ["rust"]
 resolver = "2"
 
 [profile.bench]

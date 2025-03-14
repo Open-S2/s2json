@@ -1,6 +1,8 @@
 use proc_macro::TokenStream;
+use proc_macro2::Span;
+use proc_macro_crate::{crate_name, FoundCrate};
 use quote::quote;
-use syn::{Data, Fields};
+use syn::{Data, Fields, Ident};
 
 /// Derives the `MValueCompatible` trait for a struct to convert it to a `MValue`.
 #[proc_macro_derive(MValueCompatible)]
@@ -12,6 +14,13 @@ pub fn mvalue_compatible_derive(input: TokenStream) -> TokenStream {
 fn generate_to_mvalue(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let data = &ast.data;
+
+    let crate_name = match crate_name("s2json") {
+        Ok(FoundCrate::Itself) => "s2json".to_string(),
+        Ok(FoundCrate::Name(name)) => name,
+        Err(_) => "s2json_core".to_string(), // Fallback if resolution fails (happens for testing)
+    };
+    let s2json_core = Ident::new(&crate_name, Span::call_site());
 
     let fields = match data {
         Data::Struct(data_struct) => &data_struct.fields,
@@ -30,7 +39,9 @@ fn generate_to_mvalue(ast: &syn::DeriveInput) -> TokenStream {
         )]
         const _: () = {
             #[allow(unused_extern_crates, clippy::useless_attribute)]
-            extern crate s2json_core as _s2json_core;
+            extern crate #s2json_core as _s2json_core;
+            #[allow(unused_extern_crates, clippy::useless_attribute)]
+            extern crate alloc;
             // This may be necessary if the struct is using MValue as a variable for instance
             use alloc::string::ToString;
 
