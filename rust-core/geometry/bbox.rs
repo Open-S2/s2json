@@ -6,6 +6,28 @@ use serde::{
     Deserialize, Deserializer, Serialize, Serializer,
 };
 
+trait Bounded {
+    fn min_value() -> Self;
+    fn max_value() -> Self;
+}
+macro_rules! impl_bounded {
+    ($($t:ty),*) => {
+        $(
+            impl Bounded for $t {
+                fn min_value() -> Self {
+                    <$t>::MIN
+                }
+                fn max_value() -> Self {
+                    <$t>::MAX
+                }
+            }
+        )*
+    };
+}
+
+// Implement for common numeric types
+impl_bounded!(i8, i16, i32, i64, i128, u8, u16, u32, u64, u128, isize, usize, f32, f64);
+
 /// A BBOX is defined in lon-lat space and helps with zooming motion to
 /// see the entire line or polygon
 /// The order is (left, bottom, right, top)
@@ -21,6 +43,46 @@ pub struct BBox<T = f64> {
     pub right: T,
     /// top most latitude (WM) or S (S2)
     pub top: T,
+}
+impl<T> From<BBox<T>> for MValue
+where
+    T: Into<ValueType>,
+{
+    fn from(bbox: BBox<T>) -> MValue {
+        MValue::from([
+            ("left".into(), bbox.left.into()),
+            ("bottom".into(), bbox.bottom.into()),
+            ("right".into(), bbox.right.into()),
+            ("top".into(), bbox.top.into()),
+        ])
+    }
+}
+impl<T> From<MValue> for BBox<T>
+where
+    T: From<ValueType>,
+{
+    fn from(mvalue: MValue) -> Self {
+        BBox {
+            left: mvalue.get("left").unwrap().clone().into(),
+            bottom: mvalue.get("bottom").unwrap().clone().into(),
+            right: mvalue.get("right").unwrap().clone().into(),
+            top: mvalue.get("top").unwrap().clone().into(),
+        }
+    }
+}
+impl<T> MValueCompatible for BBox<T>
+where
+    ValueType: From<T>,
+    T: From<ValueType> + Default + Bounded + Copy,
+{
+}
+impl<T> Default for BBox<T>
+where
+    T: Default + Bounded + Copy,
+{
+    fn default() -> Self {
+        BBox::new(T::max_value(), T::max_value(), T::min_value(), T::min_value())
+    }
 }
 impl<T> BBox<T> {
     /// Creates a new BBox
@@ -104,11 +166,6 @@ impl<T> BBox<T> {
         }
 
         new_bbox
-    }
-}
-impl Default for BBox<f64> {
-    fn default() -> Self {
-        BBox::new(f64::INFINITY, f64::INFINITY, -f64::INFINITY, -f64::INFINITY)
     }
 }
 impl BBox<f64> {
@@ -376,14 +433,7 @@ where
 }
 impl Default for BBox3D<f64> {
     fn default() -> Self {
-        BBox3D::new(
-            f64::INFINITY,
-            f64::INFINITY,
-            -f64::INFINITY,
-            -f64::INFINITY,
-            f64::INFINITY,
-            -f64::INFINITY,
-        )
+        BBox3D::new(f64::MAX, f64::MAX, f64::MIN, f64::MIN, f64::MAX, f64::MIN)
     }
 }
 impl BBox3D<f64> {
@@ -394,8 +444,8 @@ impl BBox3D<f64> {
             point.y,
             point.x,
             point.y,
-            point.z.unwrap_or(f64::INFINITY),
-            point.z.unwrap_or(-f64::INFINITY),
+            point.z.unwrap_or(f64::MAX),
+            point.z.unwrap_or(f64::MIN),
         )
     }
 
@@ -456,8 +506,8 @@ impl BBox3D<f64> {
             bottom: division_factor * v - 1.0,
             right: division_factor * (u + 1.0) - 1.0,
             top: division_factor * (v + 1.0) - 1.0,
-            near: f64::INFINITY,
-            far: -f64::INFINITY,
+            near: f64::MAX,
+            far: f64::MIN,
         }
     }
 
@@ -470,8 +520,8 @@ impl BBox3D<f64> {
             bottom: division_factor * t,
             right: division_factor * (s + 1.),
             top: division_factor * (t + 1.),
-            near: f64::INFINITY,
-            far: -f64::INFINITY,
+            near: f64::MAX,
+            far: f64::MIN,
         }
     }
 }

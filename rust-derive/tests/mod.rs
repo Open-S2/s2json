@@ -2,7 +2,7 @@
 mod tests {
     extern crate alloc;
 
-    use s2json_core::{MValue, PrimitiveValue, Value, ValueType};
+    use s2json_core::{MValue, NotValueType, PrimitiveValue, Value, ValueType};
     use s2json_derive::MValueCompatible as MValueDerive;
     use serde::{Deserialize, Serialize};
 
@@ -220,6 +220,42 @@ mod tests {
                     ValueType::Primitive(PrimitiveValue::U64(1))
                 )]))
             )]),
+        );
+
+        let back_to_struct: TestStruct = mvalue.into();
+        assert_eq!(back_to_struct, test_struct);
+    }
+
+    #[test]
+    fn nested_object_optional_test() {
+        #[derive(MValueDerive, Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
+        pub struct NestedStruct {
+            a: String,
+            b: u32,
+        }
+        impl NotValueType for NestedStruct {}
+        #[derive(MValueDerive, Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
+        pub struct TestStruct {
+            pub a: Option<NestedStruct>,
+            pub b: u32,
+        }
+
+        let test_struct = TestStruct { a: Some(NestedStruct { a: "a".into(), b: 1 }), b: 2 };
+
+        let mvalue: MValue = test_struct.clone().into(); // Ensure this method exists
+                                                         // println!("{:?}", mvalue); // Debug output
+        assert_eq!(
+            mvalue,
+            Value::from([
+                (
+                    "a".into(),
+                    ValueType::Nested(Value::from([
+                        ("a".into(), ValueType::Primitive(PrimitiveValue::String("a".into()))),
+                        ("b".into(), ValueType::Primitive(PrimitiveValue::U64(1))),
+                    ])),
+                ),
+                ("b".into(), ValueType::Primitive(PrimitiveValue::U64(2))),
+            ])
         );
 
         let back_to_struct: TestStruct = mvalue.into();

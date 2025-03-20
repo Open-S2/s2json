@@ -63,24 +63,33 @@ mod tests {
         let default_bbox = BBox::default();
         assert_eq!(
             default_bbox,
-            BBox {
-                left: f64::INFINITY,
-                bottom: f64::INFINITY,
-                right: -f64::INFINITY,
-                top: -f64::INFINITY
-            }
+            BBox { left: f64::MAX, bottom: f64::MAX, right: f64::MIN, top: f64::MIN }
         );
 
         let default_bbox_2 = BBOX::default();
         assert_eq!(
             default_bbox_2,
-            BBOX::BBox(BBox {
-                left: f64::INFINITY,
-                bottom: f64::INFINITY,
-                right: -f64::INFINITY,
-                top: -f64::INFINITY
-            })
+            BBOX::BBox(BBox { left: f64::MAX, bottom: f64::MAX, right: f64::MIN, top: f64::MIN })
         );
+    }
+
+    #[test]
+    fn test_bbox_mvalue() {
+        let bbox = BBox { left: -2.2, bottom: -944.22, right: 1.0, top: 2.0 };
+
+        let m_value: MValue = bbox.into();
+        assert_eq!(
+            m_value,
+            MValue::from([
+                ("left".into(), (-2.2_f64).into()),
+                ("bottom".into(), (-944.22_f64).into()),
+                ("right".into(), (1.0_f64).into()),
+                ("top".into(), (2.0_f64).into()),
+            ])
+        );
+
+        let back_to_bbox: BBox = m_value.into();
+        assert_eq!(back_to_bbox, bbox);
     }
 
     #[test]
@@ -215,12 +224,12 @@ mod tests {
         assert_eq!(
             default_bbox,
             BBox3D {
-                left: f64::INFINITY,
-                bottom: f64::INFINITY,
-                right: -f64::INFINITY,
-                top: -f64::INFINITY,
-                near: f64::INFINITY,
-                far: -f64::INFINITY
+                left: f64::MAX,
+                bottom: f64::MAX,
+                right: f64::MIN,
+                top: f64::MIN,
+                near: f64::MAX,
+                far: f64::MIN
             }
         );
     }
@@ -289,14 +298,7 @@ mod tests {
         let bbox = BBox3D::from_point(&VectorPoint::<MValue>::new(0., 0., None, None));
         assert_eq!(
             bbox,
-            BBox3D {
-                left: 0.0,
-                bottom: 0.0,
-                right: 0.0,
-                top: 0.0,
-                near: f64::INFINITY,
-                far: -f64::INFINITY
-            }
+            BBox3D { left: 0.0, bottom: 0.0, right: 0.0, top: 0.0, near: f64::MAX, far: f64::MIN }
         );
     }
 
@@ -308,14 +310,7 @@ mod tests {
         ]);
         assert_eq!(
             bbox,
-            BBox3D {
-                left: 0.0,
-                bottom: 0.0,
-                right: 1.0,
-                top: 1.5,
-                near: f64::INFINITY,
-                far: -f64::INFINITY
-            }
+            BBox3D { left: 0.0, bottom: 0.0, right: 1.0, top: 1.5, near: f64::MAX, far: f64::MIN }
         );
     }
 
@@ -327,14 +322,7 @@ mod tests {
         ]]);
         assert_eq!(
             bbox,
-            BBox3D {
-                left: 0.0,
-                bottom: 0.0,
-                right: 1.0,
-                top: 1.5,
-                near: f64::INFINITY,
-                far: -f64::INFINITY
-            }
+            BBox3D { left: 0.0, bottom: 0.0, right: 1.0, top: 1.5, near: f64::MAX, far: f64::MIN }
         );
     }
 
@@ -346,14 +334,7 @@ mod tests {
         ]]);
         assert_eq!(
             bbox,
-            BBox3D {
-                left: 0.0,
-                bottom: 0.0,
-                right: 2.0,
-                top: 1.5,
-                near: f64::INFINITY,
-                far: -f64::INFINITY
-            }
+            BBox3D { left: 0.0, bottom: 0.0, right: 2.0, top: 1.5, near: f64::MAX, far: f64::MIN }
         );
     }
 
@@ -371,14 +352,7 @@ mod tests {
         ]);
         assert_eq!(
             bbox,
-            BBox3D {
-                left: -1.0,
-                bottom: 0.0,
-                right: 2.0,
-                top: 3.5,
-                near: f64::INFINITY,
-                far: -f64::INFINITY
-            }
+            BBox3D { left: -1.0, bottom: 0.0, right: 2.0, top: 3.5, near: f64::MAX, far: f64::MIN }
         );
     }
 
@@ -393,8 +367,8 @@ mod tests {
                 bottom: -4.0,
                 right: 20.0,
                 top: -4.0,
-                near: f64::INFINITY,
-                far: -f64::INFINITY
+                near: f64::MAX,
+                far: f64::MIN
             }
         );
     }
@@ -404,27 +378,13 @@ mod tests {
         let bbox = BBox3D::from_st_zoom(0., 0., 0);
         assert_eq!(
             bbox,
-            BBox3D {
-                left: 0.0,
-                bottom: 0.0,
-                right: 1.,
-                top: 1.,
-                near: f64::INFINITY,
-                far: -f64::INFINITY
-            }
+            BBox3D { left: 0.0, bottom: 0.0, right: 1., top: 1., near: f64::MAX, far: f64::MIN }
         );
 
         let bbox = BBox3D::from_st_zoom(1., 0., 1);
         assert_eq!(
             bbox,
-            BBox3D {
-                left: 0.5,
-                bottom: 0.0,
-                right: 1.,
-                top: 0.5,
-                near: f64::INFINITY,
-                far: -f64::INFINITY
-            }
+            BBox3D { left: 0.5, bottom: 0.0, right: 1., top: 0.5, near: f64::MAX, far: f64::MIN }
         );
 
         let bbox = BBox3D::from_st_zoom(2., 0., 2);
@@ -435,48 +395,27 @@ mod tests {
                 bottom: 0.0,
                 right: 0.75,
                 top: 0.25,
-                near: f64::INFINITY,
-                far: -f64::INFINITY
+                near: f64::MAX,
+                far: f64::MIN
             }
         );
 
         let bbox = BBox3D::from_uv_zoom(0., 0., 0);
         assert_eq!(
             bbox,
-            BBox3D {
-                left: -1.0,
-                bottom: -1.0,
-                right: 1.,
-                top: 1.,
-                near: f64::INFINITY,
-                far: -f64::INFINITY
-            }
+            BBox3D { left: -1.0, bottom: -1.0, right: 1., top: 1., near: f64::MAX, far: f64::MIN }
         );
 
         let bbox = BBox3D::from_uv_zoom(1., 0., 1);
         assert_eq!(
             bbox,
-            BBox3D {
-                left: 0.,
-                bottom: -1.0,
-                right: 1.,
-                top: 0.,
-                near: f64::INFINITY,
-                far: -f64::INFINITY
-            }
+            BBox3D { left: 0., bottom: -1.0, right: 1., top: 0., near: f64::MAX, far: f64::MIN }
         );
 
         let bbox = BBox3D::from_uv_zoom(2., 0., 2);
         assert_eq!(
             bbox,
-            BBox3D {
-                left: 0.,
-                bottom: -1.0,
-                right: 0.5,
-                top: -0.5,
-                near: f64::INFINITY,
-                far: -f64::INFINITY
-            }
+            BBox3D { left: 0., bottom: -1.0, right: 0.5, top: -0.5, near: f64::MAX, far: f64::MIN }
         );
     }
 

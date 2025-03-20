@@ -43,6 +43,16 @@ impl<M: MValueCompatible> VectorPoint<M> {
         Self { x, y, z, m, t: None }
     }
 
+    /// Create a new point with xy
+    pub fn new_xy(x: f64, y: f64, m: Option<M>) -> Self {
+        Self { x, y, z: None, m, t: None }
+    }
+
+    /// Create a new point with xyz
+    pub fn new_xyz(x: f64, y: f64, z: f64, m: Option<M>) -> Self {
+        Self { x, y, z: Some(z), m, t: None }
+    }
+
     /// Project the point into the 0->1 coordinate system
     pub fn project(&mut self, bbox: Option<&mut BBox3D>) {
         let y = self.y;
@@ -278,6 +288,26 @@ mod tests {
         assert_eq!(vector_point.x, 1.0);
         assert_eq!(vector_point.y, 2.0);
         assert_eq!(vector_point.z, None);
+        assert_eq!(vector_point.m, None);
+        assert_eq!(vector_point.t, None);
+    }
+
+    #[test]
+    fn new_xy() {
+        let vector_point: VectorPoint = VectorPoint::new_xy(1.0, 2.0, None);
+        assert_eq!(vector_point.x, 1.0);
+        assert_eq!(vector_point.y, 2.0);
+        assert_eq!(vector_point.z, None);
+        assert_eq!(vector_point.m, None);
+        assert_eq!(vector_point.t, None);
+    }
+
+    #[test]
+    fn new_xyz() {
+        let vector_point: VectorPoint = VectorPoint::new_xyz(1.0, 2.0, 3.0, None);
+        assert_eq!(vector_point.x, 1.0);
+        assert_eq!(vector_point.y, 2.0);
+        assert_eq!(vector_point.z, Some(3.0));
         assert_eq!(vector_point.m, None);
         assert_eq!(vector_point.t, None);
     }

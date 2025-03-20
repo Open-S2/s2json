@@ -179,7 +179,7 @@ impl<M: MValueCompatible> VectorGeometry<M> {
     pub fn new_multipoint(coordinates: VectorMultiPoint<M>, bbox: Option<BBox3D>) -> Self {
         VectorGeometry::MultiPoint(VectorMultiPointGeometry {
             _type: VectorGeometryType::MultiPoint,
-            is_3d: coordinates[0].z.is_some(),
+            is_3d: coordinates.iter().any(|point| point.z.is_some()),
             coordinates,
             bbox,
             ..Default::default()
@@ -190,7 +190,7 @@ impl<M: MValueCompatible> VectorGeometry<M> {
     pub fn new_linestring(coordinates: VectorLineString<M>, bbox: Option<BBox3D>) -> Self {
         VectorGeometry::LineString(VectorLineStringGeometry {
             _type: VectorGeometryType::LineString,
-            is_3d: coordinates[0].z.is_some(),
+            is_3d: coordinates.iter().any(|point| point.z.is_some()),
             coordinates,
             bbox,
             ..Default::default()
@@ -204,7 +204,7 @@ impl<M: MValueCompatible> VectorGeometry<M> {
     ) -> Self {
         VectorGeometry::MultiLineString(VectorMultiLineStringGeometry {
             _type: VectorGeometryType::MultiLineString,
-            is_3d: coordinates[0][0].z.is_some(),
+            is_3d: coordinates.iter().any(|line| line.iter().any(|point| point.z.is_some())),
             coordinates,
             bbox,
             ..Default::default()
@@ -215,7 +215,7 @@ impl<M: MValueCompatible> VectorGeometry<M> {
     pub fn new_polygon(coordinates: VectorPolygon<M>, bbox: Option<BBox3D>) -> Self {
         VectorGeometry::Polygon(VectorPolygonGeometry {
             _type: VectorGeometryType::Polygon,
-            is_3d: coordinates[0][0].z.is_some(),
+            is_3d: coordinates.iter().any(|ring| ring.iter().any(|point| point.z.is_some())),
             coordinates,
             bbox,
             ..Default::default()
@@ -226,7 +226,9 @@ impl<M: MValueCompatible> VectorGeometry<M> {
     pub fn new_multipolygon(coordinates: VectorMultiPolygon<M>, bbox: Option<BBox3D>) -> Self {
         VectorGeometry::MultiPolygon(VectorMultiPolygonGeometry {
             _type: VectorGeometryType::MultiPolygon,
-            is_3d: coordinates[0][0][0].z.is_some(),
+            is_3d: coordinates.iter().any(|polygon| {
+                polygon.iter().any(|ring| ring.iter().any(|point| point.z.is_some()))
+            }),
             coordinates,
             bbox,
             ..Default::default()
