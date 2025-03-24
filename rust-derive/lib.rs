@@ -90,11 +90,30 @@ fn generate_conversions(fields: &Fields) -> (proc_macro2::TokenStream, proc_macr
     for field in fields.iter() {
         let field_name = field.ident.as_ref().unwrap();
         let field_str = field_name.to_string();
+        let field_ty = &field.ty;
+        // Option needs to be handled manually for some from cases.
+        // The rest can be handled with core provided into/from
+        let is_option = if let syn::Type::Path(type_path) = field_ty {
+            type_path.path.segments.last().unwrap().ident == "Option"
+        } else {
+            false
+        };
+        if is_option {
+            from_assignments.push(quote! {
+                #field_name: m.remove(#field_str)
+                    .map(|v| match v {
+                        _s2json_core::ValueType::Primitive(_s2json_core::PrimitiveValue::Null) => None,
+                        other => Some(other.into()),
+                    })
+                    .unwrap_or(None)
+            });
+        } else {
+            from_assignments.push(quote! {
+                #field_name: m.remove(#field_str).map(Into::into).unwrap_or_default()
+            });
+        }
 
-        from_assignments.push(quote! {
-            #field_name: m.remove(#field_str).map(Into::into).unwrap_or_default()
-        });
-
+        // into insertions work for all cases
         into_insertions.push(quote! {
             map.insert(#field_str.to_string(), value.#field_name.into());
         });

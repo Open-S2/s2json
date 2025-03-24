@@ -25,7 +25,6 @@ pub use geometry::*;
 pub use map::*;
 use serde::{Deserialize, Serialize};
 pub use value::*;
-pub use value_impl::*;
 pub use vector_point::*;
 
 /// All projections that can be used

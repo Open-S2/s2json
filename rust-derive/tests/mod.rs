@@ -2,7 +2,7 @@
 mod tests {
     extern crate alloc;
 
-    use s2json_core::{MValue, NotValueType, PrimitiveValue, Value, ValueType};
+    use s2json_core::{MValue, PrimitiveValue, Value, ValueType};
     use s2json_derive::MValueCompatible as MValueDerive;
     use serde::{Deserialize, Serialize};
 
@@ -233,7 +233,6 @@ mod tests {
             a: String,
             b: u32,
         }
-        impl NotValueType for NestedStruct {}
         #[derive(MValueDerive, Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
         pub struct TestStruct {
             pub a: Option<NestedStruct>,
