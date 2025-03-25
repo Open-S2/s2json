@@ -5,7 +5,7 @@ pub mod primitive;
 /// Vector geometry types (used by the s2json spec for both WGS84 and S2Geometry)
 pub mod vector;
 
-use crate::{Face, MValue, MValueCompatible};
+use crate::{Face, MValue};
 pub use bbox::*;
 pub use primitive::*;
 use serde::{Deserialize, Serialize};
@@ -22,7 +22,7 @@ pub enum Axis {
 
 /// A Point in S2 Space with a Face
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
-pub struct STPoint<M: MValueCompatible = MValue> {
+pub struct STPoint<M = MValue> {
     /// The face of the point
     pub face: Face,
     /// The s coordinate

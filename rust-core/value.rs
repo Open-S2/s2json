@@ -81,7 +81,7 @@ pub type MultiPolygonMValues<M = MValue> = Vec<PolygonMValues<M>>;
 /// All possible M-Value shapes
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(untagged)]
-pub enum MValues<M: MValueCompatible = MValue> {
+pub enum MValues<M: Clone = MValue> {
     /// Single M-Value
     MValue(M),
     /// LineString M-Value
