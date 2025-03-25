@@ -93,6 +93,25 @@ mod tests {
     }
 
     #[test]
+    fn test_bbox_mvalue_refs() {
+        let bbox = BBox { left: -2.2, bottom: -944.22, right: 1.0, top: 2.0 };
+
+        let m_value: MValue = (&bbox).into();
+        assert_eq!(
+            m_value,
+            MValue::from([
+                ("left".into(), (-2.2_f64).into()),
+                ("bottom".into(), (-944.22_f64).into()),
+                ("right".into(), (1.0_f64).into()),
+                ("top".into(), (2.0_f64).into()),
+            ])
+        );
+
+        let back_to_bbox: BBox = (&m_value).into();
+        assert_eq!(back_to_bbox, bbox);
+    }
+
+    #[test]
     fn test_bbox_serialize() {
         let bbox = BBox { left: 0.0, bottom: 0.0, right: 1.0, top: 1.0 };
         let bbox_str = serde_json::to_string(&bbox).unwrap();

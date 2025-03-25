@@ -58,8 +58,15 @@ pub type Properties = Value;
 pub type MValue = Value;
 
 /// Ensure M implements MValueCompatible
-pub trait MValueCompatible: From<MValue> + Into<MValue> + Clone + Default {}
-
+pub trait MValueCompatible:
+    for<'a> From<&'a MValue> + From<MValue> + Into<MValue> + Clone + Default
+{
+}
+impl From<&MValue> for MValue {
+    fn from(mvalue: &MValue) -> MValue {
+        mvalue.clone()
+    }
+}
 impl MValueCompatible for MValue {}
 
 /// LineString Properties Shape
@@ -116,6 +123,12 @@ mod tests {
 
         let json_default2: JSONValue = Default::default();
         assert_eq!(json_default2, json_default);
+    }
+
+    #[test]
+    fn mvalue_from_ref() {
+        let mvalue = MValue::from(&MValue::default());
+        assert_eq!(mvalue, MValue::default());
     }
 
     #[test]

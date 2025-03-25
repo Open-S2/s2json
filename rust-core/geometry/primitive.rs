@@ -88,7 +88,7 @@ impl From<&str> for GeometryType {
             "MultiLineString3D" => GeometryType::MultiLineString3D,
             "Polygon3D" => GeometryType::Polygon3D,
             "MultiPolygon3D" => GeometryType::MultiPolygon3D,
-            _ => unreachable!(),
+            _ => panic!("Invalid geometry type: {}", s),
         }
     }
 }
@@ -96,7 +96,7 @@ impl From<&str> for GeometryType {
 /// All possible geometry shapes
 #[derive(Clone, Serialize, Debug, PartialEq)]
 #[serde(untagged)]
-pub enum Geometry<M: MValueCompatible = MValue> {
+pub enum Geometry<M: Clone + Default = MValue> {
     /// Point Shape
     Point(PointGeometry<M>),
     /// MultiPoint Shape
@@ -128,7 +128,7 @@ pub enum Geometry<M: MValueCompatible = MValue> {
 extern crate serde as _serde;
 #[automatically_derived]
 #[coverage(off)]
-impl<'de, M: MValueCompatible> _serde::Deserialize<'de> for Geometry<M>
+impl<'de, M: Clone + Default> _serde::Deserialize<'de> for Geometry<M>
 where
     M: _serde::Deserialize<'de>,
 {
@@ -242,7 +242,7 @@ where
         ))
     }
 }
-impl<M: MValueCompatible> Default for Geometry<M> {
+impl<M: Clone + Default> Default for Geometry<M> {
     fn default() -> Self {
         Geometry::Point(PointGeometry::<M>::default())
     }

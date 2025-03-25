@@ -57,11 +57,37 @@ where
         ])
     }
 }
+impl<T> From<&BBox<T>> for MValue
+where
+    T: Copy + Into<ValueType>,
+{
+    fn from(bbox: &BBox<T>) -> MValue {
+        MValue::from([
+            ("left".into(), bbox.left.into()),
+            ("bottom".into(), bbox.bottom.into()),
+            ("right".into(), bbox.right.into()),
+            ("top".into(), bbox.top.into()),
+        ])
+    }
+}
 impl<T> From<MValue> for BBox<T>
 where
     T: From<ValueType>,
 {
     fn from(mvalue: MValue) -> Self {
+        BBox {
+            left: mvalue.get("left").unwrap().clone().into(),
+            bottom: mvalue.get("bottom").unwrap().clone().into(),
+            right: mvalue.get("right").unwrap().clone().into(),
+            top: mvalue.get("top").unwrap().clone().into(),
+        }
+    }
+}
+impl<T> From<&MValue> for BBox<T>
+where
+    T: From<ValueType>,
+{
+    fn from(mvalue: &MValue) -> Self {
         BBox {
             left: mvalue.get("left").unwrap().clone().into(),
             bottom: mvalue.get("bottom").unwrap().clone().into(),
@@ -94,7 +120,7 @@ impl<T> BBox<T> {
     }
 
     /// Checks if a point is within the BBox
-    pub fn point_overlap<M: MValueCompatible>(&self, point: VectorPoint<M>) -> bool
+    pub fn point_overlap<M: Clone>(&self, point: VectorPoint<M>) -> bool
     where
         T: Into<f64> + Copy, // Ensures that comparison operators work for type T
     {
@@ -170,12 +196,12 @@ impl<T> BBox<T> {
 }
 impl BBox<f64> {
     /// Creates a new BBox from a point
-    pub fn from_point<M: MValueCompatible>(point: &VectorPoint<M>) -> Self {
+    pub fn from_point<M: Clone>(point: &VectorPoint<M>) -> Self {
         BBox::new(point.x, point.y, point.x, point.y)
     }
 
     /// Creates a new BBox from a linestring
-    pub fn from_linestring<M: MValueCompatible>(line: &VectorLineString<M>) -> Self {
+    pub fn from_linestring<M: Clone>(line: &VectorLineString<M>) -> Self {
         let mut bbox = BBox::from_point(&line[0]);
         for point in line {
             bbox.extend_from_point(point);
@@ -184,7 +210,7 @@ impl BBox<f64> {
     }
 
     /// Creates a new BBox from a multi-linestring
-    pub fn from_multi_linestring<M: MValueCompatible>(lines: &VectorMultiLineString<M>) -> Self {
+    pub fn from_multi_linestring<M: Clone>(lines: &VectorMultiLineString<M>) -> Self {
         let mut bbox = BBox::from_point(&lines[0][0]);
         for line in lines {
             for point in line {
@@ -195,12 +221,12 @@ impl BBox<f64> {
     }
 
     /// Creates a new BBox from a polygon
-    pub fn from_polygon<M: MValueCompatible>(polygon: &VectorPolygon<M>) -> Self {
+    pub fn from_polygon<M: Clone>(polygon: &VectorPolygon<M>) -> Self {
         BBox::<f64>::from_multi_linestring(polygon)
     }
 
     /// Creates a new BBox from a multi-polygon
-    pub fn from_multi_polygon<M: MValueCompatible>(polygons: &VectorMultiPolygon<M>) -> Self {
+    pub fn from_multi_polygon<M: Clone>(polygons: &VectorMultiPolygon<M>) -> Self {
         let mut bbox = BBox::from_point(&polygons[0][0][0]);
         for polygon in polygons {
             for line in polygon {
@@ -213,7 +239,7 @@ impl BBox<f64> {
     }
 
     /// Extends the bounding box with a point
-    pub fn extend_from_point<M: MValueCompatible>(&mut self, point: &VectorPoint<M>) {
+    pub fn extend_from_point<M: Clone>(&mut self, point: &VectorPoint<M>) {
         self.merge_in_place(&BBox::from_point(point));
     }
 
@@ -327,7 +353,7 @@ impl<T> BBox3D<T> {
     }
 
     /// Checks if a point is within the BBox
-    pub fn point_overlap<M: MValueCompatible>(&self, point: VectorPoint<M>) -> bool
+    pub fn point_overlap<M: Clone>(&self, point: VectorPoint<M>) -> bool
     where
         T: Into<f64> + Copy, // Ensures that comparison operators work for type T
     {
@@ -438,7 +464,7 @@ impl Default for BBox3D<f64> {
 }
 impl BBox3D<f64> {
     /// Creates a new BBox3D from a point
-    pub fn from_point<M: MValueCompatible>(point: &VectorPoint<M>) -> Self {
+    pub fn from_point<M: Clone>(point: &VectorPoint<M>) -> Self {
         BBox3D::new(
             point.x,
             point.y,
@@ -450,7 +476,7 @@ impl BBox3D<f64> {
     }
 
     /// Creates a new BBox from a linestring
-    pub fn from_linestring<M: MValueCompatible>(line: &VectorLineString<M>) -> Self {
+    pub fn from_linestring<M: Clone>(line: &VectorLineString<M>) -> Self {
         let mut bbox = BBox3D::from_point(&line[0]);
         for point in line {
             bbox.extend_from_point(point);
@@ -459,7 +485,7 @@ impl BBox3D<f64> {
     }
 
     /// Creates a new BBox from a multi-linestring
-    pub fn from_multi_linestring<M: MValueCompatible>(lines: &VectorMultiLineString<M>) -> Self {
+    pub fn from_multi_linestring<M: Clone>(lines: &VectorMultiLineString<M>) -> Self {
         let mut bbox = BBox3D::from_point(&lines[0][0]);
         for line in lines {
             for point in line {
@@ -470,12 +496,12 @@ impl BBox3D<f64> {
     }
 
     /// Creates a new BBox from a polygon
-    pub fn from_polygon<M: MValueCompatible>(polygon: &VectorPolygon<M>) -> Self {
+    pub fn from_polygon<M: Clone>(polygon: &VectorPolygon<M>) -> Self {
         BBox3D::<f64>::from_multi_linestring(polygon)
     }
 
     /// Creates a new BBox from a multi-polygon
-    pub fn from_multi_polygon<M: MValueCompatible>(polygons: &VectorMultiPolygon<M>) -> Self {
+    pub fn from_multi_polygon<M: Clone>(polygons: &VectorMultiPolygon<M>) -> Self {
         let mut bbox = BBox3D::from_point(&polygons[0][0][0]);
         for polygon in polygons {
             for line in polygon {
@@ -493,7 +519,7 @@ impl BBox3D<f64> {
     }
 
     /// Extends the bounding box with a point
-    pub fn extend_from_point<M: MValueCompatible>(&mut self, point: &VectorPoint<M>) {
+    pub fn extend_from_point<M: Clone>(&mut self, point: &VectorPoint<M>) {
         self.merge_in_place(&BBox3D::from_point(point));
     }
 

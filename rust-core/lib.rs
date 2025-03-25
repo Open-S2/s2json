@@ -130,8 +130,7 @@ impl From<&str> for S2FeatureCollectionType {
 
 /// WM FeatureCollection
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
-pub struct FeatureCollection<M = (), P: MValueCompatible = Properties, D: MValueCompatible = MValue>
-{
+pub struct FeatureCollection<M = (), P: Clone + Default = Properties, D: Clone + Default = MValue> {
     /// Type will always be "FeatureCollection"
     #[serde(rename = "type")]
     pub _type: FeatureCollectionType,
@@ -144,7 +143,7 @@ pub struct FeatureCollection<M = (), P: MValueCompatible = Properties, D: MValue
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bbox: Option<BBox>,
 }
-impl<M, P: MValueCompatible, D: MValueCompatible> FeatureCollection<M, P, D> {
+impl<M, P: Clone + Default, D: Clone + Default> FeatureCollection<M, P, D> {
     /// Create a new FeatureCollection
     pub fn new(attributions: Option<Attributions>) -> Self {
         Self { _type: "FeatureCollection".into(), features: Vec::new(), attributions, bbox: None }
@@ -160,11 +159,8 @@ impl<M, P: MValueCompatible, D: MValueCompatible> FeatureCollection<M, P, D> {
 
 /// S2 FeatureCollection
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
-pub struct S2FeatureCollection<
-    M = (),
-    P: MValueCompatible = Properties,
-    D: MValueCompatible = MValue,
-> {
+pub struct S2FeatureCollection<M = (), P: Clone + Default = Properties, D: Clone + Default = MValue>
+{
     /// Type will always be "S2FeatureCollection"
     #[serde(rename = "type")]
     pub _type: S2FeatureCollectionType,
@@ -179,7 +175,7 @@ pub struct S2FeatureCollection<
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bbox: Option<BBox>,
 }
-impl<M, P: MValueCompatible, D: MValueCompatible> S2FeatureCollection<M, P, D> {
+impl<M, P: Clone + Default, D: Clone + Default> S2FeatureCollection<M, P, D> {
     /// Create a new S2FeatureCollection
     pub fn new(attributions: Option<Attributions>) -> Self {
         Self {
@@ -223,7 +219,7 @@ impl From<&str> for FeatureType {
 
 /// Component to build an WM Feature
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
-pub struct Feature<M = (), P: MValueCompatible = Properties, D: MValueCompatible = MValue> {
+pub struct Feature<M = (), P: Clone + Default = Properties, D: Clone + Default = MValue> {
     /// Type will always be "Feature"
     #[serde(rename = "type")]
     pub _type: FeatureType,
@@ -238,13 +234,13 @@ pub struct Feature<M = (), P: MValueCompatible = Properties, D: MValueCompatible
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<M>,
 }
-impl<M, P: MValueCompatible, D: MValueCompatible> Feature<M, P, D> {
+impl<M, P: Clone + Default, D: Clone + Default> Feature<M, P, D> {
     /// Create a new Feature
     pub fn new(id: Option<u64>, properties: P, geometry: Geometry<D>, metadata: Option<M>) -> Self {
         Self { _type: "Feature".into(), id, properties, geometry, metadata }
     }
 }
-impl<M, P: MValueCompatible, D: MValueCompatible> Default for Feature<M, P, D> {
+impl<M, P: Clone + Default, D: Clone + Default> Default for Feature<M, P, D> {
     fn default() -> Self {
         Self {
             _type: "Feature".into(),
@@ -276,7 +272,7 @@ impl From<&str> for VectorFeatureType {
 
 /// Component to build an WM or S2 Vector Feature
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
-pub struct VectorFeature<M = (), P: MValueCompatible = Properties, D: MValueCompatible = MValue> {
+pub struct VectorFeature<M = (), P: Clone + Default = Properties, D: Clone + Default = MValue> {
     /// Type will always be "VectorFeature"
     #[serde(rename = "type")]
     pub _type: VectorFeatureType,
@@ -293,7 +289,7 @@ pub struct VectorFeature<M = (), P: MValueCompatible = Properties, D: MValueComp
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<M>,
 }
-impl<M, P: MValueCompatible, D: MValueCompatible> Default for VectorFeature<M, P, D> {
+impl<M, P: Clone + Default, D: Clone + Default> Default for VectorFeature<M, P, D> {
     fn default() -> Self {
         Self {
             _type: "VectorFeature".into(),
@@ -305,7 +301,7 @@ impl<M, P: MValueCompatible, D: MValueCompatible> Default for VectorFeature<M, P
         }
     }
 }
-impl<M, P: MValueCompatible, D: MValueCompatible> VectorFeature<M, P, D> {
+impl<M, P: Clone + Default, D: Clone + Default> VectorFeature<M, P, D> {
     /// Create a new VectorFeature in the WM format
     pub fn new_wm(
         id: Option<u64>,
@@ -355,8 +351,7 @@ pub type Attributions = Map<String, String>;
 
 /// Either an S2 or WM FeatureCollection
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
-pub enum FeatureCollections<M = (), P: MValueCompatible = Properties, D: MValueCompatible = MValue>
-{
+pub enum FeatureCollections<M = (), P: Clone + Default = Properties, D: Clone + Default = MValue> {
     /// An WM FeatureCollection
     FeatureCollection(FeatureCollection<M, P, D>),
     /// An S2 FeatureCollection
@@ -365,7 +360,7 @@ pub enum FeatureCollections<M = (), P: MValueCompatible = Properties, D: MValueC
 
 /// Either an S2 or WM Feature
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
-pub enum Features<M = (), P: MValueCompatible = Properties, D: MValueCompatible = MValue> {
+pub enum Features<M = (), P: Clone + Default = Properties, D: Clone + Default = MValue> {
     /// An WM Feature
     Feature(Feature<M, P, D>),
     /// An WM or S2 Vector Feature
@@ -375,7 +370,7 @@ pub enum Features<M = (), P: MValueCompatible = Properties, D: MValueCompatible 
 /// Either an WM Feature or an WM Vector Feature
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 #[serde(untagged)]
-pub enum WMFeature<M = (), P: MValueCompatible = Properties, D: MValueCompatible = MValue> {
+pub enum WMFeature<M = (), P: Clone + Default = Properties, D: Clone + Default = MValue> {
     /// An WM Feature
     Feature(Feature<M, P, D>),
     /// An WM Vector Feature
@@ -385,7 +380,7 @@ pub enum WMFeature<M = (), P: MValueCompatible = Properties, D: MValueCompatible
 /// All major S2JSON types
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 #[serde(untagged)]
-pub enum JSONCollection<M = (), P: MValueCompatible = Properties, D: MValueCompatible = MValue> {
+pub enum JSONCollection<M = (), P: Clone + Default = Properties, D: Clone + Default = MValue> {
     /// An WM FeatureCollection
     FeatureCollection(FeatureCollection<M, P, D>),
     /// An S2 FeatureCollection

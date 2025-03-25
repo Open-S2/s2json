@@ -44,39 +44,64 @@ fn generate_to_mvalue(ast: &syn::DeriveInput) -> TokenStream {
             extern crate alloc;
             // This may be necessary if the struct is using MValue as a variable for instance
             use alloc::string::ToString;
+            use _s2json_core::*;
 
             /// Starting from an MValue, convert to a struct
             #[automatically_derived]
-            impl From<_s2json_core::MValue> for #name {
-                fn from(mut m: _s2json_core::MValue) -> Self {
+            impl From<MValue> for #name {
+                fn from(m: MValue) -> Self {
                     #from_mvalue
                 }
             }
+            /// Starting from a ref to an MValue, convert to a struct
+            #[automatically_derived]
+            impl From<&MValue> for #name {
+                fn from(m: &MValue) -> Self {
+                    #from_mvalue
+                }
+            }
+
             /// If this struct is nested into another struct, pull out the MValue and let
             /// From<MValue> handle
             #[automatically_derived]
-            impl From<_s2json_core::ValueType> for #name {
-                fn from(value: _s2json_core::ValueType) -> Self {
+            impl From<ValueType> for #name {
+                fn from(value: ValueType) -> Self {
                     match value {
-                        _s2json_core::ValueType::Nested(v) => v.into(),
+                        ValueType::Nested(v) => v.into(),
                         _ => #name::default(),
                     }
                 }
             }
-            /// Starting from a struct, convert to an MValue
+            /// If this struct ref is nested into another struct, pull out the MValue and let
+            /// From<MValue> handle
             #[automatically_derived]
-            impl From<#name> for _s2json_core::MValue {
-                fn from(value: #name) -> _s2json_core::MValue {
-                    #into_mvalue
+            impl From<&ValueType> for #name {
+                fn from(value: &ValueType) -> Self {
+                    match value {
+                        ValueType::Nested(v) => v.into(),
+                        _ => #name::default(),
+                    }
                 }
             }
             /// If this struct is nested into another struct, convert to a ValueType that's nested
             #[automatically_derived]
-            impl From<#name> for _s2json_core::ValueType {
-                fn from(value: #name) -> _s2json_core::ValueType {
-                    _s2json_core::ValueType::Nested(value.into())
+            impl From<#name> for ValueType {
+                fn from(value: #name) -> ValueType {
+                    ValueType::Nested(value.into())
                 }
             }
+
+            /// Starting from a struct, convert to an MValue
+            #[automatically_derived]
+            impl From<#name> for MValue {
+                fn from(value: #name) -> MValue {
+                    #into_mvalue
+                }
+            }
+
+            /// Finally implement the MValueCompatible trait
+            #[automatically_derived]
+            impl MValueCompatible for #name {}
         };
     };
 
@@ -100,16 +125,16 @@ fn generate_conversions(fields: &Fields) -> (proc_macro2::TokenStream, proc_macr
         };
         if is_option {
             from_assignments.push(quote! {
-                #field_name: m.remove(#field_str)
+                #field_name: m.get(#field_str)
                     .map(|v| match v {
-                        _s2json_core::ValueType::Primitive(_s2json_core::PrimitiveValue::Null) => None,
+                        ValueType::Primitive(PrimitiveValue::Null) => None,
                         other => Some(other.into()),
                     })
                     .unwrap_or(None)
             });
         } else {
             from_assignments.push(quote! {
-                #field_name: m.remove(#field_str).map(Into::into).unwrap_or_default()
+                #field_name: m.get(#field_str).map(Into::into).unwrap_or_default()
             });
         }
 
@@ -126,7 +151,7 @@ fn generate_conversions(fields: &Fields) -> (proc_macro2::TokenStream, proc_macr
     };
 
     let into_mvalue = quote! {
-        let mut map = _s2json_core::MValue::new();
+        let mut map = MValue::new();
         #(#into_insertions)*
         map
     };

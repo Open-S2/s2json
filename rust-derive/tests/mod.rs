@@ -2,7 +2,7 @@
 mod tests {
     extern crate alloc;
 
-    use s2json_core::{MValue, PrimitiveValue, Value, ValueType};
+    use s2json_core::{MValue, MValueCompatible, PrimitiveValue, Value, ValueType};
     use s2json_derive::MValueCompatible as MValueDerive;
     use serde::{Deserialize, Serialize};
 
@@ -14,7 +14,7 @@ mod tests {
             pub value: u32,
         }
 
-        let test_struct = TestStruct { name: "example".to_string(), value: 42 };
+        let test_struct = TestStruct { name: "example".into(), value: 42 };
 
         let mvalue: MValue = test_struct.clone().into(); // Ensure this method exists
                                                          // println!("{:?}", mvalue); // Debug output
@@ -255,6 +255,45 @@ mod tests {
                 ),
                 ("b".into(), ValueType::Primitive(PrimitiveValue::U64(2))),
             ])
+        );
+
+        let back_to_struct: TestStruct = mvalue.into();
+        assert_eq!(back_to_struct, test_struct);
+    }
+
+    #[test]
+    fn vec_test() {
+        #[derive(MValueDerive, Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
+        pub struct TestStruct {
+            pub a: Vec<String>,
+            pub b: Vec<u32>,
+            pub c: Vec<i32>,
+            pub d: Vec<f32>,
+        }
+    }
+
+    #[test]
+    fn generics_test() {
+        #[derive(MValueDerive, Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
+        pub struct TestStruct<T: MValueCompatible = MValue> {
+            pub a: Option<T>,
+        }
+
+        let test_struct = TestStruct {
+            a: Some(MValue::from([("b".into(), ValueType::Primitive(PrimitiveValue::U64(1)))])),
+        };
+
+        let mvalue: MValue = test_struct.clone().into(); // Ensure this method exists
+
+        assert_eq!(
+            mvalue,
+            Value::from([(
+                "a".into(),
+                ValueType::Nested(Value::from([(
+                    "b".into(),
+                    ValueType::Primitive(PrimitiveValue::U64(1))
+                )]),)
+            )]),
         );
 
         let back_to_struct: TestStruct = mvalue.into();

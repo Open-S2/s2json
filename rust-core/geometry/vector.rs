@@ -47,7 +47,7 @@ pub type VectorMultiPolygon<M = MValue> = Vec<VectorPolygon<M>>;
 /// All possible geometry shapes
 #[derive(Clone, Serialize, Debug, PartialEq)]
 #[serde(untagged)]
-pub enum VectorGeometry<M: MValueCompatible = MValue> {
+pub enum VectorGeometry<M: Clone + Default = MValue> {
     /// Point Shape
     Point(VectorPointGeometry<M>),
     /// MultiPoint Shape
@@ -66,7 +66,7 @@ pub enum VectorGeometry<M: MValueCompatible = MValue> {
 extern crate serde as _serde;
 #[automatically_derived]
 #[coverage(off)]
-impl<'de, M: MValueCompatible> _serde::Deserialize<'de> for VectorGeometry<M>
+impl<'de, M: Clone + Default> _serde::Deserialize<'de> for VectorGeometry<M>
 where
     M: _serde::Deserialize<'de>,
 {
@@ -139,7 +139,7 @@ where
         ))
     }
 }
-impl<M: MValueCompatible> VectorGeometry<M> {
+impl<M: Clone + Default> VectorGeometry<M> {
     /// Get the bbox of the geometry
     pub fn bbox(&self) -> &Option<BBox3D> {
         match self {
@@ -235,7 +235,7 @@ impl<M: MValueCompatible> VectorGeometry<M> {
         })
     }
 }
-impl<M: MValueCompatible> Default for VectorGeometry<M> {
+impl<M: Clone + Default> Default for VectorGeometry<M> {
     fn default() -> Self {
         VectorGeometry::Point(VectorPointGeometry::default())
     }
