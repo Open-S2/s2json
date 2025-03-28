@@ -2,7 +2,7 @@ extern crate alloc;
 
 #[cfg(test)]
 mod tests {
-    use alloc::{string::ToString, vec};
+    use alloc::vec;
     use core::cmp::Ordering;
     use s2json_core::*;
     use serde_json::json;

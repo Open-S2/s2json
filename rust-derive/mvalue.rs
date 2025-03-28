@@ -133,7 +133,7 @@ fn generate_mvalue_conversions(
 
         // into insertions work for all cases
         into_insertions.push(quote! {
-            map.insert(#field_str.to_string(), value.#field_name.into());
+            map.insert(#field_str.into(), value.#field_name.into());
         });
     }
 
