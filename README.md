@@ -108,7 +108,7 @@ yarn add -D s2json-spec
 npm install -D s2json-spec
 
 # cargo
-cargo install s2json --dev
+cargo install s2json
 ```
 
 grammars/highlighting for VSCode are [available for install](https://marketplace.visualstudio.com/items?itemName=OpenS2.s2json-spec).
