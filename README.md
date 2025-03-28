@@ -113,6 +113,9 @@ cargo install s2json --dev
 
 grammars/highlighting for VSCode are [available for install](https://marketplace.visualstudio.com/items?itemName=OpenS2.s2json-spec).
 
+> [!NOTE]  
+> Unsafe code is forbidden by a #![forbid(unsafe_code)] attribute in the root of the rust library.
+
 ---
 
 ## Development

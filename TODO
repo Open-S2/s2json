@@ -1,3 +1,10 @@
 # TODO
 
 [ ] - Write more TS tests coverage to ensure validation is working as expected
+[ ] - Enum with contents like enum { A(A), B(B), C(C) } needs to be macro'd?
+[ ] - Basic bitch enum needs a macro pub enum ExampleEnum { A, B, C }
+        - impl From<&ValueType> for ExampleEnum {}
+        - impl From<ValueType> for ExampleEnum {}
+        - impl From<ExampleEnum> for ValueType {}
+        - ALSO:
+        - JSONValue impl for all 3

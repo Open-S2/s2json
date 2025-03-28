@@ -1,847 +1,10 @@
-use crate::*;
-use alloc::{
-    string::{String, ToString},
-    vec::Vec,
-};
-use libm::round;
-
-// PrimitiveValue
-impl PrimitiveValue {
-    /// Returns true if the value is null
-    pub fn is_null(&self) -> bool {
-        matches!(self, PrimitiveValue::Null)
-    }
-
-    /// Converts a primitive value to a string
-    pub fn to_string(&self) -> Option<String> {
-        match self {
-            PrimitiveValue::String(v) => Some(v.clone()),
-            _ => None,
-        }
-    }
-
-    /// Converts a primitive value to a u64
-    pub fn to_u64(&self) -> Option<u64> {
-        match self {
-            PrimitiveValue::U64(v) => Some(*v),
-            PrimitiveValue::I64(v) => Some(*v as u64),
-            PrimitiveValue::F64(v) => Some(round(*v) as u64),
-            PrimitiveValue::F32(v) => Some(round((*v).into()) as u64),
-            _ => None,
-        }
-    }
-
-    /// Converts a primitive value to a i64
-    pub fn to_i64(&self) -> Option<i64> {
-        match self {
-            PrimitiveValue::U64(v) => Some(*v as i64),
-            PrimitiveValue::I64(v) => Some(*v),
-            PrimitiveValue::F64(v) => Some(round(*v) as i64),
-            PrimitiveValue::F32(v) => Some(round((*v).into()) as i64),
-            _ => None,
-        }
-    }
-
-    /// Converts a primitive value to a f64
-    pub fn to_f64(&self) -> Option<f64> {
-        match self {
-            PrimitiveValue::U64(v) => Some(*v as f64),
-            PrimitiveValue::I64(v) => Some(*v as f64),
-            PrimitiveValue::F64(v) => Some(*v),
-            PrimitiveValue::F32(v) => Some(*v as f64),
-            _ => None,
-        }
-    }
-
-    /// Converts a primitive value to a f32
-    pub fn to_f32(&self) -> Option<f32> {
-        match self {
-            PrimitiveValue::U64(v) => Some(*v as f32),
-            PrimitiveValue::I64(v) => Some(*v as f32),
-            PrimitiveValue::F64(v) => Some(*v as f32),
-            PrimitiveValue::F32(v) => Some(*v),
-            _ => None,
-        }
-    }
-
-    /// Converts a primitive value to a bool
-    pub fn to_bool(&self) -> Option<bool> {
-        match self {
-            PrimitiveValue::Bool(v) => Some(*v),
-            _ => None,
-        }
-    }
-}
-impl From<&str> for PrimitiveValue {
-    fn from(s: &str) -> Self {
-        PrimitiveValue::String(s.to_string())
-    }
-}
-impl From<String> for PrimitiveValue {
-    fn from(s: String) -> Self {
-        PrimitiveValue::String(s)
-    }
-}
-impl From<u64> for PrimitiveValue {
-    fn from(v: u64) -> Self {
-        PrimitiveValue::U64(v)
-    }
-}
-impl From<i64> for PrimitiveValue {
-    fn from(v: i64) -> Self {
-        PrimitiveValue::I64(v)
-    }
-}
-impl From<f32> for PrimitiveValue {
-    fn from(v: f32) -> Self {
-        PrimitiveValue::F32(v)
-    }
-}
-impl From<f64> for PrimitiveValue {
-    fn from(v: f64) -> Self {
-        PrimitiveValue::F64(v)
-    }
-}
-impl From<bool> for PrimitiveValue {
-    fn from(v: bool) -> Self {
-        PrimitiveValue::Bool(v)
-    }
-}
-impl From<()> for PrimitiveValue {
-    fn from(_: ()) -> Self {
-        PrimitiveValue::Null
-    }
-}
-impl<T> From<Option<T>> for PrimitiveValue
-where
-    T: Into<PrimitiveValue>,
-{
-    fn from(v: Option<T>) -> Self {
-        match v {
-            Some(v) => v.into(),
-            None => PrimitiveValue::Null,
-        }
-    }
-}
-impl From<&PrimitiveValue> for JSONValue {
-    fn from(v: &PrimitiveValue) -> Self {
-        JSONValue::Primitive(v.clone())
-    }
-}
-impl From<&JSONValue> for PrimitiveValue {
-    fn from(v: &JSONValue) -> Self {
-        match v {
-            JSONValue::Primitive(v) => v.clone(),
-            // DROPS VALUES THAT ARE NOT PRIMITIVES
-            _ => PrimitiveValue::Null,
-        }
-    }
-}
-
-// ValuePrimitiveType
-impl ValuePrimitiveType {
-    /// Returns the value as a primitive
-    pub fn to_prim(&self) -> Option<&PrimitiveValue> {
-        match self {
-            ValuePrimitiveType::Primitive(v) => Some(v),
-            _ => None,
-        }
-    }
-
-    /// Returns the value as a nested object
-    pub fn to_nested(&self) -> Option<&ValuePrimitive> {
-        match self {
-            ValuePrimitiveType::NestedPrimitive(v) => Some(v),
-            _ => None,
-        }
-    }
-}
-impl From<&str> for ValuePrimitiveType {
-    fn from(s: &str) -> Self {
-        ValuePrimitiveType::Primitive(PrimitiveValue::String(s.to_string()))
-    }
-}
-impl From<String> for ValuePrimitiveType {
-    fn from(s: String) -> Self {
-        ValuePrimitiveType::Primitive(PrimitiveValue::String(s))
-    }
-}
-impl From<&ValuePrimitiveType> for String {
-    fn from(v: &ValuePrimitiveType) -> Self {
-        match v {
-            ValuePrimitiveType::Primitive(PrimitiveValue::String(s)) => s.to_string(),
-            _ => "".to_string(),
-        }
-    }
-}
-// Implement for u8, u16, u32, u64
-macro_rules! impl_from_uint_uint {
-    ($($t:ty),*) => {
-        $(
-            impl From<$t> for ValuePrimitiveType {
-                fn from(v: $t) -> Self {
-                    ValuePrimitiveType::Primitive(PrimitiveValue::U64(v as u64))
-                }
-            }
-        )*
-    };
-}
-impl_from_uint_uint!(u8, u16, u32, u64, usize);
-macro_rules! impl_from_uint_ref {
-    ($($t:ty),*) => {
-        $(
-            impl<'a> From<&'a $t> for ValuePrimitiveType {
-                fn from(v: &$t) -> Self {
-                    ValuePrimitiveType::Primitive(PrimitiveValue::U64(*v as u64))
-                }
-            }
-        )*
-    };
-}
-impl_from_uint_ref!(u8, u16, u32, u64, usize);
-// Implement for u8, u16, u32, u64
-macro_rules! impl_from_prim_uint {
-    ($($t:ty),*) => {
-        $(
-            impl From<ValuePrimitiveType> for $t {
-                fn from(v: ValuePrimitiveType) -> Self {
-                    match v {
-                        ValuePrimitiveType::Primitive(PrimitiveValue::U64(v)) => v as $t,
-                        _ => 0,
-                    }
-                }
-            }
-        )*
-    };
-}
-impl_from_prim_uint!(u8, u16, u32, u64, usize);
-macro_rules! impl_from_prim_ref_uint {
-    ($($t:ty),*) => {
-        $(
-            impl From<&ValuePrimitiveType> for $t {
-                fn from(v: &ValuePrimitiveType) -> Self {
-                    match v {
-                        ValuePrimitiveType::Primitive(PrimitiveValue::U64(v)) => *v as $t,
-                        _ => 0,
-                    }
-                }
-            }
-        )*
-    };
-}
-impl_from_prim_ref_uint!(u8, u16, u32, u64, usize);
-// Implement for i8, i16, i32, i64, isize
-macro_rules! impl_from_sint_sint {
-    ($($t:ty),*) => {
-        $(
-            impl From<$t> for ValuePrimitiveType {
-                fn from(v: $t) -> Self {
-                    ValuePrimitiveType::Primitive(PrimitiveValue::I64(v as i64))
-                }
-            }
-        )*
-    };
-}
-impl_from_sint_sint!(i8, i16, i32, i64, isize);
-macro_rules! impl_from_sint_ref {
-    ($($t:ty),*) => {
-        $(
-            impl<'a> From<&'a $t> for ValuePrimitiveType {
-                fn from(v: &$t) -> Self {
-                    ValuePrimitiveType::Primitive(PrimitiveValue::I64(*v as i64))
-                }
-            }
-        )*
-    };
-}
-impl_from_sint_ref!(i8, i16, i32, i64, isize);
-// Implement for i8, i16, i32, i64, isize
-macro_rules! impl_from_prim_sint {
-    ($($t:ty),*) => {
-        $(
-            impl From<ValuePrimitiveType> for $t {
-                fn from(v: ValuePrimitiveType) -> Self {
-                    match v {
-                        ValuePrimitiveType::Primitive(PrimitiveValue::I64(v)) => v as $t,
-                        _ => 0,
-                    }
-                }
-            }
-        )*
-    };
-}
-impl_from_prim_sint!(i8, i16, i32, i64, isize);
-macro_rules! impl_from_prim_ref_sint {
-    ($($t:ty),*) => {
-        $(
-            impl From<&ValuePrimitiveType> for $t {
-                fn from(v: &ValuePrimitiveType) -> Self {
-                    match v {
-                        ValuePrimitiveType::Primitive(PrimitiveValue::I64(v)) => *v as $t,
-                        _ => 0,
-                    }
-                }
-            }
-        )*
-    };
-}
-impl_from_prim_ref_sint!(i8, i16, i32, i64, isize);
-impl From<f32> for ValuePrimitiveType {
-    fn from(v: f32) -> Self {
-        ValuePrimitiveType::Primitive(PrimitiveValue::F32(v))
-    }
-}
-impl From<&ValuePrimitiveType> for f32 {
-    fn from(v: &ValuePrimitiveType) -> Self {
-        match v {
-            ValuePrimitiveType::Primitive(PrimitiveValue::F32(v)) => *v,
-            _ => 0.0,
-        }
-    }
-}
-impl From<f64> for ValuePrimitiveType {
-    fn from(v: f64) -> Self {
-        ValuePrimitiveType::Primitive(PrimitiveValue::F64(v))
-    }
-}
-impl From<&ValuePrimitiveType> for f64 {
-    fn from(v: &ValuePrimitiveType) -> Self {
-        match v {
-            ValuePrimitiveType::Primitive(PrimitiveValue::F64(v)) => *v,
-            _ => 0.0,
-        }
-    }
-}
-impl From<bool> for ValuePrimitiveType {
-    fn from(v: bool) -> Self {
-        ValuePrimitiveType::Primitive(PrimitiveValue::Bool(v))
-    }
-}
-impl From<&ValuePrimitiveType> for bool {
-    fn from(v: &ValuePrimitiveType) -> Self {
-        match v {
-            ValuePrimitiveType::Primitive(PrimitiveValue::Bool(v)) => *v,
-            _ => false,
-        }
-    }
-}
-impl From<()> for ValuePrimitiveType {
-    fn from(_: ()) -> Self {
-        ValuePrimitiveType::Primitive(PrimitiveValue::Null)
-    }
-}
-impl From<&ValuePrimitiveType> for () {
-    fn from(_: &ValuePrimitiveType) -> Self {}
-}
-impl From<PrimitiveValue> for ValuePrimitiveType {
-    fn from(v: PrimitiveValue) -> Self {
-        ValuePrimitiveType::Primitive(v)
-    }
-}
-impl From<&ValuePrimitiveType> for PrimitiveValue {
-    fn from(v: &ValuePrimitiveType) -> Self {
-        match v {
-            ValuePrimitiveType::Primitive(v) => v.clone(),
-            _ => PrimitiveValue::Null,
-        }
-    }
-}
-impl From<ValuePrimitive> for ValuePrimitiveType {
-    fn from(v: ValuePrimitive) -> Self {
-        ValuePrimitiveType::NestedPrimitive(v)
-    }
-}
-impl From<&ValuePrimitiveType> for ValuePrimitive {
-    fn from(v: &ValuePrimitiveType) -> Self {
-        match v {
-            ValuePrimitiveType::NestedPrimitive(v) => v.clone(),
-            _ => ValuePrimitive::new(),
-        }
-    }
-}
-impl<T> From<Option<T>> for ValuePrimitiveType
-where
-    T: Into<ValuePrimitiveType>,
-{
-    fn from(v: Option<T>) -> Self {
-        match v {
-            Some(v) => v.into(),
-            None => ValuePrimitiveType::Primitive(PrimitiveValue::Null),
-        }
-    }
-}
-impl From<&ValuePrimitiveType> for JSONValue {
-    fn from(v: &ValuePrimitiveType) -> Self {
-        match v {
-            ValuePrimitiveType::Primitive(v) => JSONValue::Primitive(v.clone()),
-            ValuePrimitiveType::NestedPrimitive(v) => {
-                let mut map = Map::<String, JSONValue>::new();
-                for (k, v) in v.iter() {
-                    map.insert(k.clone(), v.into());
-                }
-                JSONValue::Object(map)
-            }
-        }
-    }
-}
-impl From<&JSONValue> for ValuePrimitiveType {
-    fn from(v: &JSONValue) -> Self {
-        match v {
-            JSONValue::Primitive(v) => ValuePrimitiveType::Primitive(v.clone()),
-            JSONValue::Object(v) => {
-                let mut map = ValuePrimitive::new();
-                for (k, v) in v.iter() {
-                    map.insert(k.clone(), v.into());
-                }
-                ValuePrimitiveType::NestedPrimitive(map)
-            }
-            // DROPS ALL ARRAY DATA AS IT IS NOT SUPPORTED INSIDE VALUE PRIMITIVES
-            _ => ValuePrimitiveType::Primitive(PrimitiveValue::Null),
-        }
-    }
-}
-
-// ValueType
-impl Default for ValueType {
-    fn default() -> Self {
-        ValueType::Primitive(PrimitiveValue::Null)
-    }
-}
-impl ValueType {
-    /// Returns the value as a primitive
-    pub fn to_prim(&self) -> Option<&PrimitiveValue> {
-        match self {
-            ValueType::Primitive(v) => Some(v),
-            _ => None,
-        }
-    }
-
-    /// Returns the value as a vector
-    pub fn to_vec(&self) -> Option<&Vec<ValuePrimitiveType>> {
-        match self {
-            ValueType::Array(v) => Some(v),
-            _ => None,
-        }
-    }
-
-    /// Returns the value as a nested object
-    pub fn to_nested(&self) -> Option<&Value> {
-        match self {
-            ValueType::Nested(v) => Some(v),
-            _ => None,
-        }
-    }
-}
-impl From<&str> for ValueType {
-    fn from(s: &str) -> Self {
-        ValueType::Primitive(PrimitiveValue::String(s.to_string()))
-    }
-}
-// impl AsRef<str> for ValueType {
-//     fn as_ref(&self) -> &str {
-//         match self {
-//             ValueType::Primitive(PrimitiveValue::String(s)) => s.as_str(),
-//             _ => "",
-//         }
-//     }
-// }
-impl From<String> for ValueType {
-    fn from(s: String) -> Self {
-        ValueType::Primitive(PrimitiveValue::String(s))
-    }
-}
-impl From<&String> for ValueType {
-    fn from(s: &String) -> Self {
-        ValueType::Primitive(PrimitiveValue::String(s.into()))
-    }
-}
-impl From<ValueType> for String {
-    fn from(v: ValueType) -> Self {
-        match v {
-            ValueType::Primitive(PrimitiveValue::String(s)) => s,
-            _ => "".to_string(),
-        }
-    }
-}
-impl From<&ValueType> for String {
-    fn from(v: &ValueType) -> Self {
-        match v {
-            ValueType::Primitive(PrimitiveValue::String(s)) => s.into(),
-            _ => "".to_string(),
-        }
-    }
-}
-
-// Implement for u8, u16, u32, u64
-macro_rules! impl_from_uint {
-    ($($t:ty),*) => {
-        $(
-            impl From<$t> for ValueType {
-                fn from(v: $t) -> Self {
-                    ValueType::Primitive(PrimitiveValue::U64(v as u64))
-                }
-            }
-
-            impl From<ValueType> for $t {
-                fn from(v: ValueType) -> Self {
-                    match v {
-                        ValueType::Primitive(PrimitiveValue::U64(v)) => v as $t,
-                        _ => 0,
-                    }
-                }
-            }
-        )*
-    };
-}
-impl_from_uint!(u8, u16, u32, u64, usize);
-macro_rules! impl_from_uint_ref {
-    ($($t:ty),*) => {
-        $(
-            impl From<&ValueType> for $t {
-                fn from(v: &ValueType) -> Self {
-                    match v {
-                        ValueType::Primitive(PrimitiveValue::U64(v)) => *v as $t,
-                        _ => 0,
-                    }
-                }
-            }
-        )*
-    };
-}
-impl_from_uint_ref!(u8, u16, u32, u64, usize);
-// Implement for i8, i16, i32, i64
-macro_rules! impl_from_sint {
-    ($($t:ty),*) => {
-        $(
-            impl From<$t> for ValueType {
-                fn from(v: $t) -> Self {
-                    ValueType::Primitive(PrimitiveValue::I64(v as i64))
-                }
-            }
-
-            impl From<ValueType> for $t {
-                fn from(v: ValueType) -> Self {
-                    match v {
-                        ValueType::Primitive(PrimitiveValue::I64(v)) => v as $t,
-                        _ => 0,
-                    }
-                }
-            }
-        )*
-    };
-}
-impl_from_sint!(i8, i16, i32, i64, isize);
-macro_rules! impl_from_sint_ref {
-    ($($t:ty),*) => {
-        $(
-            impl From<&ValueType> for $t {
-                fn from(v: &ValueType) -> Self {
-                    match v {
-                        ValueType::Primitive(PrimitiveValue::I64(v)) => *v as $t,
-                        _ => 0,
-                    }
-                }
-            }
-        )*
-    };
-}
-impl_from_sint_ref!(i8, i16, i32, i64, isize);
-impl From<f32> for ValueType {
-    fn from(v: f32) -> Self {
-        ValueType::Primitive(PrimitiveValue::F32(v))
-    }
-}
-impl From<ValueType> for f32 {
-    fn from(v: ValueType) -> Self {
-        match v {
-            ValueType::Primitive(PrimitiveValue::F32(v)) => v,
-            _ => 0.0,
-        }
-    }
-}
-impl From<&ValueType> for f32 {
-    fn from(v: &ValueType) -> Self {
-        match v {
-            ValueType::Primitive(PrimitiveValue::F32(v)) => *v,
-            _ => 0.0,
-        }
-    }
-}
-impl From<f64> for ValueType {
-    fn from(v: f64) -> Self {
-        ValueType::Primitive(PrimitiveValue::F64(v))
-    }
-}
-impl From<ValueType> for f64 {
-    fn from(v: ValueType) -> Self {
-        match v {
-            ValueType::Primitive(PrimitiveValue::F64(v)) => v,
-            _ => 0.0,
-        }
-    }
-}
-impl From<&ValueType> for f64 {
-    fn from(v: &ValueType) -> Self {
-        match v {
-            ValueType::Primitive(PrimitiveValue::F64(v)) => *v,
-            _ => 0.0,
-        }
-    }
-}
-impl From<bool> for ValueType {
-    fn from(v: bool) -> Self {
-        ValueType::Primitive(PrimitiveValue::Bool(v))
-    }
-}
-impl From<ValueType> for bool {
-    fn from(v: ValueType) -> Self {
-        match v {
-            ValueType::Primitive(PrimitiveValue::Bool(v)) => v,
-            _ => false,
-        }
-    }
-}
-impl From<&ValueType> for bool {
-    fn from(v: &ValueType) -> Self {
-        match v {
-            ValueType::Primitive(PrimitiveValue::Bool(v)) => *v,
-            _ => false,
-        }
-    }
-}
-impl From<()> for ValueType {
-    fn from(_: ()) -> Self {
-        ValueType::Primitive(PrimitiveValue::Null)
-    }
-}
-impl From<ValueType> for () {
-    fn from(_: ValueType) -> Self {}
-}
-impl From<&ValueType> for () {
-    fn from(_: &ValueType) -> Self {}
-}
-impl<T> From<Vec<T>> for ValueType
-where
-    T: Into<ValuePrimitiveType>,
-{
-    fn from(v: Vec<T>) -> Self {
-        ValueType::Array(v.into_iter().map(Into::into).collect())
-    }
-}
-impl<T> From<&Vec<T>> for ValueType
-where
-    T: Into<ValuePrimitiveType>,
-    ValuePrimitiveType: for<'a> From<&'a T>,
-{
-    fn from(v: &Vec<T>) -> Self {
-        ValueType::Array(v.iter().map(Into::into).collect())
-    }
-}
-impl<T> From<ValueType> for Vec<T>
-where
-    T: From<ValuePrimitiveType>,
-{
-    fn from(v: ValueType) -> Self {
-        match v {
-            ValueType::Array(v) => v.into_iter().map(Into::into).collect(),
-            _ => Vec::new(),
-        }
-    }
-}
-impl<T> From<&ValueType> for Vec<T>
-where
-    T: for<'a> From<&'a ValuePrimitiveType>,
-{
-    fn from(v: &ValueType) -> Self {
-        match v {
-            ValueType::Array(v) => v.iter().map(Into::into).collect(),
-            _ => Vec::new(),
-        }
-    }
-}
-impl From<Value> for ValueType {
-    fn from(v: Value) -> Self {
-        ValueType::Nested(v)
-    }
-}
-impl From<ValueType> for Value {
-    fn from(v: ValueType) -> Self {
-        match v {
-            ValueType::Nested(v) => v,
-            _ => Value::default(),
-        }
-    }
-}
-impl From<&ValueType> for Value {
-    fn from(v: &ValueType) -> Self {
-        match v {
-            ValueType::Nested(v) => v.clone(),
-            _ => Value::default(),
-        }
-    }
-}
-impl<T> From<Option<T>> for ValueType
-where
-    T: Into<ValueType>,
-{
-    fn from(v: Option<T>) -> Self {
-        match v {
-            Some(v) => v.into(),
-            None => ValueType::Primitive(PrimitiveValue::Null),
-        }
-    }
-}
-impl From<&JSONValue> for ValueType {
-    fn from(v: &JSONValue) -> Self {
-        match v {
-            JSONValue::Primitive(v) => ValueType::Primitive(v.clone()),
-            JSONValue::Array(v) => ValueType::Array(v.iter().map(Into::into).collect()),
-            JSONValue::Object(v) => {
-                let mut res = Value::new();
-                for (k, v) in v.iter() {
-                    res.insert(k.clone(), v.into());
-                }
-                ValueType::Nested(res)
-            }
-        }
-    }
-}
-impl From<&ValueType> for JSONValue {
-    fn from(v: &ValueType) -> Self {
-        match v {
-            ValueType::Primitive(v) => JSONValue::Primitive(v.clone()),
-            ValueType::Array(v) => JSONValue::Array(v.iter().map(Into::into).collect()),
-            ValueType::Nested(v) => {
-                let mut res = Map::<String, JSONValue>::new();
-                for (k, v) in v.iter() {
-                    res.insert(k.clone(), v.into());
-                }
-                JSONValue::Object(res)
-            }
-        }
-    }
-}
-
-impl Default for JSONValue {
-    fn default() -> Self {
-        JSONValue::Primitive(PrimitiveValue::Null)
-    }
-}
-impl JSONValue {
-    /// Returns the value as a primitive
-    pub fn to_prim(&self) -> Option<&PrimitiveValue> {
-        match self {
-            JSONValue::Primitive(v) => Some(v),
-            _ => None,
-        }
-    }
-
-    /// Returns the value as a vector
-    pub fn to_vec(&self) -> Option<&Vec<JSONValue>> {
-        match self {
-            JSONValue::Array(v) => Some(v),
-            _ => None,
-        }
-    }
-
-    /// Returns the value as a nested object
-    pub fn to_nested(&self) -> Option<&Map<String, JSONValue>> {
-        match self {
-            JSONValue::Object(v) => Some(v),
-            _ => None,
-        }
-    }
-}
-
-impl MValueCompatible for JSONProperties {}
-impl From<JSONProperties> for MValue {
-    fn from(json: JSONProperties) -> MValue {
-        let mut res = MValue::new();
-        for (k, v) in json.iter() {
-            res.insert(k.clone(), v.into());
-        }
-        res
-    }
-}
-impl From<&JSONProperties> for MValue {
-    fn from(json: &JSONProperties) -> MValue {
-        let mut res = MValue::new();
-        for (k, v) in json.iter() {
-            res.insert(k.clone(), v.into());
-        }
-        res
-    }
-}
-impl From<MValue> for JSONProperties {
-    fn from(v: MValue) -> JSONProperties {
-        let mut res = JSONProperties::new();
-        for (k, v) in v.iter() {
-            res.insert(k.clone(), v.into());
-        }
-        res
-    }
-}
-impl From<&MValue> for JSONProperties {
-    fn from(v: &MValue) -> JSONProperties {
-        let mut res = JSONProperties::new();
-        for (k, v) in v.iter() {
-            res.insert(k.clone(), v.into());
-        }
-        res
-    }
-}
-
-impl MValueCompatible for MapboxProperties {}
-impl From<MapboxProperties> for MValue {
-    fn from(json: MapboxProperties) -> MValue {
-        let mut res = MValue::new();
-        for (k, v) in json.iter() {
-            res.insert(k.clone(), ValueType::Primitive(v.clone()));
-        }
-        res
-    }
-}
-impl From<&MapboxProperties> for MValue {
-    fn from(json: &MapboxProperties) -> MValue {
-        let mut res = MValue::new();
-        for (k, v) in json.iter() {
-            res.insert(k.clone(), ValueType::Primitive(v.clone()));
-        }
-        res
-    }
-}
-impl From<MValue> for MapboxProperties {
-    fn from(v: MValue) -> MapboxProperties {
-        let mut res = MapboxProperties::new();
-        // Only copy over primitive values
-        for (k, v) in v.iter() {
-            let value = v.clone();
-            if let Some(p) = value.to_prim() {
-                res.insert(k.clone(), p.clone());
-            }
-        }
-        res
-    }
-}
-impl From<&MValue> for MapboxProperties {
-    fn from(v: &MValue) -> MapboxProperties {
-        let mut res = MapboxProperties::new();
-        // Only copy over primitive values
-        for (k, v) in v.iter() {
-            let value = v.clone();
-            if let Some(p) = value.to_prim() {
-                res.insert(k.clone(), p.clone());
-            }
-        }
-        res
-    }
-}
+extern crate alloc;
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::{MValue, MValueCompatible, VectorPoint};
     use alloc::vec;
+    use pbf::Protobuf;
+    use s2json_core::*;
 
     #[test]
     fn value_default() {
@@ -865,6 +28,20 @@ mod tests {
         let prim_value: PrimitiveValue = prim_value_str.clone().into();
         assert_eq!(PrimitiveValue::String("test".into()), prim_value);
         assert_eq!(prim_value.to_string(), Some("test".into()));
+        // string to number
+        let prim_value: PrimitiveValue = "1".into();
+        assert_eq!(PrimitiveValue::String("1".into()), prim_value);
+        assert_eq!(prim_value.to_u64(), Some(1));
+        assert_eq!(prim_value.to_i64(), Some(1));
+        assert_eq!(prim_value.to_f32(), Some(1.0));
+        assert_eq!(prim_value.to_f64(), Some(1.0));
+        // string to bool
+        let prim_value: PrimitiveValue = "true".into();
+        assert_eq!(PrimitiveValue::String("true".into()), prim_value);
+        assert_eq!(prim_value.to_bool(), Some(true));
+        let prim_value: PrimitiveValue = "false".into();
+        assert_eq!(PrimitiveValue::String("false".into()), prim_value);
+        assert_eq!(prim_value.to_bool(), Some(false));
         // u64
         let prim_value: PrimitiveValue = 1_u64.into();
         assert_eq!(PrimitiveValue::U64(1), prim_value);
@@ -902,6 +79,11 @@ mod tests {
         let prim_value: PrimitiveValue = ().into();
         assert_eq!(PrimitiveValue::Null, prim_value);
         assert!(prim_value.is_null());
+        assert_eq!(prim_value.to_u64(), None);
+        assert_eq!(prim_value.to_i64(), None);
+        assert_eq!(prim_value.to_f32(), None);
+        assert_eq!(prim_value.to_f64(), None);
+        assert_eq!(prim_value.to_bool(), None);
         // Option
         let prim_value: PrimitiveValue = Some(true).into();
         assert_eq!(PrimitiveValue::Bool(true), prim_value);
@@ -909,6 +91,8 @@ mod tests {
         let prim_value: PrimitiveValue = None::<bool>.into();
         assert_eq!(PrimitiveValue::Null, prim_value);
         assert!(prim_value.is_null());
+
+        assert!(PrimitiveValue::Null != PrimitiveValue::I64(2));
     }
 
     #[test]
@@ -966,6 +150,180 @@ mod tests {
         assert_eq!(ValuePrimitiveType::Primitive(PrimitiveValue::Bool(true)), prim_value);
         let prim_value: ValuePrimitiveType = None::<bool>.into();
         assert_eq!(ValuePrimitiveType::Primitive(PrimitiveValue::Null), prim_value);
+    }
+
+    #[test]
+    fn value_prim_type_numbers() {
+        let prim_value: ValuePrimitiveType = "1".into();
+        let unsigned: u32 = (&prim_value).into();
+        assert_eq!(unsigned, 1);
+        let prim_value: ValuePrimitiveType = "-1".into();
+        let signed: i32 = (&prim_value).into();
+        assert_eq!(signed, -1);
+        let prim_value: ValuePrimitiveType = "1".into();
+        let unsigned: u32 = (prim_value).into();
+        assert_eq!(unsigned, 1);
+        let prim_value: ValuePrimitiveType = "-1".into();
+        let signed: i32 = (prim_value).into();
+        assert_eq!(signed, -1);
+        let prim_value: ValuePrimitiveType = "1.0".into();
+        let float: f32 = (&prim_value).into();
+        assert_eq!(float, 1.0);
+        let prim_value: ValuePrimitiveType = "-1.0".into();
+        let double: f64 = (&prim_value).into();
+        assert_eq!(double, -1.0);
+        let prim_value: ValuePrimitiveType = "1.0".into();
+        let float: f32 = (prim_value).into();
+        assert_eq!(float, 1.0);
+        let prim_value: ValuePrimitiveType = "-1.0".into();
+        let double: f64 = (prim_value).into();
+        assert_eq!(double, -1.0);
+
+        let prim_value: ValuePrimitiveType = (1_f32).into();
+        let float: f32 = (&prim_value).into();
+        assert_eq!(float, 1.0);
+        let prim_value: ValuePrimitiveType = (-1_f32).into();
+        let double: f32 = (&prim_value).into();
+        assert_eq!(double, -1.0);
+        let prim_value: ValuePrimitiveType = (1_f32).into();
+        let float: f32 = (prim_value).into();
+        assert_eq!(float, 1.0);
+        let prim_value: ValuePrimitiveType = (-1_f32).into();
+        let double: f32 = (prim_value).into();
+        assert_eq!(double, -1.0);
+
+        let prim_value: ValuePrimitiveType = (1_f64).into();
+        let float: f64 = (&prim_value).into();
+        assert_eq!(float, 1.0);
+        let prim_value: ValuePrimitiveType = (-1_f64).into();
+        let double: f64 = (&prim_value).into();
+        assert_eq!(double, -1.0);
+        let prim_value: ValuePrimitiveType = (1_f64).into();
+        let float: f64 = (prim_value).into();
+        assert_eq!(float, 1.0);
+        let prim_value: ValuePrimitiveType = (-1_f64).into();
+        let double: f64 = (prim_value).into();
+        assert_eq!(double, -1.0);
+
+        let prim_value: ValuePrimitiveType = ().into();
+        let unsigned: u32 = (&prim_value).into();
+        assert_eq!(unsigned, 0);
+        let prim_value: ValuePrimitiveType = ().into();
+        let signed: i32 = (&prim_value).into();
+        assert_eq!(signed, 0);
+        let prim_value: ValuePrimitiveType = ().into();
+        let unsigned: u32 = (prim_value).into();
+        assert_eq!(unsigned, 0);
+        let prim_value: ValuePrimitiveType = ().into();
+        let signed: i32 = (prim_value).into();
+        assert_eq!(signed, 0);
+        let prim_value: ValuePrimitiveType = ().into();
+        let float: f32 = (&prim_value).into();
+        assert_eq!(float, 0.0);
+        let prim_value: ValuePrimitiveType = ().into();
+        let double: f64 = (&prim_value).into();
+        assert_eq!(double, 0.0);
+        let prim_value: ValuePrimitiveType = ().into();
+        let float: f32 = (prim_value).into();
+        assert_eq!(float, 0.0);
+        let prim_value: ValuePrimitiveType = ().into();
+        let double: f64 = (prim_value).into();
+        assert_eq!(double, 0.0);
+
+        let prim_value: ValuePrimitiveType = true.into();
+        let bool_val: bool = (prim_value).into();
+        assert!(bool_val);
+        let prim_value: ValuePrimitiveType = true.into();
+        let bool_val: bool = (&prim_value).into();
+        assert!(bool_val);
+
+        let prim_value: ValuePrimitiveType = false.into();
+        let bool_val: bool = (prim_value).into();
+        assert!(!bool_val);
+        let prim_value: ValuePrimitiveType = false.into();
+        let bool_val: bool = (&prim_value).into();
+        assert!(!bool_val);
+
+        let prim_value: ValuePrimitiveType = ().into();
+        let bool_val: bool = (&prim_value).into();
+        assert!(!bool_val);
+        let prim_value: ValuePrimitiveType = ().into();
+        let bool_val: bool = (prim_value).into();
+        assert!(!bool_val);
+    }
+
+    #[test]
+    fn value_type_numbers() {
+        let prim_value: ValueType = "1".into();
+        let unsigned: u32 = (&prim_value).into();
+        assert_eq!(unsigned, 1);
+        let prim_value: ValueType = "-1".into();
+        let signed: i32 = (&prim_value).into();
+        assert_eq!(signed, -1);
+        let prim_value: ValueType = "1".into();
+        let unsigned: u32 = (prim_value).into();
+        assert_eq!(unsigned, 1);
+        let prim_value: ValueType = "-1".into();
+        let signed: i32 = (prim_value).into();
+        assert_eq!(signed, -1);
+        let prim_value: ValueType = "1.0".into();
+        let float: f32 = (&prim_value).into();
+        assert_eq!(float, 1.0);
+        let prim_value: ValueType = "-1.0".into();
+        let double: f64 = (&prim_value).into();
+        assert_eq!(double, -1.0);
+        let prim_value: ValueType = "1.0".into();
+        let float: f32 = (prim_value).into();
+        assert_eq!(float, 1.0);
+        let prim_value: ValueType = "-1.0".into();
+        let double: f64 = (prim_value).into();
+        assert_eq!(double, -1.0);
+
+        let prim_value: ValueType = ().into();
+        let unsigned: u32 = (&prim_value).into();
+        assert_eq!(unsigned, 0);
+        let prim_value: ValueType = ().into();
+        let signed: i32 = (&prim_value).into();
+        assert_eq!(signed, 0);
+        let prim_value: ValueType = ().into();
+        let unsigned: u32 = (prim_value).into();
+        assert_eq!(unsigned, 0);
+        let prim_value: ValueType = ().into();
+        let signed: i32 = (prim_value).into();
+        assert_eq!(signed, 0);
+        let prim_value: ValueType = ().into();
+        let float: f32 = (&prim_value).into();
+        assert_eq!(float, 0.0);
+        let prim_value: ValueType = ().into();
+        let double: f64 = (&prim_value).into();
+        assert_eq!(double, 0.0);
+        let prim_value: ValueType = ().into();
+        let float: f32 = (prim_value).into();
+        assert_eq!(float, 0.0);
+        let prim_value: ValueType = ().into();
+        let double: f64 = (prim_value).into();
+        assert_eq!(double, 0.0);
+
+        let prim_value: ValueType = ().into();
+        let bool_val: bool = (&prim_value).into();
+        assert!(!bool_val);
+        let prim_value: ValueType = ().into();
+        let bool_val: bool = (prim_value).into();
+        assert!(!bool_val);
+
+        let prim_value: ValueType = true.into();
+        let bool_val: bool = (prim_value).into();
+        assert!(bool_val);
+        let prim_value: ValueType = true.into();
+        let bool_val: bool = (&prim_value).into();
+        assert!(bool_val);
+
+        let prim_value: ValueType = false.into();
+        let bool_val: bool = (prim_value).into();
+        assert!(!bool_val);
+        let prim_value: ValueType = false.into();
+        let bool_val: bool = (&prim_value).into();
+        assert!(!bool_val);
     }
 
     #[test]
@@ -1072,20 +430,26 @@ mod tests {
         }
         impl From<MValue> for Rgba {
             fn from(mvalue: MValue) -> Self {
-                let r: f64 = mvalue.get("r").unwrap().to_prim().unwrap().to_f64().unwrap();
-                let g = mvalue.get("g").unwrap().to_prim().unwrap().to_f64().unwrap();
-                let b = mvalue.get("b").unwrap().to_prim().unwrap().to_f64().unwrap();
-                let a = mvalue.get("a").unwrap().to_prim().unwrap().to_f64().unwrap();
-                Rgba::new(r, g, b, a)
+                let get_f = |key: &str| {
+                    mvalue
+                        .get(key)
+                        .and_then(|v| v.to_prim())
+                        .and_then(|v| v.to_f64())
+                        .unwrap_or(0.0)
+                };
+                Rgba::new(get_f("r"), get_f("g"), get_f("b"), get_f("a"))
             }
         }
         impl From<&MValue> for Rgba {
             fn from(mvalue: &MValue) -> Self {
-                let r: f64 = mvalue.get("r").unwrap().to_prim().unwrap().to_f64().unwrap();
-                let g = mvalue.get("g").unwrap().to_prim().unwrap().to_f64().unwrap();
-                let b = mvalue.get("b").unwrap().to_prim().unwrap().to_f64().unwrap();
-                let a = mvalue.get("a").unwrap().to_prim().unwrap().to_f64().unwrap();
-                Rgba::new(r, g, b, a)
+                let get_f = |key: &str| {
+                    mvalue
+                        .get(key)
+                        .and_then(|v| v.to_prim())
+                        .and_then(|v| v.to_f64())
+                        .unwrap_or(0.0)
+                };
+                Rgba::new(get_f("r"), get_f("g"), get_f("b"), get_f("a"))
             }
         }
 
@@ -1554,6 +918,8 @@ mod tests {
         let value: ValueType = ValueType::Primitive("test".into());
         let back_to_vec: Vec<u64> = (&value).into();
         assert_eq!(back_to_vec, Vec::<u64>::new());
+        let back_to_vec: Vec<u64> = value.into();
+        assert_eq!(back_to_vec, Vec::<u64>::new());
 
         // Value
         let data: Value = Value::from([("a".into(), "b".into())]);
@@ -1574,5 +940,63 @@ mod tests {
         let value: ValueType = ValueType::Primitive("test".into());
         let to_value: Value = (&value).into();
         assert_eq!(to_value, Value::default());
+    }
+
+    #[test]
+    fn test_pbf_prim() {
+        let mut pb = Protobuf::new();
+        let string_value = PrimitiveValue::String("test".to_string());
+        pb.write_message(1, &string_value);
+        let uint_value = PrimitiveValue::U64(1);
+        pb.write_message(2, &uint_value);
+        let sint_value = PrimitiveValue::I64(-1);
+        pb.write_message(3, &sint_value);
+        let float_value = PrimitiveValue::F32(-1.1);
+        pb.write_message(4, &float_value);
+        let double_value = PrimitiveValue::F64(1.1);
+        pb.write_message(5, &double_value);
+        let bool_value = PrimitiveValue::Bool(true);
+        pb.write_message(6, &bool_value);
+        let null_value = PrimitiveValue::Null;
+        pb.write_message(7, &null_value);
+
+        let bytes = pb.take();
+
+        let mut pb_read = Protobuf::from(bytes);
+
+        pb_read.read_field();
+        let mut read_string = PrimitiveValue::Null;
+        pb_read.read_message(&mut read_string);
+        assert_eq!(read_string, string_value);
+
+        pb_read.read_field();
+        let mut read_uint = PrimitiveValue::Null;
+        pb_read.read_message(&mut read_uint);
+        assert_eq!(read_uint, uint_value);
+
+        pb_read.read_field();
+        let mut read_sint = PrimitiveValue::Null;
+        pb_read.read_message(&mut read_sint);
+        assert_eq!(read_sint, sint_value);
+
+        pb_read.read_field();
+        let mut read_float = PrimitiveValue::Null;
+        pb_read.read_message(&mut read_float);
+        assert_eq!(read_float, float_value);
+
+        pb_read.read_field();
+        let mut read_double = PrimitiveValue::Null;
+        pb_read.read_message(&mut read_double);
+        assert_eq!(read_double, double_value);
+
+        pb_read.read_field();
+        let mut read_bool = PrimitiveValue::Null;
+        pb_read.read_message(&mut read_bool);
+        assert_eq!(read_bool, bool_value);
+
+        pb_read.read_field();
+        let mut read_null = PrimitiveValue::Null;
+        pb_read.read_message(&mut read_null);
+        assert_eq!(read_null, null_value);
     }
 }

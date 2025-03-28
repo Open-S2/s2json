@@ -1,3 +1,5 @@
+use core::cmp::Ordering;
+
 use crate::*;
 use alloc::fmt;
 use serde::{
@@ -611,5 +613,22 @@ pub enum BBOX {
 impl Default for BBOX {
     fn default() -> Self {
         BBOX::BBox(BBox::default())
+    }
+}
+impl Eq for BBOX {}
+impl PartialOrd for BBOX {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+impl Ord for BBOX {
+    fn cmp(&self, other: &Self) -> Ordering {
+        match (self, other) {
+            (BBOX::BBox(a), BBOX::BBox(b)) => a.partial_cmp(b).unwrap_or(Ordering::Equal),
+            (BBOX::BBox3D(a), BBOX::BBox3D(b)) => a.partial_cmp(b).unwrap_or(Ordering::Equal),
+            // Ensure that BBox and BBox3D are ordered correctly
+            (BBOX::BBox(_), BBOX::BBox3D(_)) => Ordering::Less,
+            (BBOX::BBox3D(_), BBOX::BBox(_)) => Ordering::Greater,
+        }
     }
 }
