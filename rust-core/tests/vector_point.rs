@@ -659,4 +659,19 @@ mod tests {
         let point = VectorPoint::from_xy(1.0, 2.0);
         assert_eq!(point.perpendicular(), VectorPoint::from_xy(-2., 1.));
     }
+
+    #[test]
+    fn test_get_traits() {
+        #[derive(Debug, PartialEq, Clone)]
+        struct Test {
+            a: String,
+        }
+        let vp: VectorPoint<Test> =
+            VectorPoint::new_xyz(1.0, 2.0, 3.0, Some(Test { a: "a".to_string() }));
+
+        assert_eq!(vp.x(), 1.0);
+        assert_eq!(vp.y(), 2.0);
+        assert_eq!(vp.z(), 3.0);
+        assert_eq!(vp.m(), Some(&Test { a: "a".to_string() }));
+    }
 }

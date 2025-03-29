@@ -31,16 +31,49 @@ pub type MultiPolygon3D = Vec<Polygon3D>;
 /// Define a Point or Point3D
 #[derive(Copy, Clone, Serialize, Deserialize, Debug, PartialEq, Default)]
 pub struct PointOrPoint3D(pub f64, pub f64, pub Option<f64>);
-
 impl From<Point> for PointOrPoint3D {
     fn from(p: Point) -> Self {
         PointOrPoint3D(p.0, p.1, None)
     }
 }
-
 impl From<Point3D> for PointOrPoint3D {
     fn from(p: Point3D) -> Self {
         PointOrPoint3D(p.0, p.1, Some(p.2))
+    }
+}
+
+impl GetXY for Point {
+    fn x(&self) -> f64 {
+        self.0
+    }
+    fn y(&self) -> f64 {
+        self.1
+    }
+}
+impl GetXY for Point3D {
+    fn x(&self) -> f64 {
+        self.0
+    }
+    fn y(&self) -> f64 {
+        self.1
+    }
+}
+impl GetXY for PointOrPoint3D {
+    fn x(&self) -> f64 {
+        self.0
+    }
+    fn y(&self) -> f64 {
+        self.1
+    }
+}
+impl GetZ for Point3D {
+    fn z(&self) -> f64 {
+        self.2
+    }
+}
+impl GetZ for PointOrPoint3D {
+    fn z(&self) -> f64 {
+        self.2.unwrap_or_default()
     }
 }
 

@@ -15,6 +15,30 @@ pub use primitive::*;
 use serde::{Deserialize, Serialize};
 pub use vector::*;
 pub use vector_point::*;
+/// Trait to extract the x and y values
+pub trait GetXY {
+    /// Returns the x value
+    fn x(&self) -> f64;
+    /// Returns the y value
+    fn y(&self) -> f64;
+}
+/// Trait to extract the z value
+pub trait GetZ {
+    /// Returns the z value
+    fn z(&self) -> f64;
+}
+/// Trait to extract the m value
+pub trait GetM<M = MValue> {
+    /// Returns the m value
+    fn m(&self) -> Option<&M>;
+}
+
+/// Composite Trait: XY + Z
+pub trait GetXYZ: GetXY + GetZ {}
+/// Composite Trait: XY + M
+pub trait GetXYM<M = MValue>: GetXY + GetM<M> {}
+/// Composite Trait: XY + Z + M
+pub trait GetXYZM<M = MValue>: GetXY + GetZ + GetM<M> {}
 
 /// The axis to apply an operation to
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]

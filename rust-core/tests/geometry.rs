@@ -1289,4 +1289,26 @@ mod tests {
         let point_or_point3d: PointOrPoint3D = point.into();
         assert_eq!(point_or_point3d, PointOrPoint3D(0., 1., Some(2.)));
     }
+
+    #[test]
+    fn point_trait_gets() {
+        let point = Point(0., 1.);
+        assert_eq!(point.x(), 0.);
+        assert_eq!(point.y(), 1.);
+
+        let point_3d = Point3D(0., 1., 2.);
+        assert_eq!(point_3d.x(), 0.);
+        assert_eq!(point_3d.y(), 1.);
+        assert_eq!(point_3d.z(), 2.);
+
+        let point_or_point3d: PointOrPoint3D = point.into();
+        assert_eq!(point_or_point3d.x(), 0.);
+        assert_eq!(point_or_point3d.y(), 1.);
+        assert_eq!(point_or_point3d.z(), 0.);
+
+        let point_or_point3d: PointOrPoint3D = point_3d.into();
+        assert_eq!(point_or_point3d.x(), 0.);
+        assert_eq!(point_or_point3d.y(), 1.);
+        assert_eq!(point_or_point3d.z(), 2.);
+    }
 }

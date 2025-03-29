@@ -1,6 +1,6 @@
 [package]
 name = "s2json"
-version = "1.27.1"
+version = "1.28.0"
 edition = "2021"
 authors = ["Craig O'Connor <oconnorct1@gmail.com>"]
 description = "This library supports the S2JSON 1.0 Specification"
@@ -20,7 +20,7 @@ bench = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-s2json-core = { path = "../rust-core", version = "1.21.1" }
+s2json-core = { path = "../rust-core", version = "1.22.0" }
 s2json-derive = { path = "../rust-derive", optional = true, version = "1.9.1" }
 
 [features]

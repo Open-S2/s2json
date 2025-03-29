@@ -27,6 +27,24 @@ pub struct VectorPoint<M: Clone = MValue> {
     #[serde(skip)]
     pub t: Option<f64>,
 }
+impl<M: Clone> GetXY for VectorPoint<M> {
+    fn x(&self) -> f64 {
+        self.x
+    }
+    fn y(&self) -> f64 {
+        self.y
+    }
+}
+impl<M: Clone> GetZ for VectorPoint<M> {
+    fn z(&self) -> f64 {
+        self.z.unwrap_or_default()
+    }
+}
+impl<M: Clone> GetM<M> for VectorPoint<M> {
+    fn m(&self) -> Option<&M> {
+        self.m.as_ref()
+    }
+}
 impl VectorPoint<MValue> {
     /// Helper function for tests. Create a new point quickly from an xy coordinate
     pub fn from_xy(x: f64, y: f64) -> Self {
