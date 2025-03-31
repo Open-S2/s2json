@@ -206,19 +206,19 @@ impl<M: Clone + Default> VectorGeometry<M> {
     }
 
     /// set the tessellation of the geometry (polygon and multipolygon only)
-    pub fn set_tess(&mut self, tessellation: Option<Vec<f64>>) {
+    pub fn set_tess(&mut self, tessellation: Vec<f64>) {
         match self {
-            VectorGeometry::Polygon(g) => g.tessellation = tessellation,
-            VectorGeometry::MultiPolygon(g) => g.tessellation = tessellation,
+            VectorGeometry::Polygon(g) => g.tessellation = Some(tessellation),
+            VectorGeometry::MultiPolygon(g) => g.tessellation = Some(tessellation),
             _ => {}
         }
     }
 
     /// set the indices of the geometry (polygon and multipolygon only)
-    pub fn set_indices(&mut self, indices: Option<Vec<u32>>) {
+    pub fn set_indices(&mut self, indices: Vec<u32>) {
         match self {
-            VectorGeometry::Polygon(g) => g.indices = indices,
-            VectorGeometry::MultiPolygon(g) => g.indices = indices,
+            VectorGeometry::Polygon(g) => g.indices = Some(indices),
+            VectorGeometry::MultiPolygon(g) => g.indices = Some(indices),
             _ => {}
         }
     }

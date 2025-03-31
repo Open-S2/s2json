@@ -1207,8 +1207,8 @@ mod tests {
         ];
         let bbox = BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 3.0);
         let mut geometry = VectorGeometry::new_polygon(polygon.clone(), Some(bbox));
-        geometry.set_tess(Some(vec![0.0, 1.0, 2.0, 3.0]));
-        geometry.set_indices(Some(vec![0, 1, 2, 3]));
+        geometry.set_tess(vec![0.0, 1.0, 2.0, 3.0]);
+        geometry.set_indices(vec![0, 1, 2, 3]);
 
         assert_eq!(
             geometry,
@@ -1263,8 +1263,8 @@ mod tests {
         ];
         let bbox = BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 3.0);
         let mut geometry = VectorGeometry::new_multipolygon(multipolygon.clone(), Some(bbox));
-        geometry.set_tess(Some(vec![0.0, 1.0, 2.0, 3.0]));
-        geometry.set_indices(Some(vec![0, 1, 2, 3]));
+        geometry.set_tess(vec![0.0, 1.0, 2.0, 3.0]);
+        geometry.set_indices(vec![0, 1, 2, 3]);
 
         assert_eq!(
             geometry,
