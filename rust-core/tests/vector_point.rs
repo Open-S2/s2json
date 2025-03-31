@@ -671,7 +671,7 @@ mod tests {
 
         assert_eq!(vp.x(), 1.0);
         assert_eq!(vp.y(), 2.0);
-        assert_eq!(vp.z(), 3.0);
+        assert_eq!(vp.z(), Some(3.0));
         assert_eq!(vp.m(), Some(&Test { a: "a".to_string() }));
     }
 }

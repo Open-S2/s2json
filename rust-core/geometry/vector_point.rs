@@ -19,6 +19,7 @@ pub struct VectorPoint<M: Clone = MValue> {
     /// Y coordinate
     pub y: f64,
     /// Z coordinate or "altitude". May be None
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub z: Option<f64>,
     /// M-Value
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -36,8 +37,8 @@ impl<M: Clone> GetXY for VectorPoint<M> {
     }
 }
 impl<M: Clone> GetZ for VectorPoint<M> {
-    fn z(&self) -> f64 {
-        self.z.unwrap_or_default()
+    fn z(&self) -> Option<f64> {
+        self.z
     }
 }
 impl<M: Clone> GetM<M> for VectorPoint<M> {
@@ -45,6 +46,8 @@ impl<M: Clone> GetM<M> for VectorPoint<M> {
         self.m.as_ref()
     }
 }
+impl<M: Clone> GetXYZ for VectorPoint<M> {}
+impl<M: Clone> GetXYZM<M> for VectorPoint<M> {}
 impl VectorPoint<MValue> {
     /// Helper function for tests. Create a new point quickly from an xy coordinate
     pub fn from_xy(x: f64, y: f64) -> Self {

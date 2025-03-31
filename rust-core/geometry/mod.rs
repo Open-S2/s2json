@@ -25,7 +25,7 @@ pub trait GetXY {
 /// Trait to extract the z value
 pub trait GetZ {
     /// Returns the z value
-    fn z(&self) -> f64;
+    fn z(&self) -> Option<f64>;
 }
 /// Trait to extract the m value
 pub trait GetM<M = MValue> {

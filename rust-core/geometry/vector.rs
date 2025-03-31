@@ -86,6 +86,14 @@ impl<M: Clone + Default> VectorGeometry<M> {
         }
     }
 
+    /// Get the geometry point
+    pub fn point(&self) -> Option<&VectorPoint<M>> {
+        match self {
+            VectorGeometry::Point(g) => Some(&g.coordinates),
+            _ => None,
+        }
+    }
+
     /// Create a new point
     pub fn new_point(coordinates: VectorPoint<M>, bbox: Option<BBox3D>) -> Self {
         VectorGeometry::Point(VectorPointGeometry {
@@ -95,6 +103,14 @@ impl<M: Clone + Default> VectorGeometry<M> {
             bbox,
             ..Default::default()
         })
+    }
+
+    /// Get the geometry multi point
+    pub fn multipoint(&self) -> Option<&VectorMultiPoint<M>> {
+        match self {
+            VectorGeometry::MultiPoint(g) => Some(&g.coordinates),
+            _ => None,
+        }
     }
 
     /// Create a new multipoint
@@ -108,6 +124,14 @@ impl<M: Clone + Default> VectorGeometry<M> {
         })
     }
 
+    /// Get the geometry linestring
+    pub fn linestring(&self) -> Option<&VectorLineString<M>> {
+        match self {
+            VectorGeometry::LineString(g) => Some(&g.coordinates),
+            _ => None,
+        }
+    }
+
     /// Create a new linestring
     pub fn new_linestring(coordinates: VectorLineString<M>, bbox: Option<BBox3D>) -> Self {
         VectorGeometry::LineString(VectorLineStringGeometry {
@@ -117,6 +141,14 @@ impl<M: Clone + Default> VectorGeometry<M> {
             bbox,
             ..Default::default()
         })
+    }
+
+    /// Get the geometry multilinestring
+    pub fn multilinestring(&self) -> Option<&VectorMultiLineString<M>> {
+        match self {
+            VectorGeometry::MultiLineString(g) => Some(&g.coordinates),
+            _ => None,
+        }
     }
 
     /// Create a new multilinestring
@@ -133,6 +165,14 @@ impl<M: Clone + Default> VectorGeometry<M> {
         })
     }
 
+    /// Get the geometry polygon
+    pub fn polygon(&self) -> Option<&VectorPolygon<M>> {
+        match self {
+            VectorGeometry::Polygon(g) => Some(&g.coordinates),
+            _ => None,
+        }
+    }
+
     /// Create a new polygon
     pub fn new_polygon(coordinates: VectorPolygon<M>, bbox: Option<BBox3D>) -> Self {
         VectorGeometry::Polygon(VectorPolygonGeometry {
@@ -142,6 +182,14 @@ impl<M: Clone + Default> VectorGeometry<M> {
             bbox,
             ..Default::default()
         })
+    }
+
+    /// Get the geometry multipolygon
+    pub fn multipolygon(&self) -> Option<&VectorMultiPolygon<M>> {
+        match self {
+            VectorGeometry::MultiPolygon(g) => Some(&g.coordinates),
+            _ => None,
+        }
     }
 
     /// Create a new multipolygon
@@ -155,6 +203,24 @@ impl<M: Clone + Default> VectorGeometry<M> {
             bbox,
             ..Default::default()
         })
+    }
+
+    /// set the tessellation of the geometry (polygon and multipolygon only)
+    pub fn set_tess(&mut self, tessellation: Option<Vec<f64>>) {
+        match self {
+            VectorGeometry::Polygon(g) => g.tessellation = tessellation,
+            VectorGeometry::MultiPolygon(g) => g.tessellation = tessellation,
+            _ => {}
+        }
+    }
+
+    /// set the indices of the geometry (polygon and multipolygon only)
+    pub fn set_indices(&mut self, indices: Option<Vec<u32>>) {
+        match self {
+            VectorGeometry::Polygon(g) => g.indices = indices,
+            VectorGeometry::MultiPolygon(g) => g.indices = indices,
+            _ => {}
+        }
     }
 }
 impl<M: Clone + Default> Default for VectorGeometry<M> {
@@ -184,9 +250,11 @@ pub struct VectorBaseGeometry<G = VectorGeometry, O = VectorOffsets> {
     #[serde(skip)]
     pub vec_bbox: Option<BBox3D>,
     /// Polygon and MultiPolygon specific property
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub indices: Option<Vec<u32>>,
     /// Polygon and MultiPolygon specific property
-    pub tesselation: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tessellation: Option<Vec<f64>>,
 }
 
 /// All possible geometry offsets

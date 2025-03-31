@@ -773,7 +773,7 @@ mod tests {
                 far: 2.0,
             }),
             indices: None,
-            tesselation: None,
+            tessellation: None,
         });
         assert_eq!(vgt_point.bbox().unwrap(), BBox3D::new(-1.0, -2.0, -3.0, -4.0, -5.0, -6.0));
         assert_eq!(vgt_point.vec_bbox().unwrap(), BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 2.0));
@@ -800,7 +800,7 @@ mod tests {
                     far: 2.0,
                 }),
                 indices: None,
-                tesselation: None,
+                tessellation: None,
             });
         assert_eq!(
             vgt_multi_point.bbox().unwrap(),
@@ -830,7 +830,7 @@ mod tests {
                     far: 2.0,
                 }),
                 indices: None,
-                tesselation: None,
+                tessellation: None,
             });
         assert_eq!(
             vgt_line_string.bbox().unwrap(),
@@ -866,7 +866,7 @@ mod tests {
                     far: 2.0,
                 }),
                 indices: None,
-                tesselation: None,
+                tessellation: None,
             });
         assert_eq!(
             vgt_multi_line_string.bbox().unwrap(),
@@ -898,7 +898,7 @@ mod tests {
                 far: 2.0,
             }),
             indices: None,
-            tesselation: None,
+            tessellation: None,
         });
         assert_eq!(vgt_polygon.bbox().unwrap(), BBox3D::new(-1.0, -2.0, -3.0, -4.0, -5.0, -6.0));
         assert_eq!(vgt_polygon.vec_bbox().unwrap(), BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 2.0));
@@ -931,7 +931,7 @@ mod tests {
                     far: 2.0,
                 }),
                 indices: None,
-                tesselation: None,
+                tessellation: None,
             });
         assert_eq!(
             vgt_multi_polygon.bbox().unwrap(),
@@ -1041,12 +1041,14 @@ mod tests {
             geometry,
             VectorGeometry::Point(VectorPointGeometry {
                 _type: "Point".into(),
-                coordinates: point,
+                coordinates: point.clone(),
                 bbox: Some(bbox),
                 is_3d: false,
                 ..Default::default()
             })
         );
+
+        assert_eq!(geometry.point(), Some(&point));
     }
 
     #[test]
@@ -1059,12 +1061,14 @@ mod tests {
             geometry,
             VectorGeometry::Point(VectorPointGeometry {
                 _type: "Point".into(),
-                coordinates: point,
+                coordinates: point.clone(),
                 bbox: Some(bbox),
                 is_3d: true,
                 ..Default::default()
             })
         );
+
+        assert_eq!(geometry.point(), Some(&point));
     }
 
     #[test]
@@ -1077,12 +1081,14 @@ mod tests {
             geometry,
             VectorGeometry::MultiPoint(VectorMultiPointGeometry {
                 _type: "MultiPoint".into(),
-                coordinates: multipoint,
+                coordinates: multipoint.clone(),
                 bbox: Some(bbox),
                 is_3d: false,
                 ..Default::default()
             })
         );
+
+        assert_eq!(geometry.multipoint(), Some(&multipoint));
     }
 
     #[test]
@@ -1096,12 +1102,14 @@ mod tests {
             geometry,
             VectorGeometry::MultiPoint(VectorMultiPointGeometry {
                 _type: "MultiPoint".into(),
-                coordinates: multipoint,
+                coordinates: multipoint.clone(),
                 bbox: Some(bbox),
                 is_3d: true,
                 ..Default::default()
             })
         );
+
+        assert_eq!(geometry.multipoint(), Some(&multipoint));
     }
 
     #[test]
@@ -1114,12 +1122,14 @@ mod tests {
             geometry,
             VectorGeometry::LineString(VectorLineStringGeometry {
                 _type: "LineString".into(),
-                coordinates: line_string,
+                coordinates: line_string.clone(),
                 bbox: Some(bbox),
                 is_3d: false,
                 ..Default::default()
             })
         );
+
+        assert_eq!(geometry.linestring(), Some(&line_string));
     }
 
     #[test]
@@ -1133,12 +1143,14 @@ mod tests {
             geometry,
             VectorGeometry::LineString(VectorLineStringGeometry {
                 _type: "LineString".into(),
-                coordinates: linestring,
+                coordinates: linestring.clone(),
                 bbox: Some(bbox),
                 is_3d: true,
                 ..Default::default()
             })
         );
+
+        assert_eq!(geometry.linestring(), Some(&linestring));
     }
 
     #[test]
@@ -1154,12 +1166,14 @@ mod tests {
             geometry,
             VectorGeometry::MultiLineString(VectorMultiLineStringGeometry {
                 _type: "MultiLineString".into(),
-                coordinates: multi_line_string,
+                coordinates: multi_line_string.clone(),
                 bbox: Some(bbox),
                 is_3d: false,
                 ..Default::default()
             })
         );
+
+        assert_eq!(geometry.multilinestring(), Some(&multi_line_string));
     }
 
     #[test]
@@ -1175,12 +1189,14 @@ mod tests {
             geometry,
             VectorGeometry::MultiLineString(VectorMultiLineStringGeometry {
                 _type: "MultiLineString".into(),
-                coordinates: multi_line_string,
+                coordinates: multi_line_string.clone(),
                 bbox: Some(bbox),
                 is_3d: true,
                 ..Default::default()
             })
         );
+
+        assert_eq!(geometry.multilinestring(), Some(&multi_line_string));
     }
 
     #[test]
@@ -1190,18 +1206,24 @@ mod tests {
             vec![VectorPoint::from_xy(1.5, 2.75), VectorPoint::from_xy(3.75, 4.5)],
         ];
         let bbox = BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 3.0);
-        let geometry = VectorGeometry::new_polygon(polygon.clone(), Some(bbox));
+        let mut geometry = VectorGeometry::new_polygon(polygon.clone(), Some(bbox));
+        geometry.set_tess(Some(vec![0.0, 1.0, 2.0, 3.0]));
+        geometry.set_indices(Some(vec![0, 1, 2, 3]));
 
         assert_eq!(
             geometry,
             VectorGeometry::Polygon(VectorPolygonGeometry {
                 _type: "Polygon".into(),
-                coordinates: polygon,
+                coordinates: polygon.clone(),
                 bbox: Some(bbox),
                 is_3d: false,
+                tessellation: Some(vec![0.0, 1.0, 2.0, 3.0]),
+                indices: Some(vec![0, 1, 2, 3]),
                 ..Default::default()
             })
         );
+
+        assert_eq!(geometry.polygon(), Some(&polygon));
     }
 
     #[test]
@@ -1217,12 +1239,14 @@ mod tests {
             geometry,
             VectorGeometry::Polygon(VectorPolygonGeometry {
                 _type: "Polygon".into(),
-                coordinates: polygon_3d,
+                coordinates: polygon_3d.clone(),
                 bbox: Some(bbox),
                 is_3d: true,
                 ..Default::default()
             })
         );
+
+        assert_eq!(geometry.polygon(), Some(&polygon_3d));
     }
 
     #[test]
@@ -1238,18 +1262,24 @@ mod tests {
             ],
         ];
         let bbox = BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 3.0);
-        let geometry = VectorGeometry::new_multipolygon(multipolygon.clone(), Some(bbox));
+        let mut geometry = VectorGeometry::new_multipolygon(multipolygon.clone(), Some(bbox));
+        geometry.set_tess(Some(vec![0.0, 1.0, 2.0, 3.0]));
+        geometry.set_indices(Some(vec![0, 1, 2, 3]));
 
         assert_eq!(
             geometry,
             VectorGeometry::MultiPolygon(VectorMultiPolygonGeometry {
                 _type: "MultiPolygon".into(),
-                coordinates: multipolygon,
+                coordinates: multipolygon.clone(),
                 bbox: Some(bbox),
                 is_3d: false,
+                tessellation: Some(vec![0.0, 1.0, 2.0, 3.0]),
+                indices: Some(vec![0, 1, 2, 3]),
                 ..Default::default()
             })
         );
+
+        assert_eq!(geometry.multipolygon(), Some(&multipolygon));
     }
 
     #[test]
@@ -1271,12 +1301,14 @@ mod tests {
             geometry,
             VectorGeometry::MultiPolygon(VectorMultiPolygonGeometry {
                 _type: "MultiPolygon".into(),
-                coordinates: multipolygon,
+                coordinates: multipolygon.clone(),
                 bbox: Some(bbox),
                 is_3d: true,
                 ..Default::default()
             })
         );
+
+        assert_eq!(geometry.multipolygon(), Some(&multipolygon));
     }
 
     #[test]
@@ -1295,20 +1327,21 @@ mod tests {
         let point = Point(0., 1.);
         assert_eq!(point.x(), 0.);
         assert_eq!(point.y(), 1.);
+        assert_eq!(point.z(), None);
 
         let point_3d = Point3D(0., 1., 2.);
         assert_eq!(point_3d.x(), 0.);
         assert_eq!(point_3d.y(), 1.);
-        assert_eq!(point_3d.z(), 2.);
+        assert_eq!(point_3d.z(), Some(2.));
 
         let point_or_point3d: PointOrPoint3D = point.into();
         assert_eq!(point_or_point3d.x(), 0.);
         assert_eq!(point_or_point3d.y(), 1.);
-        assert_eq!(point_or_point3d.z(), 0.);
+        assert_eq!(point_or_point3d.z(), None);
 
         let point_or_point3d: PointOrPoint3D = point_3d.into();
         assert_eq!(point_or_point3d.x(), 0.);
         assert_eq!(point_or_point3d.y(), 1.);
-        assert_eq!(point_or_point3d.z(), 2.);
+        assert_eq!(point_or_point3d.z(), Some(2.));
     }
 }

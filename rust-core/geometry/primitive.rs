@@ -50,6 +50,12 @@ impl GetXY for Point {
         self.1
     }
 }
+impl GetZ for Point {
+    fn z(&self) -> Option<f64> {
+        None
+    }
+}
+impl GetXYZ for Point {}
 impl GetXY for Point3D {
     fn x(&self) -> f64 {
         self.0
@@ -67,15 +73,17 @@ impl GetXY for PointOrPoint3D {
     }
 }
 impl GetZ for Point3D {
-    fn z(&self) -> f64 {
+    fn z(&self) -> Option<f64> {
+        Some(self.2)
+    }
+}
+impl GetXYZ for Point3D {}
+impl GetZ for PointOrPoint3D {
+    fn z(&self) -> Option<f64> {
         self.2
     }
 }
-impl GetZ for PointOrPoint3D {
-    fn z(&self) -> f64 {
-        self.2.unwrap_or_default()
-    }
-}
+impl GetXYZ for PointOrPoint3D {}
 
 /// Enum to represent specific geometry types as strings
 #[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Default)]
