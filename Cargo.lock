@@ -154,7 +154,7 @@ checksum = "6ea1a2d0a644769cc99faa24c3ad26b379b786fe7c36fd3c546254801650e6dd"
 
 [[package]]
 name = "s2json"
-version = "1.30.0"
+version = "1.31.0"
 dependencies = [
  "s2json-core",
  "s2json-derive",
@@ -162,7 +162,7 @@ dependencies = [
 
 [[package]]
 name = "s2json-core"
-version = "1.24.0"
+version = "1.25.0"
 dependencies = [
  "libm",
  "pbf",

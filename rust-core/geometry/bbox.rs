@@ -285,6 +285,11 @@ where
         seq.end()
     }
 }
+impl<T: Copy> From<BBox3D<T>> for BBox<T> {
+    fn from(bbox: BBox3D<T>) -> Self {
+        BBox::new(bbox.left, bbox.bottom, bbox.right, bbox.top)
+    }
+}
 impl<'de, T> Deserialize<'de> for BBox<T>
 where
     T: Deserialize<'de> + Copy,
@@ -440,6 +445,14 @@ impl<T> BBox3D<T> {
 
         new_bbox
     }
+
+    /// Creates a new BBox3D from a BBox
+    pub fn from_bbox(bbox: &BBox<T>) -> Self
+    where
+        T: Copy + Default,
+    {
+        BBox3D::new(bbox.left, bbox.bottom, bbox.right, bbox.top, T::default(), T::default())
+    }
 }
 impl<T> Serialize for BBox3D<T>
 where
@@ -459,9 +472,19 @@ where
         seq.end()
     }
 }
-impl Default for BBox3D<f64> {
+impl<T> Default for BBox3D<T>
+where
+    T: Default + Bounded + Copy,
+{
     fn default() -> Self {
-        BBox3D::new(f64::MAX, f64::MAX, f64::MIN, f64::MIN, f64::MAX, f64::MIN)
+        BBox3D::new(
+            T::max_value(),
+            T::max_value(),
+            T::min_value(),
+            T::min_value(),
+            T::max_value(),
+            T::min_value(),
+        )
     }
 }
 impl BBox3D<f64> {
@@ -515,11 +538,6 @@ impl BBox3D<f64> {
         bbox
     }
 
-    /// Creates a new BBox3D from a BBox
-    pub fn from_bbox(bbox: &BBox) -> Self {
-        BBox3D::new(bbox.left, bbox.bottom, bbox.right, bbox.top, 0., 0.)
-    }
-
     /// Extends the bounding box with a point
     pub fn extend_from_point<M: Clone>(&mut self, point: &VectorPoint<M>) {
         self.merge_in_place(&BBox3D::from_point(point));
@@ -553,8 +571,8 @@ impl BBox3D<f64> {
         }
     }
 }
-impl From<BBox> for BBox3D<f64> {
-    fn from(bbox: BBox) -> Self {
+impl<T: Default + Copy> From<BBox<T>> for BBox3D<T> {
+    fn from(bbox: BBox<T>) -> Self {
         BBox3D::from_bbox(&bbox)
     }
 }

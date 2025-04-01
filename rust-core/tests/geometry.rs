@@ -443,6 +443,13 @@ mod tests {
     }
 
     #[test]
+    fn test_bbox_3_d_to_bbox() {
+        let bbox_3d = BBox3D::new(0., 0., 1., 1., 0., 1.);
+        let bbox: BBox = bbox_3d.into();
+        assert_eq!(bbox, BBox::new(0., 0., 1., 1.));
+    }
+
+    #[test]
     fn test_point_geometry() {
         let point = PointGeometry {
             _type: "Point".into(),
