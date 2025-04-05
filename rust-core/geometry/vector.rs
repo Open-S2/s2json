@@ -222,6 +222,90 @@ impl<M: Clone + Default> VectorGeometry<M> {
             _ => {}
         }
     }
+
+    /// Convert the geometry so that all m-values are MValue rather then user defined
+    pub fn to_m_geometry(&self) -> VectorGeometry<MValue>
+    where
+        M: MValueCompatible,
+    {
+        match self {
+            VectorGeometry::Point(g) => VectorGeometry::Point(VectorPointGeometry {
+                _type: g._type,
+                is_3d: g.is_3d,
+                coordinates: g.coordinates.to_m_value(),
+                offset: g.offset.clone(),
+                bbox: g.bbox,
+                vec_bbox: g.vec_bbox,
+                ..Default::default()
+            }),
+            VectorGeometry::MultiPoint(g) => VectorGeometry::MultiPoint(VectorMultiPointGeometry {
+                _type: g._type,
+                is_3d: g.is_3d,
+                coordinates: g.coordinates.iter().map(|point| point.to_m_value()).collect(),
+                offset: g.offset,
+                bbox: g.bbox,
+                vec_bbox: g.vec_bbox,
+                ..Default::default()
+            }),
+            VectorGeometry::LineString(g) => VectorGeometry::LineString(VectorLineStringGeometry {
+                _type: g._type,
+                is_3d: g.is_3d,
+                coordinates: g.coordinates.iter().map(|point| point.to_m_value()).collect(),
+                offset: g.offset,
+                bbox: g.bbox,
+                vec_bbox: g.vec_bbox,
+                ..Default::default()
+            }),
+            VectorGeometry::MultiLineString(g) => {
+                VectorGeometry::MultiLineString(VectorMultiLineStringGeometry {
+                    _type: g._type,
+                    is_3d: g.is_3d,
+                    coordinates: g
+                        .coordinates
+                        .iter()
+                        .map(|line| line.iter().map(|point| point.to_m_value()).collect())
+                        .collect(),
+                    offset: g.offset.clone(),
+                    bbox: g.bbox,
+                    vec_bbox: g.vec_bbox,
+                    ..Default::default()
+                })
+            }
+            VectorGeometry::Polygon(g) => VectorGeometry::Polygon(VectorPolygonGeometry {
+                _type: g._type,
+                is_3d: g.is_3d,
+                coordinates: g
+                    .coordinates
+                    .iter()
+                    .map(|ring| ring.iter().map(|point| point.to_m_value()).collect())
+                    .collect(),
+                offset: g.offset.clone(),
+                bbox: g.bbox,
+                vec_bbox: g.vec_bbox,
+                ..Default::default()
+            }),
+            VectorGeometry::MultiPolygon(g) => {
+                VectorGeometry::MultiPolygon(VectorMultiPolygonGeometry {
+                    _type: g._type,
+                    is_3d: g.is_3d,
+                    coordinates: g
+                        .coordinates
+                        .iter()
+                        .map(|polygon| {
+                            polygon
+                                .iter()
+                                .map(|ring| ring.iter().map(|point| point.to_m_value()).collect())
+                                .collect()
+                        })
+                        .collect(),
+                    offset: g.offset.clone(),
+                    bbox: g.bbox,
+                    vec_bbox: g.vec_bbox,
+                    ..Default::default()
+                })
+            }
+        }
+    }
 }
 impl<M: Clone + Default> Default for VectorGeometry<M> {
     fn default() -> Self {

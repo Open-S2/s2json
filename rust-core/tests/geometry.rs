@@ -1076,13 +1076,21 @@ mod tests {
         );
 
         assert_eq!(geometry.point(), Some(&point));
+        assert_eq!(geometry.multipoint(), None);
+        assert_eq!(geometry.linestring(), None);
+        assert_eq!(geometry.multilinestring(), None);
+        assert_eq!(geometry.polygon(), None);
+        assert_eq!(geometry.multipolygon(), None);
     }
 
     #[test]
     fn vector_geometry_new_multipoint() {
         let multipoint = vec![VectorPoint::from_xy(0.5, 0.75), VectorPoint::from_xy(1.75, 2.5)];
         let bbox = BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 3.0);
-        let geometry = VectorGeometry::new_multipoint(multipoint.clone(), Some(bbox));
+        let mut geometry = VectorGeometry::new_multipoint(multipoint.clone(), Some(bbox));
+        // doesn't add them
+        geometry.set_tess(vec![0.0, 1.0, 2.0, 3.0]);
+        geometry.set_indices(vec![0, 1, 2, 3]);
 
         assert_eq!(
             geometry,
@@ -1350,5 +1358,387 @@ mod tests {
         assert_eq!(point_or_point3d.x(), 0.);
         assert_eq!(point_or_point3d.y(), 1.);
         assert_eq!(point_or_point3d.z(), Some(2.));
+    }
+
+    #[test]
+    fn to_m_geometry_points() {
+        #[derive(Debug, Default, Clone, PartialEq, Copy)]
+        struct TestA {
+            x: f64,
+        }
+        impl From<TestA> for MValue {
+            fn from(value: TestA) -> Self {
+                let mut res = MValue::new();
+                res.insert("x".into(), value.x.into());
+                res
+            }
+        }
+        impl From<MValue> for TestA {
+            fn from(value: MValue) -> Self {
+                TestA { x: value.get("x").unwrap().to_prim().unwrap().to_f64().unwrap() }
+            }
+        }
+        impl From<&MValue> for TestA {
+            fn from(value: &MValue) -> Self {
+                TestA { x: value.get("x").unwrap().to_prim().unwrap().to_f64().unwrap() }
+            }
+        }
+        impl MValueCompatible for TestA {}
+
+        let geo: VectorGeometry<TestA> =
+            VectorGeometry::new_point(VectorPoint::new_xy(0.5, 0.75, Some(TestA { x: 1.0 })), None);
+
+        let geo_m = geo.to_m_geometry();
+        assert_eq!(
+            geo_m,
+            VectorGeometry::Point(VectorPointGeometry {
+                _type: "Point".into(),
+                coordinates: VectorPoint::new_xy(
+                    0.5,
+                    0.75,
+                    Some(MValue::from([("x".into(), 1.0.into())]))
+                ),
+                bbox: None,
+                is_3d: false,
+                ..Default::default()
+            })
+        );
+    }
+
+    #[test]
+    fn to_m_geometry_multipoints() {
+        #[derive(Debug, Default, Clone, PartialEq, Copy)]
+        struct TestA {
+            x: f64,
+        }
+        impl From<TestA> for MValue {
+            fn from(value: TestA) -> Self {
+                let mut res = MValue::new();
+                res.insert("x".into(), value.x.into());
+                res
+            }
+        }
+        impl From<MValue> for TestA {
+            fn from(value: MValue) -> Self {
+                TestA { x: value.get("x").unwrap().to_prim().unwrap().to_f64().unwrap() }
+            }
+        }
+        impl From<&MValue> for TestA {
+            fn from(value: &MValue) -> Self {
+                TestA { x: value.get("x").unwrap().to_prim().unwrap().to_f64().unwrap() }
+            }
+        }
+        impl MValueCompatible for TestA {}
+
+        let geo: VectorGeometry<TestA> = VectorGeometry::new_multipoint(
+            vec![
+                VectorPoint::new_xy(0.5, 0.75, Some(TestA { x: 1.0 })),
+                VectorPoint::new_xy(-0.5, -0.75, Some(TestA { x: -1.0 })),
+            ],
+            None,
+        );
+
+        let geo_m = geo.to_m_geometry();
+        assert_eq!(
+            geo_m,
+            VectorGeometry::MultiPoint(VectorMultiPointGeometry {
+                _type: "MultiPoint".into(),
+                coordinates: vec![
+                    VectorPoint::new_xy(0.5, 0.75, Some(MValue::from([("x".into(), 1.0.into())]))),
+                    VectorPoint::new_xy(
+                        -0.5,
+                        -0.75,
+                        Some(MValue::from([("x".into(), (-1.0_f64).into())]))
+                    )
+                ],
+                bbox: None,
+                is_3d: false,
+                ..Default::default()
+            })
+        );
+    }
+
+    #[test]
+    fn to_m_geometry_linestring() {
+        #[derive(Debug, Default, Clone, PartialEq, Copy)]
+        struct TestA {
+            x: f64,
+        }
+        impl From<TestA> for MValue {
+            fn from(value: TestA) -> Self {
+                let mut res = MValue::new();
+                res.insert("x".into(), value.x.into());
+                res
+            }
+        }
+        impl From<MValue> for TestA {
+            fn from(value: MValue) -> Self {
+                TestA { x: value.get("x").unwrap().to_prim().unwrap().to_f64().unwrap() }
+            }
+        }
+        impl From<&MValue> for TestA {
+            fn from(value: &MValue) -> Self {
+                TestA { x: value.get("x").unwrap().to_prim().unwrap().to_f64().unwrap() }
+            }
+        }
+        impl MValueCompatible for TestA {}
+
+        let geo: VectorGeometry<TestA> = VectorGeometry::new_linestring(
+            vec![
+                VectorPoint::new_xy(0.5, 0.75, Some(TestA { x: 1.0 })),
+                VectorPoint::new_xy(-0.5, -0.75, Some(TestA { x: -1.0 })),
+            ],
+            None,
+        );
+
+        let geo_m = geo.to_m_geometry();
+        assert_eq!(
+            geo_m,
+            VectorGeometry::LineString(VectorLineStringGeometry {
+                _type: "LineString".into(),
+                coordinates: vec![
+                    VectorPoint::new_xy(0.5, 0.75, Some(MValue::from([("x".into(), 1.0.into())]))),
+                    VectorPoint::new_xy(
+                        -0.5,
+                        -0.75,
+                        Some(MValue::from([("x".into(), (-1.0_f64).into())]))
+                    )
+                ],
+                bbox: None,
+                is_3d: false,
+                ..Default::default()
+            })
+        );
+    }
+
+    #[test]
+    fn to_m_geometry_multilinestring() {
+        #[derive(Debug, Default, Clone, PartialEq, Copy)]
+        struct TestA {
+            x: f64,
+        }
+        impl From<TestA> for MValue {
+            fn from(value: TestA) -> Self {
+                let mut res = MValue::new();
+                res.insert("x".into(), value.x.into());
+                res
+            }
+        }
+        impl From<MValue> for TestA {
+            fn from(value: MValue) -> Self {
+                TestA { x: value.get("x").unwrap().to_prim().unwrap().to_f64().unwrap() }
+            }
+        }
+        impl From<&MValue> for TestA {
+            fn from(value: &MValue) -> Self {
+                TestA { x: value.get("x").unwrap().to_prim().unwrap().to_f64().unwrap() }
+            }
+        }
+        impl MValueCompatible for TestA {}
+
+        let geo: VectorGeometry<TestA> = VectorGeometry::new_multilinestring(
+            vec![
+                vec![
+                    VectorPoint::new_xy(0.5, 0.75, Some(TestA { x: 1.0 })),
+                    VectorPoint::new_xy(-0.5, -0.75, Some(TestA { x: -1.0 })),
+                ],
+                vec![
+                    VectorPoint::new_xy(1.5, 1.75, Some(TestA { x: 2.0 })),
+                    VectorPoint::new_xy(-1.5, -1.75, Some(TestA { x: -2.0 })),
+                ],
+            ],
+            None,
+        );
+
+        let geo_m = geo.to_m_geometry();
+        assert_eq!(
+            geo_m,
+            VectorGeometry::MultiLineString(VectorMultiLineStringGeometry {
+                _type: "MultiLineString".into(),
+                coordinates: vec![
+                    vec![
+                        VectorPoint::new_xy(
+                            0.5,
+                            0.75,
+                            Some(MValue::from([("x".into(), 1.0.into())]))
+                        ),
+                        VectorPoint::new_xy(
+                            -0.5,
+                            -0.75,
+                            Some(MValue::from([("x".into(), (-1.0_f64).into())]))
+                        )
+                    ],
+                    vec![
+                        VectorPoint::new_xy(
+                            1.5,
+                            1.75,
+                            Some(MValue::from([("x".into(), 2.0.into())]))
+                        ),
+                        VectorPoint::new_xy(
+                            -1.5,
+                            -1.75,
+                            Some(MValue::from([("x".into(), (-2.0_f64).into())]))
+                        )
+                    ]
+                ],
+                bbox: None,
+                is_3d: false,
+                ..Default::default()
+            })
+        );
+    }
+
+    #[test]
+    fn to_m_geometry_polygon() {
+        #[derive(Debug, Default, Clone, PartialEq, Copy)]
+        struct TestA {
+            x: f64,
+        }
+        impl From<TestA> for MValue {
+            fn from(value: TestA) -> Self {
+                let mut res = MValue::new();
+                res.insert("x".into(), value.x.into());
+                res
+            }
+        }
+        impl From<MValue> for TestA {
+            fn from(value: MValue) -> Self {
+                TestA { x: value.get("x").unwrap().to_prim().unwrap().to_f64().unwrap() }
+            }
+        }
+        impl From<&MValue> for TestA {
+            fn from(value: &MValue) -> Self {
+                TestA { x: value.get("x").unwrap().to_prim().unwrap().to_f64().unwrap() }
+            }
+        }
+        impl MValueCompatible for TestA {}
+
+        let geo: VectorGeometry<TestA> = VectorGeometry::new_polygon(
+            vec![
+                vec![
+                    VectorPoint::new_xy(0.5, 0.75, Some(TestA { x: 1.0 })),
+                    VectorPoint::new_xy(-0.5, -0.75, Some(TestA { x: -1.0 })),
+                ],
+                vec![
+                    VectorPoint::new_xy(1.5, 1.75, Some(TestA { x: 2.0 })),
+                    VectorPoint::new_xy(-1.5, -1.75, Some(TestA { x: -2.0 })),
+                ],
+            ],
+            None,
+        );
+
+        let geo_m = geo.to_m_geometry();
+        assert_eq!(
+            geo_m,
+            VectorGeometry::Polygon(VectorPolygonGeometry {
+                _type: "Polygon".into(),
+                coordinates: vec![
+                    vec![
+                        VectorPoint::new_xy(
+                            0.5,
+                            0.75,
+                            Some(MValue::from([("x".into(), 1.0.into())]))
+                        ),
+                        VectorPoint::new_xy(
+                            -0.5,
+                            -0.75,
+                            Some(MValue::from([("x".into(), (-1.0_f64).into())]))
+                        )
+                    ],
+                    vec![
+                        VectorPoint::new_xy(
+                            1.5,
+                            1.75,
+                            Some(MValue::from([("x".into(), 2.0.into())]))
+                        ),
+                        VectorPoint::new_xy(
+                            -1.5,
+                            -1.75,
+                            Some(MValue::from([("x".into(), (-2.0_f64).into())]))
+                        )
+                    ]
+                ],
+                bbox: None,
+                is_3d: false,
+                ..Default::default()
+            })
+        );
+    }
+
+    #[test]
+    fn to_m_geometry_multipolygon() {
+        #[derive(Debug, Default, Clone, PartialEq, Copy)]
+        struct TestA {
+            x: f64,
+        }
+        impl From<TestA> for MValue {
+            fn from(value: TestA) -> Self {
+                let mut res = MValue::new();
+                res.insert("x".into(), value.x.into());
+                res
+            }
+        }
+        impl From<MValue> for TestA {
+            fn from(value: MValue) -> Self {
+                TestA { x: value.get("x").unwrap().to_prim().unwrap().to_f64().unwrap() }
+            }
+        }
+        impl From<&MValue> for TestA {
+            fn from(value: &MValue) -> Self {
+                TestA { x: value.get("x").unwrap().to_prim().unwrap().to_f64().unwrap() }
+            }
+        }
+        impl MValueCompatible for TestA {}
+
+        let geo: VectorGeometry<TestA> = VectorGeometry::new_multipolygon(
+            vec![vec![
+                vec![
+                    VectorPoint::new_xy(0.5, 0.75, Some(TestA { x: 1.0 })),
+                    VectorPoint::new_xy(-0.5, -0.75, Some(TestA { x: -1.0 })),
+                ],
+                vec![
+                    VectorPoint::new_xy(1.5, 1.75, Some(TestA { x: 2.0 })),
+                    VectorPoint::new_xy(-1.5, -1.75, Some(TestA { x: -2.0 })),
+                ],
+            ]],
+            None,
+        );
+
+        let geo_m = geo.to_m_geometry();
+        assert_eq!(
+            geo_m,
+            VectorGeometry::MultiPolygon(VectorMultiPolygonGeometry {
+                _type: "MultiPolygon".into(),
+                coordinates: vec![vec![
+                    vec![
+                        VectorPoint::new_xy(
+                            0.5,
+                            0.75,
+                            Some(MValue::from([("x".into(), 1.0.into())]))
+                        ),
+                        VectorPoint::new_xy(
+                            -0.5,
+                            -0.75,
+                            Some(MValue::from([("x".into(), (-1.0_f64).into())]))
+                        )
+                    ],
+                    vec![
+                        VectorPoint::new_xy(
+                            1.5,
+                            1.75,
+                            Some(MValue::from([("x".into(), 2.0.into())]))
+                        ),
+                        VectorPoint::new_xy(
+                            -1.5,
+                            -1.75,
+                            Some(MValue::from([("x".into(), (-2.0_f64).into())]))
+                        )
+                    ]
+                ]],
+                bbox: None,
+                is_3d: false,
+                ..Default::default()
+            })
+        );
     }
 }

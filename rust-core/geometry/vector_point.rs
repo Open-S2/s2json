@@ -75,6 +75,20 @@ impl<M: Clone> VectorPoint<M> {
         Self { x, y, z: Some(z), m, t: None }
     }
 
+    /// Convert to an MValue VectorPoint
+    pub fn to_m_value(&self) -> VectorPoint<MValue>
+    where
+        M: Into<MValue>,
+    {
+        VectorPoint {
+            x: self.x,
+            y: self.y,
+            z: self.z,
+            m: self.m.clone().map(|m| m.into()),
+            t: None,
+        }
+    }
+
     /// Project the point into the 0->1 coordinate system
     pub fn project(&mut self, bbox: Option<&mut BBox3D>) {
         let y = self.y;
