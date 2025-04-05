@@ -347,7 +347,7 @@ impl<M, P: Clone + Default, D: Clone + Default> VectorFeature<M, P, D> {
     /// Update the metadata to user defined value
     pub fn to_m_vector_feature<M2>(
         &self,
-        to_meta: fn(Option<&M>) -> M2,
+        to_meta: impl FnOnce(Option<&M>) -> Option<M2>,
     ) -> VectorFeature<M2, Properties, MValue>
     where
         M: Clone,
@@ -360,7 +360,7 @@ impl<M, P: Clone + Default, D: Clone + Default> VectorFeature<M, P, D> {
             face: self.face,
             properties: self.properties.clone().into(),
             geometry: self.geometry.to_m_geometry(),
-            metadata: Some(to_meta(self.metadata.as_ref())),
+            metadata: to_meta(self.metadata.as_ref()),
         }
     }
 }

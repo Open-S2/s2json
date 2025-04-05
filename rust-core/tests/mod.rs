@@ -443,4 +443,37 @@ mod tests {
     fn serde_face_err() {
         let _ = serde_json::from_str::<Face>("6").unwrap();
     }
+
+    #[test]
+    fn to_m() {
+        #[derive(Serialize, Deserialize, PartialEq, Clone, Debug, Default)]
+        struct MetaTest {
+            name: String,
+            value: String,
+        }
+
+        let fc = VectorFeature::<MetaTest>::new_s2(
+            Some(55),
+            3.into(),
+            Properties::new(),
+            VectorGeometry::Point(VectorPointGeometry {
+                _type: "Point".into(),
+                coordinates: VectorPoint { x: 0.0, y: 1.0, z: Some(3.), m: None, t: None },
+                bbox: None,
+                is_3d: true,
+                offset: None,
+                vec_bbox: None,
+                indices: None,
+                tessellation: None,
+            }),
+            Some(MetaTest { name: "test".into(), value: "value".into() }),
+        );
+
+        let fc_m = fc.to_m_vector_feature(|meta| {
+            let meta = meta.unwrap().clone();
+            Some(MValue::from([("a".into(), meta.name.into())]))
+        });
+
+        assert_eq!(fc_m.metadata, Some(MValue::from([("a".into(), "test".into())])));
+    }
 }
