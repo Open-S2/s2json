@@ -3,9 +3,9 @@ use core::cmp::Ordering;
 use crate::*;
 use alloc::fmt;
 use serde::{
+    Deserialize, Deserializer, Serialize, Serializer,
     de::{self, SeqAccess, Visitor},
     ser::SerializeTuple,
-    Deserialize, Deserializer, Serialize, Serializer,
 };
 
 trait Bounded {

@@ -20,7 +20,7 @@ mod tests {
         let test_struct = TestStruct { name: "example".into(), value: 42 };
 
         let mvalue: MValue = test_struct.clone().into(); // Ensure this method exists
-                                                         // println!("{:?}", mvalue); // Debug output
+        // println!("{:?}", mvalue); // Debug output
         assert_eq!(
             mvalue,
             Value::from([
@@ -47,7 +47,7 @@ mod tests {
         let test_struct = TestStruct { a: 1, b: 2, c: 3, d: 4, e: 5 };
 
         let mvalue: MValue = test_struct.clone().into(); // Ensure this method exists
-                                                         // println!("{:?}", mvalue); // Debug output
+        // println!("{:?}", mvalue); // Debug output
         assert_eq!(
             mvalue,
             Value::from([
@@ -77,7 +77,7 @@ mod tests {
         let test_struct = TestStruct { a: -1, b: 2, c: -3, d: 4, e: -5 };
 
         let mvalue: MValue = test_struct.clone().into(); // Ensure this method exists
-                                                         // println!("{:?}", mvalue); // Debug output
+        // println!("{:?}", mvalue); // Debug output
         assert_eq!(
             mvalue,
             Value::from([
@@ -104,7 +104,7 @@ mod tests {
         let test_struct = TestStruct { a: 1.0, b: 2.0 };
 
         let mvalue: MValue = test_struct.clone().into(); // Ensure this method exists
-                                                         // println!("{:?}", mvalue); // Debug output
+        // println!("{:?}", mvalue); // Debug output
         assert_eq!(
             mvalue,
             Value::from([
@@ -127,7 +127,7 @@ mod tests {
         let test_struct = TestStruct { a: true };
 
         let mvalue: MValue = test_struct.clone().into(); // Ensure this method exists
-                                                         // println!("{:?}", mvalue); // Debug output
+        // println!("{:?}", mvalue); // Debug output
         assert_eq!(
             mvalue,
             Value::from([("a".into(), ValueType::Primitive(PrimitiveValue::Bool(true)))]),
@@ -153,7 +153,7 @@ mod tests {
         let test_struct = TestStruct { a: NestedStruct { a: "a".into(), b: 1 }, b: 2 };
 
         let mvalue: MValue = test_struct.clone().into(); // Ensure this method exists
-                                                         // println!("{:?}", mvalue); // Debug output
+        // println!("{:?}", mvalue); // Debug output
         assert_eq!(
             mvalue,
             Value::from([
@@ -182,7 +182,7 @@ mod tests {
         let test_struct = TestStruct { a: Some(1) };
 
         let mvalue: MValue = test_struct.clone().into(); // Ensure this method exists
-                                                         // println!("{:?}", mvalue); // Debug output
+        // println!("{:?}", mvalue); // Debug output
         assert_eq!(
             mvalue,
             Value::from([("a".into(), ValueType::Primitive(PrimitiveValue::U64(1)))]),
@@ -194,7 +194,7 @@ mod tests {
         let test_struct = TestStruct { a: None };
 
         let mvalue: MValue = test_struct.clone().into(); // Ensure this method exists
-                                                         // println!("{:?}", mvalue); // Debug output
+        // println!("{:?}", mvalue); // Debug output
         assert_eq!(mvalue, Value::from([("a".into(), ValueType::Primitive(PrimitiveValue::Null))]));
 
         let back_to_struct: TestStruct = mvalue.into();
@@ -213,7 +213,7 @@ mod tests {
         };
 
         let mvalue: MValue = test_struct.clone().into(); // Ensure this method exists
-                                                         // println!("{:?}", mvalue); // Debug output
+        // println!("{:?}", mvalue); // Debug output
         assert_eq!(
             mvalue,
             Value::from([(
@@ -245,7 +245,7 @@ mod tests {
         let test_struct = TestStruct { a: Some(NestedStruct { a: "a".into(), b: 1 }), b: 2 };
 
         let mvalue: MValue = test_struct.clone().into(); // Ensure this method exists
-                                                         // println!("{:?}", mvalue); // Debug output
+        // println!("{:?}", mvalue); // Debug output
         assert_eq!(
             mvalue,
             Value::from([
@@ -314,7 +314,7 @@ mod tests {
         let test_struct = TestStruct { name: "example".into(), value: 42 };
 
         let json: JSONProperties = test_struct.clone().into(); // Ensure this method exists
-                                                               // println!("{:?}", json); // Debug output
+        // println!("{:?}", json); // Debug output
         assert_eq!(
             json,
             JSONProperties::from([
@@ -341,7 +341,7 @@ mod tests {
         let test_struct = TestStruct { a: 1, b: 2, c: 3, d: 4, e: 5 };
 
         let json: JSONProperties = test_struct.clone().into(); // Ensure this method exists
-                                                               // println!("{:?}", json); // Debug output
+        // println!("{:?}", json); // Debug output
         assert_eq!(
             json,
             JSONProperties::from([
@@ -371,7 +371,7 @@ mod tests {
         let test_struct = TestStruct { a: -1, b: 2, c: -3, d: 4, e: -5 };
 
         let json: JSONProperties = test_struct.clone().into(); // Ensure this method exists
-                                                               // println!("{:?}", json); // Debug output
+        // println!("{:?}", json); // Debug output
         assert_eq!(
             json,
             JSONProperties::from([
@@ -398,7 +398,7 @@ mod tests {
         let test_struct = TestStruct { a: 1.0, b: 2.0 };
 
         let json: JSONProperties = test_struct.clone().into(); // Ensure this method exists
-                                                               // println!("{:?}", json); // Debug output
+        // println!("{:?}", json); // Debug output
         assert_eq!(
             json,
             JSONProperties::from([
@@ -421,7 +421,7 @@ mod tests {
         let test_struct = TestStruct { a: true };
 
         let json: JSONProperties = test_struct.clone().into(); // Ensure this method exists
-                                                               // println!("{:?}", json); // Debug output
+        // println!("{:?}", json); // Debug output
         assert_eq!(
             json,
             JSONProperties::from([("a".into(), JSONValue::Primitive(PrimitiveValue::Bool(true)))]),
@@ -441,7 +441,7 @@ mod tests {
         let test_struct = TestStruct { a: Some(1) };
 
         let json: JSONProperties = test_struct.clone().into(); // Ensure this method exists
-                                                               // println!("{:?}", json); // Debug output
+        // println!("{:?}", json); // Debug output
         assert_eq!(
             json,
             JSONProperties::from([("a".into(), JSONValue::Primitive(PrimitiveValue::U64(1)))]),
@@ -453,7 +453,7 @@ mod tests {
         let test_struct = TestStruct { a: None };
 
         let json: JSONProperties = test_struct.clone().into(); // Ensure this method exists
-                                                               // println!("{:?}", json); // Debug output
+        // println!("{:?}", json); // Debug output
         assert_eq!(
             json,
             JSONProperties::from([("a".into(), JSONValue::Primitive(PrimitiveValue::Null))])
@@ -475,7 +475,7 @@ mod tests {
         };
 
         let json: JSONProperties = test_struct.clone().into(); // Ensure this method exists
-                                                               // println!("{:?}", json); // Debug output
+        // println!("{:?}", json); // Debug output
         assert_eq!(
             json,
             JSONProperties::from([(
@@ -507,7 +507,7 @@ mod tests {
         let test_struct = TestStruct { a: Some(NestedStruct { a: "a".into(), b: 1 }), b: 2 };
 
         let json: JSONProperties = test_struct.clone().into(); // Ensure this method exists
-                                                               // println!("{:?}", json); // Debug output
+        // println!("{:?}", json); // Debug output
         assert_eq!(
             json,
             JSONProperties::from([
@@ -589,7 +589,7 @@ mod tests {
         };
 
         let json: MValue = test_struct.clone().into(); // Ensure this method exists
-                                                       // println!("{:?}", json); // Debug output
+        // println!("{:?}", json); // Debug output
         assert_eq!(
             json,
             MValue::from([(

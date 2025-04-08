@@ -220,11 +220,7 @@ impl<M: Clone> VectorPoint<M> {
         let tmp = self.abs();
         let tmp_z = tmp.z.unwrap_or(-2.);
         if tmp.x > tmp.y {
-            if tmp.x > tmp_z {
-                0
-            } else {
-                2
-            }
+            if tmp.x > tmp_z { 0 } else { 2 }
         } else if tmp.y > tmp_z {
             1
         } else {
