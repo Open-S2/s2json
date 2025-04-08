@@ -1,7 +1,7 @@
 {
   "name": "s2json-spec",
   "publisher": "OpenS2",
-  "version": "1.9.0",
+  "version": "1.10.0",
   "description": "S2JSON is a specification for encoding a variety of geographic data structures",
   "keywords": [
     "vector",

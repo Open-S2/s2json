@@ -1,6 +1,6 @@
 use proc_macro::TokenStream;
+use proc_macro_crate::{FoundCrate, crate_name};
 use proc_macro2::Span;
-use proc_macro_crate::{crate_name, FoundCrate};
 use quote::quote;
 use syn::{Data, Fields, Ident};
 
@@ -22,7 +22,7 @@ pub fn generate_to_mvalue(ast: &syn::DeriveInput) -> TokenStream {
 
     let (from_mvalue, into_mvalue) = generate_mvalue_conversions(fields);
 
-    let gen = quote! {
+    let gener = quote! {
         #[doc(hidden)]
         #[allow(
             non_upper_case_globals,
@@ -96,7 +96,7 @@ pub fn generate_to_mvalue(ast: &syn::DeriveInput) -> TokenStream {
         };
     };
 
-    gen.into()
+    gener.into()
 }
 
 fn generate_mvalue_conversions(

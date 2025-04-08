@@ -1,4 +1,4 @@
-import type { Face } from '.';
+import type { Face, Feature, VectorFeature } from '.';
 import type {
   LineStringMValues,
   MValue,
@@ -6,6 +6,7 @@ import type {
   MultiLineStringMValues,
   MultiPolygonMValues,
   PolygonMValues,
+  Properties,
 } from './values.spec';
 
 /**
@@ -201,6 +202,79 @@ export type MultiPolygon3DGeometry<M extends MValue = MValue> = BaseGeometry<
   BBox3D
 >;
 
+/** Feature that specifically contains PointGeometry */
+export type PointFeature<
+  M = Record<string, unknown>,
+  D extends MValue = Properties,
+  P extends Properties = Properties,
+> = Feature<M, D, P, PointGeometry<D>>;
+/** Feature that specifically contains Point3DGeometry */
+export type Point3DFeature<
+  M = Record<string, unknown>,
+  D extends MValue = Properties,
+  P extends Properties = Properties,
+> = Feature<M, D, P, Point3DGeometry<D>>;
+/** Feature that specifically contains MultiPointGeometry */
+export type MultiPointFeature<
+  M = Record<string, unknown>,
+  D extends MValue = Properties,
+  P extends Properties = Properties,
+> = Feature<M, D, P, MultiPointGeometry<D>>;
+/** Feature that specifically contains MultiPoint3DGeometry */
+export type MultiPoint3DFeature<
+  M = Record<string, unknown>,
+  D extends MValue = Properties,
+  P extends Properties = Properties,
+> = Feature<M, D, P, MultiPoint3DGeometry<D>>;
+/** Feature that specifically contains LineStringGeometry */
+export type LineStringFeature<
+  M = Record<string, unknown>,
+  D extends MValue = Properties,
+  P extends Properties = Properties,
+> = Feature<M, D, P, LineStringGeometry<D>>;
+/** Feature that specifically contains LineString3DGeometry */
+export type LineString3DFeature<
+  M = Record<string, unknown>,
+  D extends MValue = Properties,
+  P extends Properties = Properties,
+> = Feature<M, D, P, LineString3DGeometry<D>>;
+/** Feature that specifically contains MultiLineStringGeometry */
+export type MultiLineStringFeature<
+  M = Record<string, unknown>,
+  D extends MValue = Properties,
+  P extends Properties = Properties,
+> = Feature<M, D, P, MultiLineStringGeometry<D>>;
+/** Feature that specifically contains MultiLineString3DGeometry */
+export type MultiLineString3DFeature<
+  M = Record<string, unknown>,
+  D extends MValue = Properties,
+  P extends Properties = Properties,
+> = Feature<M, D, P, MultiLineString3DGeometry<D>>;
+/** Feature that specifically contains PolygonGeometry */
+export type PolygonFeature<
+  M = Record<string, unknown>,
+  D extends MValue = Properties,
+  P extends Properties = Properties,
+> = Feature<M, D, P, PolygonGeometry<D>>;
+/** Feature that specifically contains Polygon3DGeometry */
+export type Polygon3DFeature<
+  M = Record<string, unknown>,
+  D extends MValue = Properties,
+  P extends Properties = Properties,
+> = Feature<M, D, P, Polygon3DGeometry<D>>;
+/** Feature that specifically contains MultiPolygonGeometry */
+export type MultiPolygonFeature<
+  M = Record<string, unknown>,
+  D extends MValue = Properties,
+  P extends Properties = Properties,
+> = Feature<M, D, P, MultiPolygonGeometry<D>>;
+/** Feature that specifically contains MultiPolygon3DGeometry */
+export type MultiPolygon3DFeature<
+  M = Record<string, unknown>,
+  D extends MValue = Properties,
+  P extends Properties = Properties,
+> = Feature<M, D, P, MultiPolygon3DGeometry<D>>;
+
 /// Vector Types
 
 /** Definition of a Vector Point */
@@ -337,3 +411,40 @@ export interface VectorMultiPolygonGeometry<M extends MValue = MValue>
   indices?: number[];
   tessellation?: number[];
 }
+
+/** Vector Feature that specifically contains VectorPointGeometry */
+export type VectorPointFeature<
+  M = Record<string, unknown>,
+  D extends MValue = Properties,
+  P extends Properties = Properties,
+> = VectorFeature<M, D, P, VectorPointGeometry<D>>;
+/** Vector Feature that specifically contains VectorMultiPointGeometry */
+export type VectorMultiPointFeature<
+  M = Record<string, unknown>,
+  D extends MValue = Properties,
+  P extends Properties = Properties,
+> = VectorFeature<M, D, P, VectorMultiPointGeometry<D>>;
+/** Vector Feature that specifically contains VectorLineStringGeometry */
+export type VectorLineStringFeature<
+  M = Record<string, unknown>,
+  D extends MValue = Properties,
+  P extends Properties = Properties,
+> = VectorFeature<M, D, P, VectorLineStringGeometry<D>>;
+/** Vector Feature that specifically contains VectorMultiLineStringGeometry */
+export type VectorMultiLineStringFeature<
+  M = Record<string, unknown>,
+  D extends MValue = Properties,
+  P extends Properties = Properties,
+> = VectorFeature<M, D, P, VectorMultiLineStringGeometry<D>>;
+/** Vector Feature that specifically contains VectorPolygonGeometry */
+export type VectorPolygonFeature<
+  M = Record<string, unknown>,
+  D extends MValue = Properties,
+  P extends Properties = Properties,
+> = VectorFeature<M, D, P, VectorPolygonGeometry<D>>;
+/** Vector Feature that specifically contains VectorMultiPolygonGeometry */
+export type VectorMultiPolygonFeature<
+  M = Record<string, unknown>,
+  D extends MValue = Properties,
+  P extends Properties = Properties,
+> = VectorFeature<M, D, P, VectorMultiPolygonGeometry<D>>;
