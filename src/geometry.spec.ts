@@ -1,4 +1,4 @@
-import type { Face, Feature, VectorFeature } from '.';
+import type { Face, Feature, VectorFeature } from './index.js';
 import type {
   LineStringMValues,
   MValue,
@@ -7,7 +7,7 @@ import type {
   MultiPolygonMValues,
   PolygonMValues,
   Properties,
-} from './values.spec';
+} from './values.spec.js';
 
 /**
  * A BBOX is defined in lon-lat space and helps with zooming motion to

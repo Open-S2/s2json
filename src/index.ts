@@ -1,8 +1,11 @@
-import type { BBOX, Geometry, VectorGeometry } from './geometry.spec';
-import type { MValue, Properties } from './values.spec';
+import S2JsonSchema from './s2json.schema.json' with { type: 'json' };
 
-export * from './geometry.spec';
-export * from './values.spec';
+import type { BBOX, Geometry, VectorGeometry } from './geometry.spec.js';
+import type { MValue, Properties } from './values.spec.js';
+
+export { S2JsonSchema };
+export * from './geometry.spec.js';
+export * from './values.spec.js';
 
 // NOTE: S2 -> S2Geometry
 // NOTE: WG -> WGS84
