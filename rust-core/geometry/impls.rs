@@ -5,7 +5,7 @@ use crate::*;
 #[allow(unused_extern_crates, clippy::useless_attribute)]
 extern crate serde as _serde;
 #[automatically_derived]
-#[coverage(off)]
+// #[coverage(off)]
 impl<'de, M: Clone + Default> _serde::Deserialize<'de> for Geometry<M>
 where
     M: _serde::Deserialize<'de>,
@@ -124,7 +124,7 @@ where
 #[doc(hidden)]
 #[allow(unused_extern_crates, clippy::useless_attribute)]
 #[automatically_derived]
-#[coverage(off)]
+// #[coverage(off)]
 impl<'de, M: Clone + Default> _serde::Deserialize<'de> for VectorGeometry<M>
 where
     M: _serde::Deserialize<'de>,

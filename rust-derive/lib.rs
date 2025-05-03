@@ -1,4 +1,8 @@
-use proc_macro::TokenStream;
+#![forbid(unsafe_code)]
+#![deny(missing_docs)]
+#![cfg_attr(docsrs, feature(doc_cfg))]
+
+//! The `s2json-derive` Rust crate provides ... TODO
 
 mod json;
 mod mvalue;
@@ -7,6 +11,7 @@ mod prim_value;
 use json::generate_to_json;
 use mvalue::generate_to_mvalue;
 use prim_value::generate_to_value_prim;
+use proc_macro::TokenStream;
 
 /// Derives the `MValueCompatible` trait for a struct to convert it to a `MValue`.
 #[proc_macro_derive(MValueCompatible)]
@@ -36,6 +41,7 @@ pub fn json_properties_derive(input: TokenStream) -> TokenStream {
     generate_to_json(&ast)
 }
 
+/// Derives the `ValuePrimitive` trait for a struct to convert it to a `ValuePrimitive`.
 #[proc_macro_derive(ValuePrimitive)]
 pub fn primitive_value_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();

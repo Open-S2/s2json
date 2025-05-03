@@ -1,27 +1,30 @@
 [package]
 name = "s2json-derive"
-version = "1.10.0"
-edition = "2024"
-authors = ["Craig O'Connor <oconnorct1@gmail.com>"]
-description = "This library supports the S2JSON 1.0 Specification"
-documentation = "https://docs.rs/s2json-derive"
-homepage = "https://github.com/OpenS2/s2json"
-repository = "https://github.com/OpenS2/s2json"
-readme = "README.md"
-categories = ["encoding", "wasm", "embedded", "no-std"]
-keywords = ["open", "vector", "tile", "gis", "low-cost-code"]
-license = "MIT"
+publish = false
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+description.workspace = true
+documentation.workspace = true
+homepage.workspace = true
+repository.workspace = true
+readme.workspace = true
+categories.workspace = true
+keywords.workspace = true
+license.workspace = true
 
 [dependencies]
+# LOCAL
+s2json-core = { workspace = true }
+# EXTERNAL
 proc-macro2 = "1.0"
 quote = "1.0"
-syn = { version = "1.0", features = ["derive"] }
-s2json-core = { path = "../rust-core", version = "1" }
+syn = { version = "2.0", features = ["derive"] }
 proc-macro-crate = "3.3"
 
 [dev-dependencies]
-serde = { version = "1.0", default-features = false, features = ["alloc", "derive"] }
-serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
+serde = { workspace = true }
+serde_json = { workspace = true }
 
 [lib]
 proc-macro = true

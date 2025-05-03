@@ -1,16 +1,17 @@
 [package]
 name = "s2json-core"
-version = "1.28.0"
-edition = "2024"
-authors = ["Craig O'Connor <oconnorct1@gmail.com>"]
-description = "This library supports the S2JSON 1.0 Specification"
-documentation = "https://docs.rs/s2json-core"
-homepage = "https://github.com/OpenS2/s2json"
-repository = "https://github.com/OpenS2/s2json"
-readme = "README.md"
-categories = ["encoding", "wasm", "embedded", "no-std"]
-keywords = ["open", "vector", "tile", "gis", "low-cost-code"]
-license = "MIT"
+publish = false
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+description.workspace = true
+documentation.workspace = true
+homepage.workspace = true
+repository.workspace = true
+readme.workspace = true
+categories.workspace = true
+keywords.workspace = true
+license.workspace = true
 
 [lib]
 name = "s2json_core"
@@ -20,10 +21,10 @@ bench = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-libm = "0.2"
-pbf = "1.21"
-serde = { version = "1.0", default-features = false, features = ["alloc", "derive"] }
-serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
+libm = { workspace = true }
+pbf = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
 
 [dev-dependencies]
 
