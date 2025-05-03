@@ -1,6 +1,6 @@
 [package]
 name = "s2json-derive"
-publish = false
+publish = true
 version.workspace = true
 edition.workspace = true
 authors.workspace = true

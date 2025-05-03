@@ -66,7 +66,10 @@ mod tests {
         assert_eq!(fc.bbox, Some(BBox::new(5., -2., 35., 2.2)));
 
         let string = serde_json::to_string(&fc).unwrap();
-        assert_eq!(string, "{\"type\":\"FeatureCollection\",\"features\":[],\"attributions\":{\"Open S2\":\"https://opens2.com/legal/data\"},\"bbox\":[5.0,-2.0,35.0,2.2]}");
+        assert_eq!(
+            string,
+            "{\"type\":\"FeatureCollection\",\"features\":[],\"attributions\":{\"Open S2\":\"https://opens2.com/legal/data\"},\"bbox\":[5.0,-2.0,35.0,2.2]}"
+        );
         let back_to_fc: FeatureCollection = serde_json::from_str(&string).unwrap();
         assert_eq!(back_to_fc, fc);
     }
@@ -88,7 +91,10 @@ mod tests {
         assert_eq!(fc.faces, vec![0.into(), 3.into()]);
 
         let string = serde_json::to_string(&fc).unwrap();
-        assert_eq!(string, "{\"type\":\"S2FeatureCollection\",\"features\":[],\"faces\":[0,3],\"attributions\":{\"Open S2\":\"https://opens2.com/legal/data\"},\"bbox\":[5.0,-2.0,35.0,2.2]}");
+        assert_eq!(
+            string,
+            "{\"type\":\"S2FeatureCollection\",\"features\":[],\"faces\":[0,3],\"attributions\":{\"Open S2\":\"https://opens2.com/legal/data\"},\"bbox\":[5.0,-2.0,35.0,2.2]}"
+        );
         let back_to_fc: S2FeatureCollection = serde_json::from_str(&string).unwrap();
         assert_eq!(back_to_fc, fc);
     }
