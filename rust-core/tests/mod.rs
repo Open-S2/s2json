@@ -482,4 +482,16 @@ mod tests {
 
         assert_eq!(fc_m.metadata, Some(MValue::from([("a".into(), "test".into())])));
     }
+
+    #[test]
+    fn semi_bad_data_test() {
+        let data = r#"{"type": "VectorFeature", "geometry": {"type": "Point", "coordinates": {"x": 637012.2400, "y": 849028.3100, "z": 431.6600, "m": {"intensity": 143, "gps_time": 245380.7825, "rgba": {"r": 68, "g": 77, "b": 88, "a": 255}}}}}"#;
+
+        let vec_feat: VectorFeature = serde_json::from_str(data).unwrap();
+        assert_eq!(vec_feat.properties, Properties::new());
+        assert_eq!(vec_feat.face, Face::default());
+
+        let features: Features = serde_json::from_str(data).unwrap();
+        assert_eq!(features, Features::VectorFeature(vec_feat));
+    }
 }

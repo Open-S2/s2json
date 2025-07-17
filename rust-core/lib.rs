@@ -229,6 +229,7 @@ pub struct Feature<M = (), P: Clone + Default = Properties, D: Clone + Default =
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<u64>,
     /// Properties of the feature
+    #[serde(default)]
     pub properties: P,
     /// Geometry of the feature
     pub geometry: Geometry<D>,
@@ -282,8 +283,10 @@ pub struct VectorFeature<M = (), P: Clone + Default = Properties, D: Clone + Def
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<u64>,
     /// Face of the feature
+    #[serde(default)]
     pub face: Face,
     /// Properties of the feature
+    #[serde(default)]
     pub properties: P,
     /// Geometry of the feature
     pub geometry: VectorGeometry<D>,

@@ -320,7 +320,7 @@ pub struct VectorBaseGeometry<G = VectorGeometry, O = VectorOffsets> {
     #[serde(rename = "type")]
     pub _type: VectorGeometryType,
     /// Specifies if the geometry is 3D or 2D
-    #[serde(rename = "is3D")]
+    #[serde(rename = "is3D", default)]
     pub is_3d: bool,
     /// The geometry shape
     pub coordinates: G,
