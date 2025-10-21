@@ -26,11 +26,10 @@ where
 
         // Attempt to deserialize as MultiPoint then check if it's actually a LineString
         if let Ok(multipoint) = MultiPointGeometry::<M>::deserialize(value.clone()) {
-            if multipoint._type == GeometryType::LineString {
-                // If the type matches, we prioritize the LineString deserialization.
-                if let Ok(linestring) = LineStringGeometry::<M>::deserialize(value.clone()) {
-                    return Ok(Geometry::LineString(linestring));
-                }
+            if multipoint._type == GeometryType::LineString
+                && let Ok(linestring) = LineStringGeometry::<M>::deserialize(value.clone())
+            {
+                return Ok(Geometry::LineString(linestring));
             }
             // Otherwise, or if LineString parsing failed, we fall back to the valid MultiPoint.
             return Ok(Geometry::MultiPoint(multipoint));
@@ -38,10 +37,10 @@ where
 
         // Attempt as MultiLineString, then check for Polygon
         if let Ok(multilinestring) = MultiLineStringGeometry::<M>::deserialize(value.clone()) {
-            if multilinestring._type == GeometryType::Polygon {
-                if let Ok(polygon) = PolygonGeometry::<M>::deserialize(value.clone()) {
-                    return Ok(Geometry::Polygon(polygon));
-                }
+            if multilinestring._type == GeometryType::Polygon
+                && let Ok(polygon) = PolygonGeometry::<M>::deserialize(value.clone())
+            {
+                return Ok(Geometry::Polygon(polygon));
             }
             return Ok(Geometry::MultiLineString(multilinestring));
         }
@@ -55,20 +54,20 @@ where
 
         // Attempt as MultiPoint3D, then check for LineString3D
         if let Ok(multipoint3d) = MultiPoint3DGeometry::<M>::deserialize(value.clone()) {
-            if multipoint3d._type == GeometryType::LineString3D {
-                if let Ok(linestring3d) = LineString3DGeometry::<M>::deserialize(value.clone()) {
-                    return Ok(Geometry::LineString3D(linestring3d));
-                }
+            if multipoint3d._type == GeometryType::LineString3D
+                && let Ok(linestring3d) = LineString3DGeometry::<M>::deserialize(value.clone())
+            {
+                return Ok(Geometry::LineString3D(linestring3d));
             }
             return Ok(Geometry::MultiPoint3D(multipoint3d));
         }
 
         // Attempt as MultiLineString3D, then check for Polygon3D
         if let Ok(multilinestring3d) = MultiLineString3DGeometry::<M>::deserialize(value.clone()) {
-            if multilinestring3d._type == GeometryType::Polygon3D {
-                if let Ok(polygon3d) = Polygon3DGeometry::<M>::deserialize(value.clone()) {
-                    return Ok(Geometry::Polygon3D(polygon3d));
-                }
+            if multilinestring3d._type == GeometryType::Polygon3D
+                && let Ok(polygon3d) = Polygon3DGeometry::<M>::deserialize(value.clone())
+            {
+                return Ok(Geometry::Polygon3D(polygon3d));
             }
             return Ok(Geometry::MultiLineString3D(multilinestring3d));
         }
@@ -101,10 +100,10 @@ where
 
         // Attempt to deserialize as MultiPoint, then check for LineString
         if let Ok(multipoint) = VectorMultiPointGeometry::<M>::deserialize(value.clone()) {
-            if multipoint._type == VectorGeometryType::LineString {
-                if let Ok(linestring) = VectorLineStringGeometry::<M>::deserialize(value.clone()) {
-                    return Ok(VectorGeometry::LineString(linestring));
-                }
+            if multipoint._type == VectorGeometryType::LineString
+                && let Ok(linestring) = VectorLineStringGeometry::<M>::deserialize(value.clone())
+            {
+                return Ok(VectorGeometry::LineString(linestring));
             }
             return Ok(VectorGeometry::MultiPoint(multipoint));
         }
@@ -112,10 +111,10 @@ where
         // Attempt to deserialize as MultiLineString, then check for Polygon
         if let Ok(multilinestring) = VectorMultiLineStringGeometry::<M>::deserialize(value.clone())
         {
-            if multilinestring._type == VectorGeometryType::Polygon {
-                if let Ok(polygon) = VectorPolygonGeometry::<M>::deserialize(value.clone()) {
-                    return Ok(VectorGeometry::Polygon(polygon));
-                }
+            if multilinestring._type == VectorGeometryType::Polygon
+                && let Ok(polygon) = VectorPolygonGeometry::<M>::deserialize(value.clone())
+            {
+                return Ok(VectorGeometry::Polygon(polygon));
             }
             return Ok(VectorGeometry::MultiLineString(multilinestring));
         }
