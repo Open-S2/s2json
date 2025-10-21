@@ -4,7 +4,7 @@ default-members = ["rust"]
 resolver = "2"
 
 [workspace.package]
-version = "1.36.0"
+version = "1.37.0"
 edition = "2024"
 authors = ["Craig O'Connor <oconnorct1@gmail.com>"]
 description = "This library supports the S2JSON 1.0 Specification"

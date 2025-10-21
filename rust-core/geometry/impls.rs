@@ -6,118 +6,78 @@ use crate::*;
 extern crate serde as _serde;
 #[automatically_derived]
 // #[coverage(off)]
-impl<'de, M: Clone + Default> _serde::Deserialize<'de> for Geometry<M>
+impl<'de, M: Clone + Default> Deserialize<'de> for Geometry<M>
 where
-    M: _serde::Deserialize<'de>,
+    M: Deserialize<'de>,
 {
-    fn deserialize<__D>(__deserializer: __D) -> _serde::__private::Result<Self, __D::Error>
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
-        __D: _serde::Deserializer<'de>,
+        D: _serde::Deserializer<'de>,
     {
-        let __content =
-            <_serde::__private::de::Content as _serde::Deserialize>::deserialize(__deserializer)?;
-        let __deserializer =
-            _serde::__private::de::ContentRefDeserializer::<__D::Error>::new(&__content);
-        if let _serde::__private::Ok(__ok) = _serde::__private::Result::map(
-            <PointGeometry<M> as _serde::Deserialize>::deserialize(__deserializer),
-            Geometry::Point,
-        ) {
-            return _serde::__private::Ok(__ok);
+        // 1. Deserialize into an intermediate Value.
+        let value = serde_json::Value::deserialize(deserializer)?;
+
+        // 2. Attempt to deserialize from the `value` into each possible variant.
+        // We use serde_json::from_value(value.clone()) to create owned instances
+        // and avoid the lifetime error where a borrow outlives the owned 'value'.
+        if let Ok(geom) = PointGeometry::<M>::deserialize(value.clone()) {
+            return Ok(Geometry::Point(geom));
         }
-        // Attempt to deserialize as MultiPoint then check for LineString
-        if let _serde::__private::Ok(__ok) = _serde::__private::Result::map(
-            <MultiPointGeometry<M> as _serde::Deserialize>::deserialize(__deserializer),
-            Geometry::MultiPoint,
-        ) {
-            // pull out the MultiPoint variant
-            if let Geometry::MultiPoint(multipoint) = &__ok {
-                if multipoint._type == GeometryType::LineString {
-                    // If deserialization succeeds as MultiPoint, check if content is LineString
-                    if let _serde::__private::Ok(__ok2) = _serde::__private::Result::map(
-                        <LineStringGeometry<M> as _serde::Deserialize>::deserialize(__deserializer),
-                        Geometry::LineString,
-                    ) {
-                        // If LineString is found, return LineString variant
-                        return _serde::__private::Ok(__ok2);
-                    }
+
+        // Attempt to deserialize as MultiPoint then check if it's actually a LineString
+        if let Ok(multipoint) = MultiPointGeometry::<M>::deserialize(value.clone()) {
+            if multipoint._type == GeometryType::LineString {
+                // If the type matches, we prioritize the LineString deserialization.
+                if let Ok(linestring) = LineStringGeometry::<M>::deserialize(value.clone()) {
+                    return Ok(Geometry::LineString(linestring));
                 }
             }
-            return _serde::__private::Ok(__ok);
+            // Otherwise, or if LineString parsing failed, we fall back to the valid MultiPoint.
+            return Ok(Geometry::MultiPoint(multipoint));
         }
-        if let _serde::__private::Ok(__ok) = _serde::__private::Result::map(
-            <MultiLineStringGeometry<M> as _serde::Deserialize>::deserialize(__deserializer),
-            Geometry::MultiLineString,
-        ) {
-            // pull out the MultiLineString variant
-            if let Geometry::MultiLineString(multilinestring) = &__ok {
-                if multilinestring._type == GeometryType::Polygon {
-                    if let _serde::__private::Ok(__ok2) = _serde::__private::Result::map(
-                        <PolygonGeometry<M> as _serde::Deserialize>::deserialize(__deserializer),
-                        Geometry::Polygon,
-                    ) {
-                        return _serde::__private::Ok(__ok2);
-                    }
+
+        // Attempt as MultiLineString, then check for Polygon
+        if let Ok(multilinestring) = MultiLineStringGeometry::<M>::deserialize(value.clone()) {
+            if multilinestring._type == GeometryType::Polygon {
+                if let Ok(polygon) = PolygonGeometry::<M>::deserialize(value.clone()) {
+                    return Ok(Geometry::Polygon(polygon));
                 }
             }
-            return _serde::__private::Ok(__ok);
+            return Ok(Geometry::MultiLineString(multilinestring));
         }
-        if let _serde::__private::Ok(__ok) = _serde::__private::Result::map(
-            <MultiPolygonGeometry<M> as _serde::Deserialize>::deserialize(__deserializer),
-            Geometry::MultiPolygon,
-        ) {
-            return _serde::__private::Ok(__ok);
+
+        if let Ok(geom) = MultiPolygonGeometry::<M>::deserialize(value.clone()) {
+            return Ok(Geometry::MultiPolygon(geom));
         }
-        if let _serde::__private::Ok(__ok) = _serde::__private::Result::map(
-            <Point3DGeometry<M> as _serde::Deserialize>::deserialize(__deserializer),
-            Geometry::Point3D,
-        ) {
-            return _serde::__private::Ok(__ok);
+        if let Ok(geom) = Point3DGeometry::<M>::deserialize(value.clone()) {
+            return Ok(Geometry::Point3D(geom));
         }
-        if let _serde::__private::Ok(__ok) = _serde::__private::Result::map(
-            <MultiPoint3DGeometry<M> as _serde::Deserialize>::deserialize(__deserializer),
-            Geometry::MultiPoint3D,
-        ) {
-            // pull out the MultiPoint3D variant
-            if let Geometry::MultiPoint3D(multipoint3d) = &__ok {
-                if multipoint3d._type == GeometryType::LineString3D {
-                    if let _serde::__private::Ok(__ok2) = _serde::__private::Result::map(
-                        <LineString3DGeometry<M> as _serde::Deserialize>::deserialize(
-                            __deserializer,
-                        ),
-                        Geometry::LineString3D,
-                    ) {
-                        return _serde::__private::Ok(__ok2);
-                    }
+
+        // Attempt as MultiPoint3D, then check for LineString3D
+        if let Ok(multipoint3d) = MultiPoint3DGeometry::<M>::deserialize(value.clone()) {
+            if multipoint3d._type == GeometryType::LineString3D {
+                if let Ok(linestring3d) = LineString3DGeometry::<M>::deserialize(value.clone()) {
+                    return Ok(Geometry::LineString3D(linestring3d));
                 }
             }
-            return _serde::__private::Ok(__ok);
+            return Ok(Geometry::MultiPoint3D(multipoint3d));
         }
-        if let _serde::__private::Ok(__ok) = _serde::__private::Result::map(
-            <MultiLineString3DGeometry<M> as _serde::Deserialize>::deserialize(__deserializer),
-            Geometry::MultiLineString3D,
-        ) {
-            // pull out the MultiLineString3D variant
-            if let Geometry::MultiLineString3D(multilinestring3d) = &__ok {
-                if multilinestring3d._type == GeometryType::Polygon3D {
-                    if let _serde::__private::Ok(__ok2) = _serde::__private::Result::map(
-                        <Polygon3DGeometry<M> as _serde::Deserialize>::deserialize(__deserializer),
-                        Geometry::Polygon3D,
-                    ) {
-                        return _serde::__private::Ok(__ok2);
-                    }
+
+        // Attempt as MultiLineString3D, then check for Polygon3D
+        if let Ok(multilinestring3d) = MultiLineString3DGeometry::<M>::deserialize(value.clone()) {
+            if multilinestring3d._type == GeometryType::Polygon3D {
+                if let Ok(polygon3d) = Polygon3DGeometry::<M>::deserialize(value.clone()) {
+                    return Ok(Geometry::Polygon3D(polygon3d));
                 }
             }
-            return _serde::__private::Ok(__ok);
+            return Ok(Geometry::MultiLineString3D(multilinestring3d));
         }
-        if let _serde::__private::Ok(__ok) = _serde::__private::Result::map(
-            <MultiPolygon3DGeometry<M> as _serde::Deserialize>::deserialize(__deserializer),
-            Geometry::MultiPolygon3D,
-        ) {
-            return _serde::__private::Ok(__ok);
+
+        if let Ok(geom) = MultiPolygon3DGeometry::<M>::deserialize(value.clone()) {
+            return Ok(Geometry::MultiPolygon3D(geom));
         }
-        _serde::__private::Err(_serde::de::Error::custom(
-            "data did not match any variant of untagged enum Geometry",
-        ))
+
+        Err(_serde::de::Error::custom("data did not match any variant of untagged enum Geometry"))
     }
 }
 
@@ -125,75 +85,46 @@ where
 #[allow(unused_extern_crates, clippy::useless_attribute)]
 #[automatically_derived]
 // #[coverage(off)]
-impl<'de, M: Clone + Default> _serde::Deserialize<'de> for VectorGeometry<M>
+impl<'de, M: Clone + Default> Deserialize<'de> for VectorGeometry<M>
 where
-    M: _serde::Deserialize<'de>,
+    M: Deserialize<'de>,
 {
-    fn deserialize<__D>(__deserializer: __D) -> _serde::__private::Result<Self, __D::Error>
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
-        __D: _serde::Deserializer<'de>,
+        D: _serde::Deserializer<'de>,
     {
-        let __content =
-            <_serde::__private::de::Content as _serde::Deserialize>::deserialize(__deserializer)?;
-        let __deserializer =
-            _serde::__private::de::ContentRefDeserializer::<__D::Error>::new(&__content);
-        if let _serde::__private::Ok(__ok) = _serde::__private::Result::map(
-            <VectorPointGeometry<M> as _serde::Deserialize>::deserialize(__deserializer),
-            VectorGeometry::Point,
-        ) {
-            return _serde::__private::Ok(__ok);
+        let value = serde_json::Value::deserialize(deserializer)?;
+
+        if let Ok(geom) = VectorPointGeometry::<M>::deserialize(value.clone()) {
+            return Ok(VectorGeometry::Point(geom));
         }
+
         // Attempt to deserialize as MultiPoint, then check for LineString
-        if let _serde::__private::Ok(__ok) = _serde::__private::Result::map(
-            <VectorMultiPointGeometry<M> as _serde::Deserialize>::deserialize(__deserializer),
-            VectorGeometry::MultiPoint,
-        ) {
-            // pull out the MultiPoint variant
-            if let VectorGeometry::MultiPoint(multipoint) = &__ok {
-                if multipoint._type == VectorGeometryType::LineString {
-                    // If deserialization succeeds as MultiPoint, check if content is LineString
-                    if let _serde::__private::Ok(__ok2) = _serde::__private::Result::map(
-                        <VectorLineStringGeometry<M> as _serde::Deserialize>::deserialize(
-                            __deserializer,
-                        ),
-                        VectorGeometry::LineString,
-                    ) {
-                        // If LineString is found, return LineString variant
-                        return _serde::__private::Ok(__ok2);
-                    }
+        if let Ok(multipoint) = VectorMultiPointGeometry::<M>::deserialize(value.clone()) {
+            if multipoint._type == VectorGeometryType::LineString {
+                if let Ok(linestring) = VectorLineStringGeometry::<M>::deserialize(value.clone()) {
+                    return Ok(VectorGeometry::LineString(linestring));
                 }
             }
-            return _serde::__private::Ok(__ok);
+            return Ok(VectorGeometry::MultiPoint(multipoint));
         }
+
         // Attempt to deserialize as MultiLineString, then check for Polygon
-        if let _serde::__private::Ok(__ok) = _serde::__private::Result::map(
-            <VectorMultiLineStringGeometry<M> as _serde::Deserialize>::deserialize(__deserializer),
-            VectorGeometry::MultiLineString,
-        ) {
-            // pull out the MultiLineString variant
-            if let VectorGeometry::MultiLineString(multilinestring) = &__ok {
-                if multilinestring._type == VectorGeometryType::Polygon {
-                    // If deserialization succeeds as MultiLineString, check if content is Polygon
-                    if let _serde::__private::Ok(__ok2) = _serde::__private::Result::map(
-                        <VectorPolygonGeometry<M> as _serde::Deserialize>::deserialize(
-                            __deserializer,
-                        ),
-                        VectorGeometry::Polygon,
-                    ) {
-                        // If Polygon is found, return Polygon variant
-                        return _serde::__private::Ok(__ok2);
-                    }
+        if let Ok(multilinestring) = VectorMultiLineStringGeometry::<M>::deserialize(value.clone())
+        {
+            if multilinestring._type == VectorGeometryType::Polygon {
+                if let Ok(polygon) = VectorPolygonGeometry::<M>::deserialize(value.clone()) {
+                    return Ok(VectorGeometry::Polygon(polygon));
                 }
             }
-            return _serde::__private::Ok(__ok);
+            return Ok(VectorGeometry::MultiLineString(multilinestring));
         }
-        if let _serde::__private::Ok(__ok) = _serde::__private::Result::map(
-            <VectorMultiPolygonGeometry<M> as _serde::Deserialize>::deserialize(__deserializer),
-            VectorGeometry::MultiPolygon,
-        ) {
-            return _serde::__private::Ok(__ok);
+
+        if let Ok(geom) = VectorMultiPolygonGeometry::<M>::deserialize(value.clone()) {
+            return Ok(VectorGeometry::MultiPolygon(geom));
         }
-        _serde::__private::Err(_serde::de::Error::custom(
+
+        Err(_serde::de::Error::custom(
             "data did not match any variant of untagged enum VectorGeometry",
         ))
     }
