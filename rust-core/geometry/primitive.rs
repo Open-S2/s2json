@@ -42,6 +42,8 @@ impl From<Point3D> for PointOrPoint3D {
     }
 }
 
+// GET
+
 impl GetXY for Point {
     fn x(&self) -> f64 {
         self.0
@@ -84,6 +86,77 @@ impl GetZ for PointOrPoint3D {
     }
 }
 impl GetXYZ for PointOrPoint3D {}
+
+// SET
+
+impl SetXY for Point {
+    fn set_x(&mut self, x: f64) {
+        self.0 = x;
+    }
+    fn set_y(&mut self, y: f64) {
+        self.1 = y;
+    }
+    fn set_xy(&mut self, x: f64, y: f64) {
+        self.0 = x;
+        self.1 = y;
+    }
+}
+impl SetXY for Point3D {
+    fn set_x(&mut self, x: f64) {
+        self.0 = x;
+    }
+    fn set_y(&mut self, y: f64) {
+        self.1 = y;
+    }
+}
+impl SetZ for Point3D {
+    fn set_z(&mut self, z: f64) {
+        self.2 = z;
+    }
+}
+impl SetXYZ for Point3D {}
+impl SetXY for PointOrPoint3D {
+    fn set_x(&mut self, x: f64) {
+        self.0 = x;
+    }
+    fn set_y(&mut self, y: f64) {
+        self.1 = y;
+    }
+}
+impl SetZ for PointOrPoint3D {
+    fn set_z(&mut self, z: f64) {
+        self.2 = Some(z);
+    }
+}
+impl SetXYZ for PointOrPoint3D {}
+
+// NEW
+
+impl NewXY for Point {
+    fn new_xy(x: f64, y: f64) -> Self {
+        Self(x, y)
+    }
+}
+impl NewXY for Point3D {
+    fn new_xy(x: f64, y: f64) -> Self {
+        Self(x, y, 0.0)
+    }
+}
+impl NewXY for PointOrPoint3D {
+    fn new_xy(x: f64, y: f64) -> Self {
+        Self(x, y, None)
+    }
+}
+impl NewXYZ for Point3D {
+    fn new_xyz(x: f64, y: f64, z: f64) -> Self {
+        Self(x, y, z)
+    }
+}
+impl NewXYZ for PointOrPoint3D {
+    fn new_xyz(x: f64, y: f64, z: f64) -> Self {
+        Self(x, y, Some(z))
+    }
+}
 
 /// Enum to represent specific geometry types as strings
 #[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Default)]

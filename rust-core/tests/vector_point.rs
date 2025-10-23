@@ -674,4 +674,63 @@ mod tests {
         assert_eq!(vp.z(), Some(3.0));
         assert_eq!(vp.m(), Some(&Test { a: "a".to_string() }));
     }
+
+    #[test]
+    fn test_set_traits() {
+        #[derive(Debug, PartialEq, Clone)]
+        struct Test {
+            a: String,
+        }
+        let mut vp: VectorPoint<Test> =
+            VectorPoint::new_xyz(1.0, 2.0, 3.0, Some(Test { a: "a".to_string() }));
+        vp.set_x(4.0);
+        vp.set_y(5.0);
+        vp.set_z(6.0);
+        vp.set_m(Test { a: "b".to_string() });
+        assert_eq!(vp.x(), 4.0);
+        assert_eq!(vp.y(), 5.0);
+        assert_eq!(vp.z(), Some(6.0));
+        assert_eq!(vp.m(), Some(&Test { a: "b".to_string() }));
+        vp.set_xy(7.0, 8.0);
+        assert_eq!(vp.x(), 7.0);
+        assert_eq!(vp.y(), 8.0);
+        vp.set_xym(6.0, 5.0, Test { a: "t".to_string() });
+        assert_eq!(vp.x(), 6.0);
+        assert_eq!(vp.y(), 5.0);
+        assert_eq!(vp.m(), Some(&Test { a: "t".to_string() }));
+        vp.set_xyz(9.0, 10.0, 11.0);
+        assert_eq!(vp.x(), 9.0);
+        assert_eq!(vp.y(), 10.0);
+        assert_eq!(vp.z(), Some(11.0));
+        vp.set_xyzm(12.0, 13.0, 14.0, Test { a: "c".to_string() });
+        assert_eq!(vp.x(), 12.0);
+        assert_eq!(vp.y(), 13.0);
+        assert_eq!(vp.z(), Some(14.0));
+        assert_eq!(vp.m(), Some(&Test { a: "c".to_string() }));
+    }
+
+    #[test]
+    fn test_new_traits() {
+        #[derive(Debug, PartialEq, Clone)]
+        struct Test {
+            a: String,
+        }
+        let vp: VectorPoint<Test> = NewXY::new_xy(1.0, 2.0);
+        assert_eq!(vp.x(), 1.0);
+        assert_eq!(vp.y(), 2.0);
+        assert_eq!(vp.z(), None);
+        assert_eq!(vp.m(), None);
+
+        let vp: VectorPoint<Test> = NewXYZ::new_xyz(1.0, 2.0, 3.0);
+        assert_eq!(vp.x(), 1.0);
+        assert_eq!(vp.y(), 2.0);
+        assert_eq!(vp.z(), Some(3.0));
+        assert_eq!(vp.m(), None);
+
+        let vp: VectorPoint<Test> = NewXYZM::new_xyzm(1.0, 2.0, 3.0, Test { a: "a".to_string() });
+        assert_eq!(vp.x(), 1.0);
+        assert_eq!(vp.y(), 2.0);
+        assert_eq!(vp.z(), Some(3.0));
+        assert_eq!(vp.m(), Some(&Test { a: "a".to_string() }));
+    }
 }

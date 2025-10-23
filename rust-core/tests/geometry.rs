@@ -1361,6 +1361,91 @@ mod tests {
     }
 
     #[test]
+    fn point_trait_sets() {
+        let mut point = Point(0., 1.);
+        point.set_x(10.);
+        point.set_y(20.);
+        assert_eq!(point.x(), 10.);
+        assert_eq!(point.y(), 20.);
+        assert_eq!(point.z(), None);
+        point.set_xy(30., 40.);
+        assert_eq!(point.x(), 30.);
+        assert_eq!(point.y(), 40.);
+        assert_eq!(point.z(), None);
+
+        let mut point = Point3D(0., 1., 2.);
+        point.set_x(10.);
+        point.set_y(20.);
+        point.set_z(30.);
+        assert_eq!(point.x(), 10.);
+        assert_eq!(point.y(), 20.);
+        assert_eq!(point.z(), Some(30.));
+        point.set_xy(40., 50.);
+        assert_eq!(point.x(), 40.);
+        assert_eq!(point.y(), 50.);
+        assert_eq!(point.z(), Some(30.));
+        point.set_xyz(60., 70., 80.);
+        assert_eq!(point.x(), 60.);
+        assert_eq!(point.y(), 70.);
+        assert_eq!(point.z(), Some(80.));
+
+        let mut point = PointOrPoint3D(0., 1., None);
+        point.set_x(10.);
+        point.set_y(20.);
+        assert_eq!(point.x(), 10.);
+        assert_eq!(point.y(), 20.);
+        assert_eq!(point.z(), None);
+        point.set_xy(30., 40.);
+        assert_eq!(point.x(), 30.);
+        assert_eq!(point.y(), 40.);
+        assert_eq!(point.z(), None);
+
+        let mut point = PointOrPoint3D(0., 1., Some(2.));
+        point.set_x(10.);
+        point.set_y(20.);
+        point.set_z(30.);
+        assert_eq!(point.x(), 10.);
+        assert_eq!(point.y(), 20.);
+        assert_eq!(point.z(), Some(30.));
+        point.set_xy(40., 50.);
+        assert_eq!(point.x(), 40.);
+        assert_eq!(point.y(), 50.);
+        assert_eq!(point.z(), Some(30.));
+        point.set_xyz(60., 70., 80.);
+        assert_eq!(point.x(), 60.);
+        assert_eq!(point.y(), 70.);
+        assert_eq!(point.z(), Some(80.));
+    }
+
+    #[test]
+    fn point_trait_new() {
+        let point: Point = NewXY::new_xy(0., 1.);
+        assert_eq!(point.x(), 0.);
+        assert_eq!(point.y(), 1.);
+        assert_eq!(point.z(), None);
+
+        let point: Point3D = NewXY::new_xy(0., 1.);
+        assert_eq!(point.x(), 0.);
+        assert_eq!(point.y(), 1.);
+        assert_eq!(point.z(), Some(0.));
+
+        let point: Point3D = NewXYZ::new_xyz(0., 1., 2.);
+        assert_eq!(point.x(), 0.);
+        assert_eq!(point.y(), 1.);
+        assert_eq!(point.z(), Some(2.));
+
+        let point: PointOrPoint3D = NewXY::new_xy(0., 1.);
+        assert_eq!(point.x(), 0.);
+        assert_eq!(point.y(), 1.);
+        assert_eq!(point.z(), None);
+
+        let point: PointOrPoint3D = NewXYZ::new_xyz(0., 1., 2.);
+        assert_eq!(point.x(), 0.);
+        assert_eq!(point.y(), 1.);
+        assert_eq!(point.z(), Some(2.));
+    }
+
+    #[test]
     fn to_m_geometry_points() {
         #[derive(Debug, Default, Clone, PartialEq, Copy)]
         struct TestA {

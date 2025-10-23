@@ -6,6 +6,7 @@
 //! The `s2json` Rust crate provides functionalities to read and write S2JSON Spec data structures.
 //! This crate is a 0 dependency package that uses `no_std` and is intended to be used in
 //! embedded systems and WASM applications.
+//!
 //! NOTE: WG stands for WGS84 and S2 stands for S2Geometry
 
 extern crate alloc;

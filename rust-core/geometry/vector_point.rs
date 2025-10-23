@@ -28,6 +28,7 @@ pub struct VectorPoint<M: Clone = MValue> {
     #[serde(skip)]
     pub t: Option<f64>,
 }
+// GET
 impl<M: Clone> GetXY for VectorPoint<M> {
     fn x(&self) -> f64 {
         self.x
@@ -48,6 +49,51 @@ impl<M: Clone> GetM<M> for VectorPoint<M> {
 }
 impl<M: Clone> GetXYZ for VectorPoint<M> {}
 impl<M: Clone> GetXYZM<M> for VectorPoint<M> {}
+// SET
+impl<M: Clone> SetXY for VectorPoint<M> {
+    fn set_xy(&mut self, x: f64, y: f64) {
+        self.x = x;
+        self.y = y;
+    }
+
+    fn set_x(&mut self, x: f64) {
+        self.x = x;
+    }
+
+    fn set_y(&mut self, y: f64) {
+        self.y = y;
+    }
+}
+impl<M: Clone> SetZ for VectorPoint<M> {
+    fn set_z(&mut self, z: f64) {
+        self.z = Some(z);
+    }
+}
+impl<M: Clone> SetM<M> for VectorPoint<M> {
+    fn set_m(&mut self, m: M) {
+        self.m = Some(m);
+    }
+}
+impl<M: Clone> SetXYZ for VectorPoint<M> {}
+impl<M: Clone> SetXYM<M> for VectorPoint<M> {}
+impl<M: Clone> SetXYZM<M> for VectorPoint<M> {}
+// NEW
+impl<M: Clone> NewXY for VectorPoint<M> {
+    fn new_xy(x: f64, y: f64) -> Self {
+        Self { x, y, z: None, m: None, t: None }
+    }
+}
+impl<M: Clone> NewXYZ for VectorPoint<M> {
+    fn new_xyz(x: f64, y: f64, z: f64) -> Self {
+        Self { x, y, z: Some(z), m: None, t: None }
+    }
+}
+impl<M: Clone> NewXYZM<M> for VectorPoint<M> {
+    fn new_xyzm(x: f64, y: f64, z: f64, m: M) -> Self {
+        Self { x, y, z: Some(z), m: Some(m), t: None }
+    }
+}
+// MValue METHODS
 impl VectorPoint<MValue> {
     /// Helper function for tests. Create a new point quickly from an xy coordinate
     pub fn from_xy(x: f64, y: f64) -> Self {
@@ -59,6 +105,7 @@ impl VectorPoint<MValue> {
         Self { x, y, z: Some(z), m: None, t: None }
     }
 }
+// M METHODS
 impl<M: Clone> VectorPoint<M> {
     /// Create a new point
     pub fn new(x: f64, y: f64, z: Option<f64>, m: Option<M>) -> Self {
