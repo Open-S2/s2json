@@ -195,6 +195,17 @@ impl<T> BBox<T> {
 
         new_bbox
     }
+
+    /// Checks if this bounding box is inside another
+    pub fn inside(&self, other: &BBox<T>) -> bool
+    where
+        T: PartialOrd + Copy,
+    {
+        self.left >= other.left
+            && self.right <= other.right
+            && self.bottom >= other.bottom
+            && self.top <= other.top
+    }
 }
 impl BBox<f64> {
     /// Creates a new BBox from a point
@@ -452,6 +463,19 @@ impl<T> BBox3D<T> {
         T: Copy + Default,
     {
         BBox3D::new(bbox.left, bbox.bottom, bbox.right, bbox.top, T::default(), T::default())
+    }
+
+    /// Checks if this bounding box is inside another
+    pub fn inside(&self, other: &BBox3D<T>) -> bool
+    where
+        T: PartialOrd + Copy,
+    {
+        self.left >= other.left
+            && self.right <= other.right
+            && self.bottom >= other.bottom
+            && self.top <= other.top
+            && self.near >= other.near
+            && self.far <= other.far
     }
 }
 impl<T> Serialize for BBox3D<T>

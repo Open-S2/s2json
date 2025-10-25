@@ -69,6 +69,24 @@ mod tests {
     }
 
     #[test]
+    fn test_bbox_inside() {
+        let bbox = BBox { left: 0.0, bottom: 0.0, right: 1.0, top: 1.0 };
+        assert!(bbox.inside(&bbox));
+        let bbox2 = BBox { left: 0.1, bottom: 0.1, right: 0.9, top: 0.9 };
+        assert!(!bbox.inside(&bbox2));
+        assert!(bbox2.inside(&bbox));
+    }
+
+    #[test]
+    fn test_bbox3d_inside() {
+        let bbox = BBox3D { left: 0.0, bottom: 0.0, right: 1.0, top: 1.0, far: 0.0, near: 0.0 };
+        assert!(bbox.inside(&bbox));
+        let bbox2 = BBox3D { left: 0.1, bottom: 0.1, right: 0.9, top: 0.9, far: 0.0, near: 0.0 };
+        assert!(!bbox.inside(&bbox2));
+        assert!(bbox2.inside(&bbox));
+    }
+
+    #[test]
     fn test_bbox_mvalue() {
         let bbox = BBox { left: -2.2, bottom: -944.22, right: 1.0, top: 2.0 };
 
@@ -1103,6 +1121,7 @@ mod tests {
             })
         );
 
+        assert_eq!(geometry.point(), None);
         assert_eq!(geometry.multipoint(), Some(&multipoint));
     }
 
