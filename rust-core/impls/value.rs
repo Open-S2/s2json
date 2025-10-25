@@ -1,7 +1,6 @@
-use core::cmp::Ordering;
-
 use crate::*;
 use alloc::{string::String, vec::Vec};
+use core::cmp::Ordering;
 use libm::round;
 use pbf::{ProtoRead, ProtoWrite, Protobuf, Type};
 

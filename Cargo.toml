@@ -4,7 +4,7 @@ default-members = ["rust"]
 resolver = "2"
 
 [workspace.package]
-version = "1.39.0"
+version = "1.40.0"
 edition = "2024"
 authors = ["Craig O'Connor <oconnorct1@gmail.com>"]
 description = "This library supports the S2JSON 1.0 Specification"
@@ -18,9 +18,9 @@ license = "MIT"
 
 [workspace.dependencies]
 # LOCAL
-s2json = { path = "./rust", version = "1.35.0" }
-s2json-core = { path = "./rust-core", version = "1.35.0" }
-s2json-derive = { path = "./rust-derive", version = "1.35.0" }
+s2json = { path = "./rust", version = "1.40.0" }
+s2json-core = { path = "./rust-core", version = "1.40.0" }
+s2json-derive = { path = "./rust-derive", version = "1.40.0" }
 # EXTERNAL
 libm = "0.2"
 pbf = "1.22"

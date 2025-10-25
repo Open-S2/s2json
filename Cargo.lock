@@ -154,7 +154,7 @@ checksum = "28d3b2b1366ec20994f1fd18c3c594f05c5dd4bc44d8bb0c1c632c8d6829481f"
 
 [[package]]
 name = "s2json"
-version = "1.39.0"
+version = "1.40.0"
 dependencies = [
  "s2json-core",
  "s2json-derive",
@@ -162,7 +162,7 @@ dependencies = [
 
 [[package]]
 name = "s2json-core"
-version = "1.39.0"
+version = "1.40.0"
 dependencies = [
  "libm",
  "pbf",
@@ -172,7 +172,7 @@ dependencies = [
 
 [[package]]
 name = "s2json-derive"
-version = "1.39.0"
+version = "1.40.0"
 dependencies = [
  "proc-macro-crate",
  "proc-macro2",

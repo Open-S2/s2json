@@ -1,3 +1,4 @@
+use crate::*;
 use core::{
     cmp::Ordering,
     f64::consts::PI,
@@ -6,9 +7,6 @@ use core::{
 };
 use libm::{atan, atan2, fabs, fmod, log, sin, sinh, sqrt};
 use serde::{Deserialize, Serialize};
-
-/// Importing necessary types (equivalent to importing from 'values')
-use crate::*;
 
 /// A Vector Point uses a structure for 2D or 3D points
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]

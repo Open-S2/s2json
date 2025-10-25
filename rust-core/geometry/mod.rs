@@ -15,6 +15,7 @@ pub use primitive::*;
 use serde::{Deserialize, Serialize};
 pub use vector::*;
 pub use vector_point::*;
+
 /// Trait to extract the x and y values
 pub trait GetXY {
     /// Returns the x value

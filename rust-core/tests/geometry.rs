@@ -150,8 +150,8 @@ mod tests {
     #[test]
     fn test_bbox_overlap() {
         let bbox = BBox::new(0., 0., 1., 1.);
-        assert!(bbox.point_overlap(VectorPoint::<MValue>::new(0.5, 0.5, None, None)));
-        assert!(!bbox.point_overlap(VectorPoint::<MValue>::new(2.0, 2.0, None, None)));
+        assert!(bbox.point_overlap(&VectorPoint::<MValue>::new(0.5, 0.5, None, None)));
+        assert!(!bbox.point_overlap(&VectorPoint::<MValue>::new(2.0, 2.0, None, None)));
         let bbox2 = BBox { left: 0.5, bottom: 0.5, right: 1.5, top: 1.5 };
         assert_eq!(
             bbox.overlap(&bbox2),
@@ -286,8 +286,8 @@ mod tests {
     #[test]
     fn test_bbox_3_d_overlap() {
         let bbox = BBox3D::new(0., 0., 1., 1., 0., 1.);
-        assert!(bbox.point_overlap(VectorPoint::<MValue>::new(0.5, 0.5, None, None)));
-        assert!(!bbox.point_overlap(VectorPoint::<MValue>::new(2.0, 2.0, None, None)));
+        assert!(bbox.point_overlap(&VectorPoint::<MValue>::new(0.5, 0.5, None, None)));
+        assert!(!bbox.point_overlap(&VectorPoint::<MValue>::new(2.0, 2.0, None, None)));
         let bbox2 = BBox3D { left: 0.5, bottom: 0.5, right: 1.5, top: 1.5, near: 0.5, far: 1.5 };
         assert_eq!(
             bbox.overlap(&bbox2),
