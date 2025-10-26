@@ -45,8 +45,6 @@ impl<M: Clone> GetM<M> for VectorPoint<M> {
         self.m.as_ref()
     }
 }
-impl<M: Clone> GetXYZ for VectorPoint<M> {}
-impl<M: Clone> GetXYZM<M> for VectorPoint<M> {}
 // SET
 impl<M: Clone> SetXY for VectorPoint<M> {
     fn set_xy(&mut self, x: f64, y: f64) {
@@ -72,9 +70,6 @@ impl<M: Clone> SetM<M> for VectorPoint<M> {
         self.m = Some(m);
     }
 }
-impl<M: Clone> SetXYZ for VectorPoint<M> {}
-impl<M: Clone> SetXYM<M> for VectorPoint<M> {}
-impl<M: Clone> SetXYZM<M> for VectorPoint<M> {}
 // NEW
 impl<M: Clone> NewXY for VectorPoint<M> {
     fn new_xy(x: f64, y: f64) -> Self {

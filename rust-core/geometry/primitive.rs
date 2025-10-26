@@ -1,5 +1,6 @@
 use crate::*;
 use alloc::vec::Vec;
+use core::cmp::Ordering;
 use serde::{Deserialize, Serialize};
 
 /// Definition of a Point. May represent WebMercator Lon-Lat or S2Geometry S-T
@@ -57,7 +58,6 @@ impl GetZ for Point {
         None
     }
 }
-impl GetXYZ for Point {}
 impl GetXY for Point3D {
     fn x(&self) -> f64 {
         self.0
@@ -79,13 +79,11 @@ impl GetZ for Point3D {
         Some(self.2)
     }
 }
-impl GetXYZ for Point3D {}
 impl GetZ for PointOrPoint3D {
     fn z(&self) -> Option<f64> {
         self.2
     }
 }
-impl GetXYZ for PointOrPoint3D {}
 
 // SET
 
@@ -114,7 +112,6 @@ impl SetZ for Point3D {
         self.2 = z;
     }
 }
-impl SetXYZ for Point3D {}
 impl SetXY for PointOrPoint3D {
     fn set_x(&mut self, x: f64) {
         self.0 = x;
@@ -128,7 +125,6 @@ impl SetZ for PointOrPoint3D {
         self.2 = Some(z);
     }
 }
-impl SetXYZ for PointOrPoint3D {}
 
 // NEW
 
@@ -155,6 +151,73 @@ impl NewXYZ for Point3D {
 impl NewXYZ for PointOrPoint3D {
     fn new_xyz(x: f64, y: f64, z: f64) -> Self {
         Self(x, y, Some(z))
+    }
+}
+
+// Equalities
+
+impl Eq for Point {}
+impl Ord for Point {
+    fn cmp(&self, other: &Point) -> Ordering {
+        match self.0.partial_cmp(&other.0) {
+            Some(Ordering::Equal) => {}
+            other => return other.unwrap_or(Ordering::Greater), /* Handle cases where `x` comparison is not equal */
+        }
+        match self.1.partial_cmp(&other.1) {
+            Some(Ordering::Equal) => Ordering::Equal,
+            other => other.unwrap_or(Ordering::Greater), /* Handle cases where `y` comparison is not equal */
+        }
+    }
+}
+impl PartialOrd for Point {
+    fn partial_cmp(&self, other: &Point) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Eq for Point3D {}
+impl Ord for Point3D {
+    fn cmp(&self, other: &Point3D) -> Ordering {
+        match self.0.partial_cmp(&other.0) {
+            Some(Ordering::Equal) => {}
+            other => return other.unwrap_or(Ordering::Greater), /* Handle cases where `x` comparison is not equal */
+        }
+        match self.1.partial_cmp(&other.1) {
+            Some(Ordering::Equal) => {}
+            other => return other.unwrap_or(Ordering::Greater), /* Handle cases where `y` comparison is not equal */
+        }
+        match self.2.partial_cmp(&other.2) {
+            Some(order) => order,
+            None => Ordering::Equal, // This handles the NaN case safely
+        }
+    }
+}
+impl PartialOrd for Point3D {
+    fn partial_cmp(&self, other: &Point3D) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Eq for PointOrPoint3D {}
+impl Ord for PointOrPoint3D {
+    fn cmp(&self, other: &PointOrPoint3D) -> Ordering {
+        match self.0.partial_cmp(&other.0) {
+            Some(Ordering::Equal) => {}
+            other => return other.unwrap_or(Ordering::Greater), /* Handle cases where `x` comparison is not equal */
+        }
+        match self.1.partial_cmp(&other.1) {
+            Some(Ordering::Equal) => {}
+            other => return other.unwrap_or(Ordering::Greater), /* Handle cases where `y` comparison is not equal */
+        }
+        match self.2.partial_cmp(&other.2) {
+            Some(order) => order,
+            None => Ordering::Equal, // This handles the NaN case safely
+        }
+    }
+}
+impl PartialOrd for PointOrPoint3D {
+    fn partial_cmp(&self, other: &PointOrPoint3D) -> Option<Ordering> {
+        Some(self.cmp(other))
     }
 }
 

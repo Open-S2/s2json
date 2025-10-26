@@ -1845,4 +1845,109 @@ mod tests {
             })
         );
     }
+
+    #[test]
+    fn test_point_eq_ord() {
+        let a = Point(1.0, 2.0);
+        let b = Point(1.0, 2.0);
+        let c = Point(1.0, 3.0);
+        let d = Point(0.5, 5.0);
+        let nan = Point(f64::NAN, 1.0);
+
+        assert_eq!(a, b);
+        assert_eq!(a.partial_cmp(&b), Some(Ordering::Equal));
+        assert_eq!(a.cmp(&b), Ordering::Equal);
+
+        // x differs
+        assert_eq!(a.cmp(&d), Ordering::Greater);
+        assert_eq!(d.cmp(&a), Ordering::Less);
+
+        // y differs
+        assert_eq!(a.cmp(&c), Ordering::Less);
+        assert_eq!(c.cmp(&a), Ordering::Greater);
+
+        // NaN handled as Greater
+        assert_eq!(nan.cmp(&a), Ordering::Greater);
+        assert_eq!(a.cmp(&nan), Ordering::Greater);
+    }
+
+    #[test]
+    fn test_point3d_eq_ord() {
+        let a = Point3D(1.0, 2.0, 3.0);
+        let b = Point3D(1.0, 2.0, 3.0);
+        let xdiff = Point3D(0.5, 2.0, 3.0);
+        let ydiff = Point3D(1.0, 5.0, 3.0);
+        let zdiff = Point3D(1.0, 2.0, 4.0);
+        let nan = Point3D(1.0, f64::NAN, 3.0);
+        let nan_y = Point3D(1.0, f64::NAN, 3.0);
+        let nan_z = Point3D(1.0, 2.0, f64::NAN);
+
+        // equal
+        assert_eq!(a, b);
+        assert_eq!(a.partial_cmp(&b), Some(Ordering::Equal));
+        assert_eq!(a.cmp(&b), Ordering::Equal);
+
+        // x differs
+        assert_eq!(a.cmp(&xdiff), Ordering::Greater);
+        assert_eq!(xdiff.cmp(&a), Ordering::Less);
+
+        // y differs
+        assert_eq!(a.cmp(&ydiff), Ordering::Less);
+        assert_eq!(ydiff.cmp(&a), Ordering::Greater);
+
+        // z differs
+        assert_eq!(a.cmp(&zdiff), Ordering::Less);
+        assert_eq!(zdiff.cmp(&a), Ordering::Greater);
+
+        // NaN treated as Equal in last fallback
+        assert_eq!(nan.cmp(&a), Ordering::Greater);
+
+        // triggers NaN handling in z comparison (None => Ordering::Equal)
+        assert_eq!(nan_z.cmp(&a), Ordering::Equal);
+        assert_eq!(a.cmp(&nan_z), Ordering::Equal);
+
+        // NaN in y — handled earlier
+        assert_eq!(nan_y.cmp(&a), Ordering::Greater);
+    }
+
+    #[test]
+    fn test_point_or_point3d_eq_ord() {
+        let a = PointOrPoint3D(1.0, 2.0, Some(3.0));
+        let b = PointOrPoint3D(1.0, 2.0, Some(3.0));
+        let xdiff = PointOrPoint3D(0.5, 2.0, Some(3.0));
+        let ydiff = PointOrPoint3D(1.0, 3.0, Some(3.0));
+        let zdiff = PointOrPoint3D(1.0, 2.0, Some(4.0));
+        let none_z = PointOrPoint3D(1.0, 2.0, None);
+        let nan = PointOrPoint3D(f64::NAN, 2.0, Some(3.0));
+        let nan_z = PointOrPoint3D(1.0, 2.0, Some(f64::NAN));
+
+        // equal
+        assert_eq!(a, b);
+        assert_eq!(a.partial_cmp(&b), Some(Ordering::Equal));
+        assert_eq!(a.cmp(&b), Ordering::Equal);
+
+        // x differs
+        assert_eq!(a.cmp(&xdiff), Ordering::Greater);
+        assert_eq!(xdiff.cmp(&a), Ordering::Less);
+
+        // y differs
+        assert_eq!(a.cmp(&ydiff), Ordering::Less);
+        assert_eq!(ydiff.cmp(&a), Ordering::Greater);
+
+        // z differs
+        assert_eq!(a.cmp(&zdiff), Ordering::Less);
+        assert_eq!(zdiff.cmp(&a), Ordering::Greater);
+
+        // z = None (Option comparison)
+        assert_eq!(a.cmp(&none_z), Ordering::Greater);
+        assert_eq!(none_z.cmp(&a), Ordering::Less);
+
+        // NaN in x
+        assert_eq!(nan.cmp(&a), Ordering::Greater);
+        assert_eq!(a.cmp(&nan), Ordering::Greater);
+
+        // triggers None => Ordering::Equal in z comparison
+        assert_eq!(nan_z.cmp(&a), Ordering::Equal);
+        assert_eq!(a.cmp(&nan_z), Ordering::Equal);
+    }
 }

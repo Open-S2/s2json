@@ -36,10 +36,13 @@ pub trait GetM<M> {
 
 /// Composite Trait: XY + Z
 pub trait GetXYZ: GetXY + GetZ {}
+impl<T> GetXYZ for T where T: GetXY + GetZ {}
 /// Composite Trait: XY + M
 pub trait GetXYM<M>: GetXY + GetM<M> {}
+impl<T, M> GetXYM<M> for T where T: GetXY + GetM<M> {}
 /// Composite Trait: XY + Z + M
 pub trait GetXYZM<M>: GetXY + GetZ + GetM<M> {}
+impl<T, M> GetXYZM<M> for T where T: GetXY + GetZ + GetM<M> {}
 
 /// Trait to set the x and y values
 pub trait SetXY {
@@ -72,6 +75,7 @@ pub trait SetXYZ: SetXY + SetZ {
         self.set_z(z);
     }
 }
+impl<T> SetXYZ for T where T: SetXY + SetZ {}
 /// Composite Trait: XY + M
 pub trait SetXYM<M>: SetXY + SetM<M> {
     /// Set x, y and m
@@ -80,6 +84,7 @@ pub trait SetXYM<M>: SetXY + SetM<M> {
         self.set_m(m);
     }
 }
+impl<T, M> SetXYM<M> for T where T: SetXY + SetM<M> {}
 /// Composite Trait: XY + Z + M
 pub trait SetXYZM<M>: SetXY + SetZ + SetM<M> {
     /// Set x, y, z and m
@@ -89,6 +94,7 @@ pub trait SetXYZM<M>: SetXY + SetZ + SetM<M> {
         self.set_m(m);
     }
 }
+impl<T, M> SetXYZM<M> for T where T: SetXY + SetZ + SetM<M> {}
 
 /// Trait to create a new XY
 pub trait NewXY {
@@ -105,6 +111,20 @@ pub trait NewXYZM<M> {
     /// Create a new point with xyzm
     fn new_xyzm(x: f64, y: f64, z: f64, m: M) -> Self;
 }
+
+// Finally lets make "full" traits for ease of use
+
+/// Composite Trait for XY use cases
+pub trait FullXY: GetXY + SetXY + NewXY + Clone + PartialEq + Ord {}
+impl<T> FullXY for T where T: GetXY + SetXY + NewXY + Clone + PartialEq + Ord {}
+
+/// Composite Trait for XYZ use cases
+pub trait FullXYZ: GetXYZ + SetXYZ + NewXYZ + Clone + PartialEq + Ord {}
+impl<T> FullXYZ for T where T: GetXYZ + SetXYZ + NewXYZ + Clone + PartialEq + Ord {}
+
+/// Composite Trait for XYZM use cases
+pub trait FullXYZM<M>: GetXYZM<M> + SetXYZM<M> + NewXYZM<M> + Clone + PartialEq + Ord {}
+impl<T, M> FullXYZM<M> for T where T: GetXYZM<M> + SetXYZM<M> + NewXYZM<M> + Clone + PartialEq + Ord {}
 
 /// The axis to apply an operation to
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
