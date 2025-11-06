@@ -1,6 +1,9 @@
 use crate::*;
 use alloc::fmt;
-use core::cmp::Ordering;
+use core::{
+    cmp::Ordering,
+    ops::{Mul, MulAssign, Sub},
+};
 use serde::{
     Deserialize, Deserializer, Serialize, Serializer,
     de::{self, SeqAccess, Visitor},
@@ -204,6 +207,14 @@ impl<T> BBox<T> {
             && self.right <= other.right
             && self.bottom >= other.bottom
             && self.top <= other.top
+    }
+
+    /// Returns the area of the bounding box
+    pub fn area(&self) -> T
+    where
+        T: Sub<Output = T> + Mul<Output = T> + Copy,
+    {
+        (self.right - self.left) * (self.top - self.bottom)
     }
 }
 impl BBox<f64> {
@@ -475,6 +486,19 @@ impl<T> BBox3D<T> {
             && self.top <= other.top
             && self.near >= other.near
             && self.far <= other.far
+    }
+
+    /// Returns the area of the bounding box
+    pub fn area(&self) -> T
+    where
+        T: Sub<Output = T> + Mul<Output = T> + MulAssign + Into<f64> + Copy,
+    {
+        let mut res = (self.right - self.left) * (self.top - self.bottom);
+        if self.far.into() != 0. || self.near.into() != 0. {
+            res *= self.far - self.near
+        }
+
+        res
     }
 }
 impl<T> Serialize for BBox3D<T>

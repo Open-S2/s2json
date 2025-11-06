@@ -69,6 +69,40 @@ mod tests {
     }
 
     #[test]
+    fn test_bbox_area() {
+        let bbox = BBox { left: 0.0, bottom: 0.0, right: 1.0, top: 1.0 };
+        assert_eq!(bbox.area(), 1.0);
+        let bbox = BBox { left: 0.0, bottom: 0.0, right: 10.0, top: 10.0 };
+        assert_eq!(bbox.area(), 100.0);
+        let bbox = BBox { left: -5.0, bottom: -5.0, right: 5.0, top: 5.0 };
+        assert_eq!(bbox.area(), 100.0);
+        let bbox = BBox { left: -10.0, bottom: -10.0, right: 0.0, top: 0.0 };
+        assert_eq!(bbox.area(), 100.0);
+
+        // no near-far use
+        let bbox = BBox3D { left: 0.0, bottom: 0.0, right: 1.0, top: 1.0, far: 0.0, near: 0.0 };
+        assert_eq!(bbox.area(), 1.0);
+        let bbox = BBox3D { left: 0.0, bottom: 0.0, right: 10.0, top: 10.0, far: 0.0, near: 0.0 };
+        assert_eq!(bbox.area(), 100.0);
+        let bbox = BBox3D { left: -5.0, bottom: -5.0, right: 5.0, top: 5.0, far: 0.0, near: 0.0 };
+        assert_eq!(bbox.area(), 100.0);
+        let bbox = BBox3D { left: -10.0, bottom: -10.0, right: 0.0, top: 0.0, far: 0.0, near: 0.0 };
+        assert_eq!(bbox.area(), 100.0);
+        // with near-far
+        let bbox = BBox3D { left: 0.0, bottom: 0.0, right: 1.0, top: 1.0, far: 1.0, near: 0.0 };
+        assert_eq!(bbox.area(), 1.0);
+        let bbox = BBox3D { left: 0.0, bottom: 0.0, right: 10.0, top: 10.0, far: 1.0, near: 0.0 };
+        assert_eq!(bbox.area(), 100.0);
+        let bbox = BBox3D { left: -5.0, bottom: -5.0, right: 5.0, top: 5.0, far: 1.0, near: 0.0 };
+        assert_eq!(bbox.area(), 100.0);
+        let bbox = BBox3D { left: -10.0, bottom: -10.0, right: 0.0, top: 0.0, far: 1.0, near: 0.0 };
+        assert_eq!(bbox.area(), 100.0);
+        // use near and far
+        let bbox = BBox3D { left: 0.0, bottom: 0.0, right: 1.0, top: 1.0, far: 1.0, near: -1.0 };
+        assert_eq!(bbox.area(), 2.0);
+    }
+
+    #[test]
     fn test_bbox_inside() {
         let bbox = BBox { left: 0.0, bottom: 0.0, right: 1.0, top: 1.0 };
         assert!(bbox.inside(&bbox));

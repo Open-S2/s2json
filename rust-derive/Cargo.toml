@@ -2,6 +2,7 @@
 name = "s2json-derive"
 publish = true
 version.workspace = true
+rust-version.workspace = true
 edition.workspace = true
 authors.workspace = true
 description.workspace = true
