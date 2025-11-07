@@ -225,7 +225,7 @@ impl BBox<f64> {
 
     /// Creates a new BBox from a linestring
     pub fn from_linestring<P: GetXY>(line: &[P]) -> Self {
-        let mut bbox = BBox::from_point(&line[0]);
+        let mut bbox = BBox::default();
         for point in line {
             bbox.extend_from_point(point);
         }
@@ -234,7 +234,7 @@ impl BBox<f64> {
 
     /// Creates a new BBox from a multi-linestring
     pub fn from_multi_linestring<P: GetXY>(lines: &[Vec<P>]) -> Self {
-        let mut bbox = BBox::from_point(&lines[0][0]);
+        let mut bbox = BBox::default();
         for line in lines {
             for point in line {
                 bbox.extend_from_point(point);
@@ -245,12 +245,12 @@ impl BBox<f64> {
 
     /// Creates a new BBox from a polygon
     pub fn from_polygon<P: GetXY>(polygon: &[Vec<P>]) -> Self {
-        BBox::<f64>::from_multi_linestring(polygon)
+        Self::from_multi_linestring(polygon)
     }
 
     /// Creates a new BBox from a multi-polygon
     pub fn from_multi_polygon<P: GetXY>(polygons: &[Vec<Vec<P>>]) -> Self {
-        let mut bbox = BBox::from_point(&polygons[0][0][0]);
+        let mut bbox = BBox::default();
         for polygon in polygons {
             for line in polygon {
                 for point in line {
@@ -549,7 +549,7 @@ impl BBox3D<f64> {
 
     /// Creates a new BBox from a linestring
     pub fn from_linestring<P: GetXY + GetZ>(line: &[P]) -> Self {
-        let mut bbox = BBox3D::from_point(&line[0]);
+        let mut bbox = BBox3D::default();
         for point in line {
             bbox.extend_from_point(point);
         }
@@ -558,7 +558,7 @@ impl BBox3D<f64> {
 
     /// Creates a new BBox from a multi-linestring
     pub fn from_multi_linestring<P: GetXY + GetZ>(lines: &[Vec<P>]) -> Self {
-        let mut bbox = BBox3D::from_point(&lines[0][0]);
+        let mut bbox = BBox3D::default();
         for line in lines {
             for point in line {
                 bbox.extend_from_point(point);
@@ -569,12 +569,12 @@ impl BBox3D<f64> {
 
     /// Creates a new BBox from a polygon
     pub fn from_polygon<P: GetXY + GetZ>(polygon: &[Vec<P>]) -> Self {
-        BBox3D::<f64>::from_multi_linestring(polygon)
+        Self::from_multi_linestring(polygon)
     }
 
     /// Creates a new BBox from a multi-polygon
     pub fn from_multi_polygon<P: GetXY + GetZ>(polygons: &[Vec<Vec<P>>]) -> Self {
-        let mut bbox = BBox3D::from_point(&polygons[0][0][0]);
+        let mut bbox = BBox3D::default();
         for polygon in polygons {
             for line in polygon {
                 for point in line {

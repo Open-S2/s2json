@@ -239,6 +239,9 @@ mod tests {
             VectorPoint::new(1., 1.5, None, None),
         ]);
         assert_eq!(bbox, BBox { left: 0.0, bottom: 0.0, right: 1.0, top: 1.5 });
+
+        let bbox = BBox::from_linestring(&vec![] as &[VectorPoint<MValue>]);
+        assert_eq!(bbox, BBox::default());
     }
 
     #[test]
@@ -248,6 +251,9 @@ mod tests {
             VectorPoint::new(1., 1.5, None, None),
         ]]);
         assert_eq!(bbox, BBox { left: 0.0, bottom: 0.0, right: 1.0, top: 1.5 });
+
+        let bbox = BBox::from_multi_linestring(&vec![] as &[Vec<VectorPoint<MValue>>]);
+        assert_eq!(bbox, BBox::default());
     }
 
     #[test]
@@ -257,6 +263,9 @@ mod tests {
             VectorPoint::new(2., 1.5, None, None),
         ]]);
         assert_eq!(bbox, BBox { left: 0.0, bottom: 0.0, right: 2.0, top: 1.5 });
+
+        let bbox = BBox::from_polygon(&vec![] as &[Vec<VectorPoint<MValue>>]);
+        assert_eq!(bbox, BBox::default());
     }
 
     #[test]
@@ -272,6 +281,9 @@ mod tests {
             ]],
         ]);
         assert_eq!(bbox, BBox { left: -1.0, bottom: 0.0, right: 2.0, top: 3.5 });
+
+        let bbox = BBox::from_multi_polygon(&vec![] as &[Vec<Vec<VectorPoint<MValue>>>]);
+        assert_eq!(bbox, BBox::default());
     }
 
     #[test]
@@ -378,6 +390,9 @@ mod tests {
             bbox,
             BBox3D { left: 0.0, bottom: 0.0, right: 1.0, top: 1.5, near: f64::MAX, far: f64::MIN }
         );
+
+        let bbox = BBox3D::from_linestring(&vec![] as &[VectorPoint<MValue>]);
+        assert_eq!(bbox, BBox3D::default());
     }
 
     #[test]
@@ -390,6 +405,9 @@ mod tests {
             bbox,
             BBox3D { left: 0.0, bottom: 0.0, right: 1.0, top: 1.5, near: f64::MAX, far: f64::MIN }
         );
+
+        let bbox = BBox3D::from_multi_linestring(&vec![] as &[Vec<VectorPoint<MValue>>]);
+        assert_eq!(bbox, BBox3D::default());
     }
 
     #[test]
@@ -402,6 +420,9 @@ mod tests {
             bbox,
             BBox3D { left: 0.0, bottom: 0.0, right: 2.0, top: 1.5, near: f64::MAX, far: f64::MIN }
         );
+
+        let bbox = BBox3D::from_polygon(&vec![] as &[Vec<VectorPoint<MValue>>]);
+        assert_eq!(bbox, BBox3D::default());
     }
 
     #[test]
@@ -420,6 +441,9 @@ mod tests {
             bbox,
             BBox3D { left: -1.0, bottom: 0.0, right: 2.0, top: 3.5, near: f64::MAX, far: f64::MIN }
         );
+
+        let bbox = BBox3D::from_multi_polygon(&vec![] as &[Vec<Vec<VectorPoint<MValue>>>]);
+        assert_eq!(bbox, BBox3D::default());
     }
 
     #[test]
