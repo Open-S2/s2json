@@ -22,6 +22,10 @@ pub trait GetXY {
     fn x(&self) -> f64;
     /// Returns the y value
     fn y(&self) -> f64;
+    /// Returns the x and y values
+    fn xy(&self) -> (f64, f64) {
+        (self.x(), self.y())
+    }
 }
 /// Trait to extract the z value
 pub trait GetZ {
@@ -115,8 +119,8 @@ pub trait NewXYZM<M> {
 // Finally lets make "full" traits for ease of use
 
 /// Composite Trait for XY use cases
-pub trait FullXY: GetXY + SetXY + NewXY + Clone + PartialEq + Ord {}
-impl<T> FullXY for T where T: GetXY + SetXY + NewXY + Clone + PartialEq + Ord {}
+pub trait FullXY: GetXYZ + SetXY + NewXY + Clone + PartialEq + Ord {}
+impl<T> FullXY for T where T: GetXYZ + SetXY + NewXY + Clone + PartialEq + Ord {}
 
 /// Composite Trait for XYZ use cases
 pub trait FullXYZ: GetXYZ + SetXYZ + NewXYZ + Clone + PartialEq + Ord {}

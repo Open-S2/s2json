@@ -301,23 +301,18 @@ impl<M: Clone> VectorPoint<M> {
         }
     }
 }
+impl<M: Clone, P: GetXYZ> From<&P> for VectorPoint<M> {
+    fn from(p: &P) -> Self {
+        Self { x: p.x(), y: p.y(), z: p.z(), m: None, t: None }
+    }
+}
 impl<M: Clone> From<Point> for VectorPoint<M> {
     fn from(p: Point) -> Self {
         Self { x: p.0, y: p.1, z: None, m: None, t: None }
     }
 }
-impl<M: Clone> From<&Point> for VectorPoint<M> {
-    fn from(p: &Point) -> Self {
-        Self { x: p.0, y: p.1, z: None, m: None, t: None }
-    }
-}
 impl<M: Clone> From<Point3D> for VectorPoint<M> {
     fn from(p: Point3D) -> Self {
-        Self { x: p.0, y: p.1, z: Some(p.2), m: None, t: None }
-    }
-}
-impl<M: Clone> From<&Point3D> for VectorPoint<M> {
-    fn from(p: &Point3D) -> Self {
         Self { x: p.0, y: p.1, z: Some(p.2), m: None, t: None }
     }
 }

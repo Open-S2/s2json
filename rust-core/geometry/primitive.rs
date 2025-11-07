@@ -6,6 +6,11 @@ use serde::{Deserialize, Serialize};
 /// Definition of a Point. May represent WebMercator Lon-Lat or S2Geometry S-T
 #[derive(Copy, Clone, Serialize, Deserialize, Debug, PartialEq, Default)]
 pub struct Point(pub f64, pub f64);
+impl<P: GetXY> From<&P> for Point {
+    fn from(p: &P) -> Self {
+        Point(p.x(), p.y())
+    }
+}
 /// Definition of a MultiPoint
 pub type MultiPoint = Vec<Point>;
 /// Definition of a LineString
@@ -19,6 +24,11 @@ pub type MultiPolygon = Vec<Polygon>;
 /// Definition of a 3D Point. May represent WebMercator Lon-Lat or S2Geometry S-T with a z-value
 #[derive(Copy, Clone, Serialize, Deserialize, Debug, PartialEq, Default)]
 pub struct Point3D(pub f64, pub f64, pub f64);
+impl<P: GetXYZ> From<&P> for Point3D {
+    fn from(p: &P) -> Self {
+        Point3D(p.x(), p.y(), p.z().unwrap_or_default())
+    }
+}
 /// Definition of a 3D MultiPoint
 pub type MultiPoint3D = Vec<Point3D>;
 /// Definition of a 3D LineString
@@ -40,6 +50,11 @@ impl From<Point> for PointOrPoint3D {
 impl From<Point3D> for PointOrPoint3D {
     fn from(p: Point3D) -> Self {
         PointOrPoint3D(p.0, p.1, Some(p.2))
+    }
+}
+impl<P: GetXYZ> From<&P> for PointOrPoint3D {
+    fn from(p: &P) -> Self {
+        PointOrPoint3D(p.x(), p.y(), p.z())
     }
 }
 

@@ -1395,6 +1395,7 @@ mod tests {
         let point = Point(0., 1.);
         assert_eq!(point.x(), 0.);
         assert_eq!(point.y(), 1.);
+        assert_eq!(point.xy(), (0., 1.));
         assert_eq!(point.z(), None);
 
         let point_3d = Point3D(0., 1., 2.);
@@ -1426,6 +1427,11 @@ mod tests {
         assert_eq!(point.y(), 40.);
         assert_eq!(point.z(), None);
 
+        let point: Point = (&Point3D(0., 1., 2.)).into();
+        assert_eq!(point.x(), 0.);
+        assert_eq!(point.y(), 1.);
+        assert_eq!(point.z(), None);
+
         let mut point = Point3D(0., 1., 2.);
         point.set_x(10.);
         point.set_y(20.);
@@ -1442,6 +1448,16 @@ mod tests {
         assert_eq!(point.y(), 70.);
         assert_eq!(point.z(), Some(80.));
 
+        let point: Point3D = (&PointOrPoint3D(0., 1., Some(2.))).into();
+        assert_eq!(point.x(), 0.);
+        assert_eq!(point.y(), 1.);
+        assert_eq!(point.z(), Some(2.));
+
+        let point: Point3D = (&Point(0., 1.)).into();
+        assert_eq!(point.x(), 0.);
+        assert_eq!(point.y(), 1.);
+        assert_eq!(point.z(), Some(0.));
+
         let mut point = PointOrPoint3D(0., 1., None);
         point.set_x(10.);
         point.set_y(20.);
@@ -1452,6 +1468,16 @@ mod tests {
         assert_eq!(point.x(), 30.);
         assert_eq!(point.y(), 40.);
         assert_eq!(point.z(), None);
+
+        let point: PointOrPoint3D = (&Point(0., 1.)).into();
+        assert_eq!(point.x(), 0.);
+        assert_eq!(point.y(), 1.);
+        assert_eq!(point.z(), None);
+
+        let point: PointOrPoint3D = (&Point3D(0., 1., 2.)).into();
+        assert_eq!(point.x(), 0.);
+        assert_eq!(point.y(), 1.);
+        assert_eq!(point.z(), Some(2.));
 
         let mut point = PointOrPoint3D(0., 1., Some(2.));
         point.set_x(10.);
