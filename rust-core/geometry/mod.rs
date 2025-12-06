@@ -105,6 +105,11 @@ pub trait NewXY {
     /// Create a new point with xy
     fn new_xy(x: f64, y: f64) -> Self;
 }
+/// Trait to create a new XY
+pub trait NewXYM<M> {
+    /// Create a new point with xy
+    fn new_xym(x: f64, y: f64, m: M) -> Self;
+}
 /// Trait to create a new XYZ
 pub trait NewXYZ {
     /// Create a new point with xyz

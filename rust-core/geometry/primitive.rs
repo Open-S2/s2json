@@ -158,6 +158,21 @@ impl NewXY for PointOrPoint3D {
         Self(x, y, None)
     }
 }
+impl<M: Clone> NewXYM<M> for Point {
+    fn new_xym(x: f64, y: f64, _m: M) -> Self {
+        Self(x, y)
+    }
+}
+impl<M: Clone> NewXYM<M> for Point3D {
+    fn new_xym(x: f64, y: f64, _m: M) -> Self {
+        Self(x, y, 0.0)
+    }
+}
+impl<M: Clone> NewXYM<M> for PointOrPoint3D {
+    fn new_xym(x: f64, y: f64, _m: M) -> Self {
+        Self(x, y, None)
+    }
+}
 impl NewXYZ for Point3D {
     fn new_xyz(x: f64, y: f64, z: f64) -> Self {
         Self(x, y, z)
@@ -165,6 +180,16 @@ impl NewXYZ for Point3D {
 }
 impl NewXYZ for PointOrPoint3D {
     fn new_xyz(x: f64, y: f64, z: f64) -> Self {
+        Self(x, y, Some(z))
+    }
+}
+impl<M: Clone> NewXYZM<M> for Point3D {
+    fn new_xyzm(x: f64, y: f64, z: f64, _m: M) -> Self {
+        Self(x, y, z)
+    }
+}
+impl<M: Clone> NewXYZM<M> for PointOrPoint3D {
+    fn new_xyzm(x: f64, y: f64, z: f64, _m: M) -> Self {
         Self(x, y, Some(z))
     }
 }

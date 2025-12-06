@@ -1546,6 +1546,28 @@ mod tests {
         assert_eq!(point.x(), 0.);
         assert_eq!(point.y(), 1.);
         assert_eq!(point.z(), Some(2.));
+
+        let point: Point = NewXYM::<()>::new_xym(0., 1., ());
+        assert_eq!(point.x(), 0.);
+        assert_eq!(point.y(), 1.);
+        assert_eq!(point.z(), None);
+        let point: Point3D = NewXYM::<()>::new_xym(0., 1., ());
+        assert_eq!(point.x(), 0.);
+        assert_eq!(point.y(), 1.);
+        assert_eq!(point.z(), Some(0.));
+        let point: PointOrPoint3D = NewXYM::<()>::new_xym(0., 1., ());
+        assert_eq!(point.x(), 0.);
+        assert_eq!(point.y(), 1.);
+        assert_eq!(point.z(), None);
+
+        let point: Point3D = NewXYZM::<()>::new_xyzm(0., 1., 2., ());
+        assert_eq!(point.x(), 0.);
+        assert_eq!(point.y(), 1.);
+        assert_eq!(point.z(), Some(2.));
+        let point: PointOrPoint3D = NewXYZM::<()>::new_xyzm(0., 1., 2., ());
+        assert_eq!(point.x(), 0.);
+        assert_eq!(point.y(), 1.);
+        assert_eq!(point.z(), Some(2.));
     }
 
     #[test]

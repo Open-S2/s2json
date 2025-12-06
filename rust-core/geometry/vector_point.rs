@@ -76,6 +76,11 @@ impl<M: Clone> NewXY for VectorPoint<M> {
         Self { x, y, z: None, m: None, t: None }
     }
 }
+impl<M: Clone> NewXYM<M> for VectorPoint<M> {
+    fn new_xym(x: f64, y: f64, m: M) -> Self {
+        Self { x, y, z: None, m: Some(m), t: None }
+    }
+}
 impl<M: Clone> NewXYZ for VectorPoint<M> {
     fn new_xyz(x: f64, y: f64, z: f64) -> Self {
         Self { x, y, z: Some(z), m: None, t: None }
