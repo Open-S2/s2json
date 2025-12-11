@@ -1,5 +1,5 @@
 use crate::*;
-use alloc::{string::String, vec::Vec};
+use alloc::{string::String, vec, vec::Vec};
 use core::cmp::Ordering;
 use libm::round;
 use pbf::{ProtoRead, ProtoWrite, Protobuf, Type};
@@ -1010,6 +1010,97 @@ impl From<&MValue> for MapboxProperties {
             if let Some(p) = value.to_prim() {
                 res.insert(k.clone(), p.clone());
             }
+        }
+        res
+    }
+}
+
+// Geometry
+
+impl From<&Point> for ValueType {
+    fn from(v: &Point) -> Self {
+        ValueType::Array(vec![v.0.into(), v.1.into()])
+    }
+}
+impl From<&ValueType> for Point {
+    fn from(v: &ValueType) -> Self {
+        match v {
+            ValueType::Array(arr) => {
+                if let Some(x) = arr.get(0)
+                    && let Some(y) = arr.get(1)
+                {
+                    Point(
+                        x.to_prim()
+                            .unwrap_or(&PrimitiveValue::default())
+                            .to_f64()
+                            .unwrap_or_default(),
+                        y.to_prim()
+                            .unwrap_or(&PrimitiveValue::default())
+                            .to_f64()
+                            .unwrap_or_default(),
+                    )
+                } else {
+                    Point::default()
+                }
+            }
+            _ => Point::default(),
+        }
+    }
+}
+
+// Serde compatibility for testing
+
+impl From<&serde_json::Value> for Value {
+    fn from(val: &serde_json::Value) -> Self {
+        let mut res = Value::new();
+        match val {
+            serde_json::Value::Object(o) => {
+                for (k, v) in o.iter() {
+                    res.insert(k.clone(), v.into());
+                }
+            }
+            _ => {}
+        }
+
+        res
+    }
+}
+impl From<&serde_json::Value> for ValueType {
+    fn from(val: &serde_json::Value) -> Self {
+        match val {
+            serde_json::Value::Null => ValueType::Primitive(PrimitiveValue::Null),
+            serde_json::Value::Bool(b) => ValueType::Primitive(PrimitiveValue::Bool(*b)),
+            serde_json::Value::Number(num) => {
+                ValueType::Primitive(PrimitiveValue::F64(num.as_f64().unwrap_or_default()))
+            }
+            serde_json::Value::String(s) => ValueType::Primitive(PrimitiveValue::String(s.clone())),
+            serde_json::Value::Array(values) => {
+                ValueType::Array(values.iter().map(Into::into).collect())
+            }
+            serde_json::Value::Object(map) => ValueType::Nested(map.into()),
+        }
+    }
+}
+impl From<&serde_json::Value> for ValuePrimitiveType {
+    fn from(val: &serde_json::Value) -> Self {
+        match val {
+            serde_json::Value::Null => ValuePrimitiveType::Primitive(PrimitiveValue::Null),
+            serde_json::Value::Bool(b) => ValuePrimitiveType::Primitive(PrimitiveValue::Bool(*b)),
+            serde_json::Value::Number(num) => {
+                ValuePrimitiveType::Primitive(PrimitiveValue::F64(num.as_f64().unwrap_or_default()))
+            }
+            serde_json::Value::String(s) => {
+                ValuePrimitiveType::Primitive(PrimitiveValue::String(s.clone()))
+            }
+            _ => ValuePrimitiveType::Primitive(PrimitiveValue::Null),
+        }
+    }
+}
+impl From<&serde_json::Map<String, serde_json::Value>> for Value {
+    fn from(val: &serde_json::Map<String, serde_json::Value>) -> Self {
+        let mut res = Value::new();
+        for (k, v) in val.iter() {
+            res.insert(k.clone(), v.into());
         }
         res
     }

@@ -5,6 +5,7 @@ mod tests {
     use alloc::vec;
     use pbf::Protobuf;
     use s2json_core::*;
+    use serde_json::json;
 
     #[test]
     fn value_default() {
@@ -998,5 +999,45 @@ mod tests {
         let mut read_null = PrimitiveValue::Null;
         pb_read.read_message(&mut read_null);
         assert_eq!(read_null, null_value);
+    }
+
+    #[test]
+    fn test_from_to_point_value_type() {
+        let point = Point(1., 2.);
+        let value: ValueType = (&point).into();
+        assert_eq!(
+            value,
+            ValueType::Array(vec![
+                ValuePrimitiveType::Primitive(PrimitiveValue::F64(1.)),
+                ValuePrimitiveType::Primitive(PrimitiveValue::F64(2.)),
+            ])
+        );
+        let back_to_point: Point = (&value).into();
+        assert_eq!(back_to_point, point);
+
+        // now read in json
+        let properties: Properties = (&json!({ "point": [1., 2.] })).into();
+        let prop_point = properties.get("point").unwrap();
+        assert_eq!(
+            prop_point,
+            &ValueType::Array(vec![
+                ValuePrimitiveType::Primitive(PrimitiveValue::F64(1.)),
+                ValuePrimitiveType::Primitive(PrimitiveValue::F64(2.)),
+            ])
+        );
+        let back_to_point: Point = (prop_point).into();
+        assert_eq!(back_to_point, point);
+
+        // default case 1
+        let properties: Properties = (&json!({ "point": [1.] })).into();
+        let prop_point = properties.get("point").unwrap();
+        let back_to_point: Point = (prop_point).into();
+        assert_eq!(back_to_point, Point::default());
+
+        // default case 2
+        let properties: Properties = (&json!({ "point": "string" })).into();
+        let prop_point = properties.get("point").unwrap();
+        let back_to_point: Point = (prop_point).into();
+        assert_eq!(back_to_point, Point::default());
     }
 }
