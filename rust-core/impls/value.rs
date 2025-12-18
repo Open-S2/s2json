@@ -1026,7 +1026,7 @@ impl From<&ValueType> for Point {
     fn from(v: &ValueType) -> Self {
         match v {
             ValueType::Array(arr) => {
-                if let Some(x) = arr.get(0)
+                if let Some(x) = arr.first()
                     && let Some(y) = arr.get(1)
                 {
                     Point(
@@ -1053,13 +1053,10 @@ impl From<&ValueType> for Point {
 impl From<&serde_json::Value> for Value {
     fn from(val: &serde_json::Value) -> Self {
         let mut res = Value::new();
-        match val {
-            serde_json::Value::Object(o) => {
-                for (k, v) in o.iter() {
-                    res.insert(k.clone(), v.into());
-                }
+        if let serde_json::Value::Object(o) = val {
+            for (k, v) in o.iter() {
+                res.insert(k.clone(), v.into());
             }
-            _ => {}
         }
 
         res
