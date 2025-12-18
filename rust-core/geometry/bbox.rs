@@ -103,7 +103,7 @@ where
 impl<T> MValueCompatible for BBox<T>
 where
     ValueType: From<T>,
-    T: From<ValueType> + Default + Bounded + Copy,
+    T: From<ValueType> + Default + Bounded + Copy + Interpolate,
 {
 }
 impl<T> Default for BBox<T>
@@ -370,6 +370,72 @@ pub struct BBox3D<T = f64> {
     /// far most height (WM) or T (S2)
     /// generic height is relative to the surface of the earth in meters
     pub far: T,
+}
+impl<T> From<BBox3D<T>> for MValue
+where
+    T: Into<ValueType>,
+{
+    fn from(bbox: BBox3D<T>) -> MValue {
+        MValue::from([
+            ("left".into(), bbox.left.into()),
+            ("bottom".into(), bbox.bottom.into()),
+            ("right".into(), bbox.right.into()),
+            ("top".into(), bbox.top.into()),
+            ("near".into(), bbox.near.into()),
+            ("far".into(), bbox.far.into()),
+        ])
+    }
+}
+impl<T> From<&BBox3D<T>> for MValue
+where
+    T: Copy + Into<ValueType>,
+{
+    fn from(bbox: &BBox3D<T>) -> MValue {
+        MValue::from([
+            ("left".into(), bbox.left.into()),
+            ("bottom".into(), bbox.bottom.into()),
+            ("right".into(), bbox.right.into()),
+            ("top".into(), bbox.top.into()),
+            ("near".into(), bbox.near.into()),
+            ("far".into(), bbox.far.into()),
+        ])
+    }
+}
+impl<T> From<MValue> for BBox3D<T>
+where
+    T: From<ValueType>,
+{
+    fn from(mvalue: MValue) -> Self {
+        BBox3D {
+            left: mvalue.get("left").unwrap().clone().into(),
+            bottom: mvalue.get("bottom").unwrap().clone().into(),
+            right: mvalue.get("right").unwrap().clone().into(),
+            top: mvalue.get("top").unwrap().clone().into(),
+            near: mvalue.get("near").unwrap().clone().into(),
+            far: mvalue.get("far").unwrap().clone().into(),
+        }
+    }
+}
+impl<T> From<&MValue> for BBox3D<T>
+where
+    T: From<ValueType>,
+{
+    fn from(mvalue: &MValue) -> Self {
+        BBox3D {
+            left: mvalue.get("left").unwrap().clone().into(),
+            bottom: mvalue.get("bottom").unwrap().clone().into(),
+            right: mvalue.get("right").unwrap().clone().into(),
+            top: mvalue.get("top").unwrap().clone().into(),
+            near: mvalue.get("near").unwrap().clone().into(),
+            far: mvalue.get("far").unwrap().clone().into(),
+        }
+    }
+}
+impl<T> MValueCompatible for BBox3D<T>
+where
+    ValueType: From<T>,
+    T: From<ValueType> + Default + Bounded + Copy + Interpolate,
+{
 }
 impl<T> BBox3D<T> {
     /// Creates a new BBox3D
@@ -678,6 +744,16 @@ pub enum BBOX {
 impl Default for BBOX {
     fn default() -> Self {
         BBOX::BBox(BBox::default())
+    }
+}
+impl From<BBox> for BBOX {
+    fn from(bbox: BBox) -> Self {
+        BBOX::BBox(bbox)
+    }
+}
+impl From<BBox3D> for BBOX {
+    fn from(bbox: BBox3D) -> Self {
+        BBOX::BBox3D(bbox)
     }
 }
 impl Eq for BBOX {}

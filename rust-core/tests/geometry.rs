@@ -8,6 +8,40 @@ mod tests {
     use serde_json::json;
 
     #[test]
+    fn test_bbox_value_type_conversion() {
+        let bbox = BBox3D::new(0., 0., 1., 1., 0., 1.);
+        let value: MValue = bbox.into();
+        assert_eq!(
+            value,
+            MValue::from([
+                ("left".into(), bbox.left.into()),
+                ("bottom".into(), bbox.bottom.into()),
+                ("right".into(), bbox.right.into()),
+                ("top".into(), bbox.top.into()),
+                ("near".into(), bbox.near.into()),
+                ("far".into(), bbox.far.into()),
+            ])
+        );
+        let back_to_bbox: BBox3D = value.into();
+        assert_eq!(back_to_bbox, bbox);
+
+        let value: MValue = (&bbox).into();
+        assert_eq!(
+            value,
+            MValue::from([
+                ("left".into(), bbox.left.into()),
+                ("bottom".into(), bbox.bottom.into()),
+                ("right".into(), bbox.right.into()),
+                ("top".into(), bbox.top.into()),
+                ("near".into(), bbox.near.into()),
+                ("far".into(), bbox.far.into()),
+            ])
+        );
+        let back_to_bbox: BBox3D = (&value).into();
+        assert_eq!(back_to_bbox, bbox);
+    }
+
+    #[test]
     fn test_vector_offset() {
         let offset = VectorOffsets::default();
         assert_eq!(offset, VectorOffsets::LineOffset(0.0));

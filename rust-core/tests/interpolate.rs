@@ -4,6 +4,11 @@ mod tests {
 
     #[test]
     fn interpolate_numbers() {
+        // ()
+        let a = ();
+        let b = ();
+        let c = a.interpolate(&b, 0.5);
+        assert_eq!(c, ());
         // f64
         let a: f64 = 1.;
         let b: f64 = 2.;
@@ -14,9 +19,65 @@ mod tests {
         let b: f32 = 2.;
         let c = a.interpolate(&b, 0.5);
         assert_eq!(c, 1.5);
+        // isize
+        let a: isize = 1;
+        let b: isize = 2;
+        let c = a.interpolate(&b, 0.4);
+        assert_eq!(c, 1);
+        let c = a.interpolate(&b, 0.6);
+        assert_eq!(c, 2);
+        // i8
+        let a: i8 = 1;
+        let b: i8 = 2;
+        let c = a.interpolate(&b, 0.4);
+        assert_eq!(c, 1);
+        let c = a.interpolate(&b, 0.6);
+        assert_eq!(c, 2);
+        // i16
+        let a: i16 = 1;
+        let b: i16 = 2;
+        let c = a.interpolate(&b, 0.4);
+        assert_eq!(c, 1);
+        let c = a.interpolate(&b, 0.6);
+        assert_eq!(c, 2);
+        // i32
+        let a: i32 = 1;
+        let b: i32 = 2;
+        let c = a.interpolate(&b, 0.4);
+        assert_eq!(c, 1);
+        let c = a.interpolate(&b, 0.6);
+        assert_eq!(c, 2);
         // i64
         let a: i64 = 1;
         let b: i64 = 2;
+        let c = a.interpolate(&b, 0.4);
+        assert_eq!(c, 1);
+        let c = a.interpolate(&b, 0.6);
+        assert_eq!(c, 2);
+        // usize
+        let a: usize = 1;
+        let b: usize = 2;
+        let c = a.interpolate(&b, 0.4);
+        assert_eq!(c, 1);
+        let c = a.interpolate(&b, 0.6);
+        assert_eq!(c, 2);
+        // u8
+        let a: u8 = 1;
+        let b: u8 = 2;
+        let c = a.interpolate(&b, 0.4);
+        assert_eq!(c, 1);
+        let c = a.interpolate(&b, 0.6);
+        assert_eq!(c, 2);
+        // u16
+        let a: u16 = 1;
+        let b: u16 = 2;
+        let c = a.interpolate(&b, 0.4);
+        assert_eq!(c, 1);
+        let c = a.interpolate(&b, 0.6);
+        assert_eq!(c, 2);
+        // u32
+        let a: u32 = 1;
+        let b: u32 = 2;
         let c = a.interpolate(&b, 0.4);
         assert_eq!(c, 1);
         let c = a.interpolate(&b, 0.6);
@@ -159,6 +220,37 @@ mod tests {
     }
 
     #[test]
+    fn test_json_props() {
+        let a =
+            JSONProperties::from([("a".into(), (1.0_f64).into()), ("b".into(), (2.0_f64).into())]);
+        let b =
+            JSONProperties::from([("a".into(), (3.0_f64).into()), ("b".into(), (4.0_f64).into())]);
+        let c = a.interpolate(&b, 0.5);
+        assert_eq!(
+            c,
+            JSONProperties::from([("a".into(), (2.0_f64).into()), ("b".into(), (3.0_f64).into())])
+        );
+
+        let a =
+            JSONProperties::from([("a".into(), (1.0_f64).into()), ("b".into(), (2.0_f64).into())]);
+        let b = JSONProperties::from([("a".into(), (3.0_f64).into())]);
+        let c = a.interpolate(&b, 0.5);
+        assert_eq!(
+            c,
+            JSONProperties::from([("a".into(), (2.0_f64).into()), ("b".into(), (2.0_f64).into())])
+        );
+
+        let a = JSONProperties::from([("a".into(), (1.0_f64).into())]);
+        let b =
+            JSONProperties::from([("a".into(), (3.0_f64).into()), ("b".into(), (4.0_f64).into())]);
+        let c = a.interpolate(&b, 0.5);
+        assert_eq!(
+            c,
+            JSONProperties::from([("a".into(), (2.0_f64).into()), ("b".into(), (4.0_f64).into())])
+        );
+    }
+
+    #[test]
     fn test_value_type() {
         let a = Value::from([(
             "a".into(),
@@ -266,5 +358,63 @@ mod tests {
         )]));
         let c = a.interpolate(&b, 0.5);
         assert_eq!(c, ValuePrimitiveType::Primitive(PrimitiveValue::Null));
+    }
+
+    #[test]
+    fn test_json_value() {
+        // prim
+        let a = JSONValue::Primitive((1.0_f64).into());
+        let b = JSONValue::Primitive((2.0_f64).into());
+        let c = a.interpolate(&b, 0.5);
+        assert_eq!(c, JSONValue::Primitive((1.5_f64).into()));
+        // nested_prim
+        let a = JSONValue::Object(JSONProperties::from([("a".into(), (1.0_f64).into())]));
+        let b = JSONValue::Object(JSONProperties::from([("a".into(), (2.0_f64).into())]));
+        let c = a.interpolate(&b, 0.5);
+        assert_eq!(c, JSONValue::Object(JSONProperties::from([("a".into(), (1.5_f64).into(),)])));
+        // null case
+        let a = JSONValue::Primitive(PrimitiveValue::Null);
+        let b = JSONValue::Object(JSONProperties::from([("a".into(), (2.0_f64).into())]));
+        let c = a.interpolate(&b, 0.5);
+        assert_eq!(c, JSONValue::Primitive(PrimitiveValue::Null));
+
+        // array
+        let a = JSONValue::Array(vec![(1.0_f64).into(), (2.0_f64).into(), (3.0_f64).into()]);
+        let b = JSONValue::Array(vec![(4.0_f64).into(), (5.0_f64).into(), (6.0_f64).into()]);
+        let c = a.interpolate(&b, 0.5);
+        assert_eq!(c, JSONValue::Array(vec![(2.5_f64).into(), (3.5_f64).into(), (4.5_f64).into()]));
+    }
+
+    #[test]
+    fn test_bbox() {
+        let a = BBox::new(1., 2., 3., 4.);
+        let b = BBox::new(5., 6., 7., 8.);
+        let c = a.interpolate(&b, 0.5);
+        assert_eq!(c, BBox::new(3., 4., 5., 6.));
+
+        let a: BBOX = BBox::new(1., 2., 3., 4.).into();
+        let b: BBOX = BBox::new(5., 6., 7., 8.).into();
+        let c = a.interpolate(&b, 0.5);
+        assert_eq!(c, BBox::new(3., 4., 5., 6.).into());
+
+        let a = BBox3D::new(1., 2., 3., 4., 5., 6.);
+        let b = BBox3D::new(7., 8., 9., 10., 11., 12.);
+        let c = a.interpolate(&b, 0.5);
+        assert_eq!(c, BBox3D::new(4., 5., 6., 7., 8., 9.));
+
+        let a: BBOX = BBox3D::new(1., 2., 3., 4., 5., 6.).into();
+        let b: BBOX = BBox3D::new(7., 8., 9., 10., 11., 12.).into();
+        let c = a.interpolate(&b, 0.5);
+        assert_eq!(c, BBox3D::new(4., 5., 6., 7., 8., 9.).into());
+
+        let a: BBOX = BBox::new(1., 2., 3., 4.).into();
+        let b: BBOX = BBox3D::new(7., 8., 9., 10., 11., 12.).into();
+        let c = a.interpolate(&b, 0.5);
+        assert_eq!(c, a);
+
+        let a: BBOX = BBox3D::new(1., 2., 3., 4., 5., 6.).into();
+        let b: BBOX = BBox::new(7., 8., 9., 10.).into();
+        let c = a.interpolate(&b, 0.5);
+        assert_eq!(c, a);
     }
 }
