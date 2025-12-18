@@ -278,8 +278,8 @@ impl Interpolate for BBOX {
             (BBOX::BBox(a), BBOX::BBox(b)) => a.interpolate(b, t).into(),
             (BBOX::BBox3D(a), BBOX::BBox3D(b)) => a.interpolate(b, t).into(),
             // Ensure that BBox and BBox3D are ordered correctly
-            (BBOX::BBox(_), BBOX::BBox3D(_)) => self.clone(),
-            (BBOX::BBox3D(_), BBOX::BBox(_)) => self.clone(),
+            (BBOX::BBox(_), BBOX::BBox3D(_)) => *self,
+            (BBOX::BBox3D(_), BBOX::BBox(_)) => *self,
         }
     }
 }
