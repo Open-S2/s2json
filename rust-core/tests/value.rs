@@ -2,6 +2,7 @@
 mod tests {
     use core::cmp::Ordering;
     use s2json_core::*;
+    use serde_json::json;
 
     #[test]
     fn json_value() {
@@ -288,4 +289,183 @@ mod tests {
         let usize: usize = (&prim_value).into();
         assert_eq!(usize, 1);
     }
+
+    #[test]
+    fn value_from_object() {
+        let j = json!({
+            "a": 1,
+            "b": true,
+            "c": "str",
+            "d": null,
+        });
+
+        let v = Value::from(&j);
+
+        assert!(matches!(
+            v.get("a").unwrap(),
+            ValueType::Primitive(PrimitiveValue::F64(x)) if *x == 1.0
+        ));
+        assert!(matches!(v.get("b").unwrap(), ValueType::Primitive(PrimitiveValue::Bool(true))));
+        assert!(matches!(
+            v.get("c").unwrap(),
+            ValueType::Primitive(PrimitiveValue::String(s)) if s == "str"
+        ));
+        assert!(matches!(v.get("d").unwrap(), ValueType::Primitive(PrimitiveValue::Null)));
+    }
+
+    #[test]
+    fn value_from_non_object_is_empty() {
+        let j = json!(123);
+        let v = Value::from(&j);
+        assert!(v.is_empty());
+    }
+
+    #[test]
+    fn valuetype_primitives() {
+        assert!(matches!(
+            ValueType::from(&json!(null)),
+            ValueType::Primitive(PrimitiveValue::Null)
+        ));
+
+        assert!(matches!(
+            ValueType::from(&json!(false)),
+            ValueType::Primitive(PrimitiveValue::Bool(false))
+        ));
+
+        assert!(matches!(
+            ValueType::from(&json!(2.5)),
+            ValueType::Primitive(PrimitiveValue::F64(x)) if x == 2.5
+        ));
+
+        assert!(matches!(
+            ValueType::from(&json!("abc")),
+            ValueType::Primitive(PrimitiveValue::String(s)) if s == "abc"
+        ));
+    }
+
+    #[test]
+    fn valuetype_array() {
+        let j = json!([1, 2, 3]);
+        let v = ValueType::from(&j);
+
+        match v {
+            ValueType::Array(arr) => {
+                assert_eq!(arr.len(), 3);
+                assert!(matches!(
+                    arr[0],
+                    ValuePrimitiveType::Primitive(PrimitiveValue::F64(x)) if x == 1.0
+                ));
+            }
+            _ => panic!("expected array"),
+        }
+    }
+
+    #[test]
+    fn valuetype_nested_object() {
+        let j = json!({ "x": 1 });
+        let v = ValueType::from(&j);
+
+        match v {
+            ValueType::Nested(map) => {
+                assert!(matches!(
+                    map.get("x").unwrap(),
+                    ValueType::Primitive(PrimitiveValue::F64(x)) if *x == 1.0
+                ));
+            }
+            _ => panic!("expected nested"),
+        }
+    }
+
+    #[test]
+    fn valueprimitive_only_accepts_primitives() {
+        assert!(matches!(
+            ValuePrimitiveType::from(&json!(true)),
+            ValuePrimitiveType::Primitive(PrimitiveValue::Bool(true))
+        ));
+
+        assert!(matches!(
+            ValuePrimitiveType::from(&json!("s")),
+            ValuePrimitiveType::Primitive(PrimitiveValue::String(s)) if s == "s"
+        ));
+
+        // arrays and objects collapse to Null
+        assert!(matches!(
+            ValuePrimitiveType::from(&json!([1, 2])),
+            ValuePrimitiveType::Primitive(PrimitiveValue::Null)
+        ));
+        assert!(matches!(
+            ValuePrimitiveType::from(&json!({ "a": 1 })),
+            ValuePrimitiveType::Primitive(PrimitiveValue::Null)
+        ));
+    }
+
+    #[test]
+    fn value_from_map() {
+        let j = json!({ "k": 42 });
+        let map = j.as_object().unwrap();
+        let v = Value::from(map);
+
+        assert!(matches!(
+            v.get("k").unwrap(),
+            ValueType::Primitive(PrimitiveValue::F64(x)) if *x == 42.0
+        ));
+    }
 }
+
+// // Serde compatibility for testing
+
+// impl From<&serde_json::Value> for Value {
+//     fn from(val: &serde_json::Value) -> Self {
+//         let mut res = Value::new();
+//         match val {
+//             serde_json::Value::Object(o) => {
+//                 for (k, v) in o.iter() {
+//                     res.insert(k.clone(), v.into());
+//                 }
+//             }
+//             _ => {}
+//         }
+
+//         res
+//     }
+// }
+// impl From<&serde_json::Value> for ValueType {
+//     fn from(val: &serde_json::Value) -> Self {
+//         match val {
+//             serde_json::Value::Null => ValueType::Primitive(PrimitiveValue::Null),
+//             serde_json::Value::Bool(b) => ValueType::Primitive(PrimitiveValue::Bool(*b)),
+//             serde_json::Value::Number(num) => {
+//                 ValueType::Primitive(PrimitiveValue::F64(num.as_f64().unwrap_or_default()))
+//             }
+//             serde_json::Value::String(s) => ValueType::Primitive(PrimitiveValue::String(s.clone())),
+//             serde_json::Value::Array(values) => {
+//                 ValueType::Array(values.iter().map(Into::into).collect())
+//             }
+//             serde_json::Value::Object(map) => ValueType::Nested(map.into()),
+//         }
+//     }
+// }
+// impl From<&serde_json::Value> for ValuePrimitiveType {
+//     fn from(val: &serde_json::Value) -> Self {
+//         match val {
+//             serde_json::Value::Null => ValuePrimitiveType::Primitive(PrimitiveValue::Null),
+//             serde_json::Value::Bool(b) => ValuePrimitiveType::Primitive(PrimitiveValue::Bool(*b)),
+//             serde_json::Value::Number(num) => {
+//                 ValuePrimitiveType::Primitive(PrimitiveValue::F64(num.as_f64().unwrap_or_default()))
+//             }
+//             serde_json::Value::String(s) => {
+//                 ValuePrimitiveType::Primitive(PrimitiveValue::String(s.clone()))
+//             }
+//             _ => ValuePrimitiveType::Primitive(PrimitiveValue::Null),
+//         }
+//     }
+// }
+// impl From<&serde_json::Map<String, serde_json::Value>> for Value {
+//     fn from(val: &serde_json::Map<String, serde_json::Value>) -> Self {
+//         let mut res = Value::new();
+//         for (k, v) in val.iter() {
+//             res.insert(k.clone(), v.into());
+//         }
+//         res
+//     }
+// }

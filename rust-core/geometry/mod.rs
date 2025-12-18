@@ -2,6 +2,8 @@
 pub mod bbox;
 /// Impls that we want to hide to make the code more readable
 pub mod impls;
+/// Interpolation tools
+pub mod interpolate;
 /// Primitive geometry types (used by GeoJSON spec)
 pub mod primitive;
 /// Vector geometry types (used by the s2json spec for both WGS84 and S2Geometry)
@@ -11,6 +13,7 @@ pub mod vector_point;
 
 use crate::Face;
 pub use bbox::*;
+pub use interpolate::*;
 pub use primitive::*;
 use serde::{Deserialize, Serialize};
 pub use vector::*;

@@ -673,6 +673,20 @@ mod tests {
         assert_eq!(vp.y(), 2.0);
         assert_eq!(vp.z(), Some(3.0));
         assert_eq!(vp.m(), Some(&Test { a: "a".to_string() }));
+
+        let vp: VectorPoint<Test> = NewXYZM::new_xyzm(1.0, 2.0, 3.0, Test { a: "a".to_string() });
+
+        assert_eq!(vp.x(), 1.0);
+        assert_eq!(vp.y(), 2.0);
+        assert_eq!(vp.z(), Some(3.0));
+        assert_eq!(vp.m(), Some(&Test { a: "a".to_string() }));
+
+        let vp: VectorPoint<Test> = NewXYM::new_xym(1.0, 2.0, Test { a: "a".to_string() });
+
+        assert_eq!(vp.x(), 1.0);
+        assert_eq!(vp.y(), 2.0);
+        assert_eq!(vp.z(), None);
+        assert_eq!(vp.m(), Some(&Test { a: "a".to_string() }));
     }
 
     #[test]
