@@ -130,6 +130,10 @@ pub trait NewXYZM<M> {
 pub trait FullXY: GetXYZ + SetXY + NewXY + Clone + PartialEq + Ord {}
 impl<T> FullXY for T where T: GetXYZ + SetXY + NewXY + Clone + PartialEq + Ord {}
 
+/// Composite Trait for XYM use cases
+pub trait FullXYM<M>: GetXYZM<M> + SetXYM<M> + NewXYM<M> + Clone + PartialEq + Ord {}
+impl<T, M> FullXYM<M> for T where T: GetXYZM<M> + SetXYM<M> + NewXYM<M> + Clone + PartialEq + Ord {}
+
 /// Composite Trait for XYZ use cases
 pub trait FullXYZ: GetXYZ + SetXYZ + NewXYZ + Clone + PartialEq + Ord {}
 impl<T> FullXYZ for T where T: GetXYZ + SetXYZ + NewXYZ + Clone + PartialEq + Ord {}

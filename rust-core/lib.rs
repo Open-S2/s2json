@@ -396,7 +396,7 @@ pub enum Features<M = (), P: Clone + Default = Properties, D: Clone + Default = 
     VectorFeature(VectorFeature<M, P, D>),
 }
 
-/// All major S2JSON types
+/// All major GeoJSON and S2JSON types
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 #[serde(untagged)]
 pub enum JSONCollection<M = (), P: Clone + Default = Properties, D: Clone + Default = MValue> {

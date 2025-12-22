@@ -8,7 +8,43 @@ use core::{
 use libm::{atan, atan2, fabs, fmod, log, sin, sinh, sqrt};
 use serde::{Deserialize, Serialize};
 
-/// A Vector Point uses a structure for 2D or 3D points
+/// # Vector Points
+///
+/// ## Description
+/// A Vector Point uses a structure for 2D or 3D points. Useful for geometry that also has m-values
+///
+/// Implements the ops [`Add`], [`AddAssign`], [`Sub`], [`SubAssign`], [`Mul`], [`MulAssign`], [`Div`], [`DivAssign`], [`Rem`], [`RemAssign`], [`Neg`], [`PartialEq`], and [`Eq`].
+///
+/// Also implements local traits [`GetXY`], [`GetZ`], [`GetM`], [`SetXY`], [`SetZ`], [`SetM`], [`NewXY`], [`NewXYM`], [`NewXYZ`], [`NewXYZM`], [`MValueCompatible`], [`MValue`], and [`Interpolate`].
+///
+/// ## Fields
+/// - `x`: X coordinate
+/// - `y`: Y coordinate
+/// - `z`: Z coordinate or "altitude". May be None
+/// - `m`: M-Value
+/// - `t`: T for tolerance. A tmp value often used for simplification if needed.
+///
+/// ## Usage
+///
+/// - [`VectorPoint::new`]: Creates a new VectorPoint
+/// - [`VectorPoint::to_m_value`]: Convert to an MValue VectorPoint using to_m_value
+/// - [`VectorPoint::project`]: Project the point into the 0->1 coordinate system
+/// - [`VectorPoint::unproject`]: Unproject the point from the 0->1 coordinate system
+/// - [`VectorPoint::is_empty`]: Returns true if the point is the zero vector
+/// - [`VectorPoint::face`]: Returns the S2 face assocated with this point
+/// - [`VectorPoint::modulo]: Apply modular arithmetic
+/// - [`VectorPoint::angle`]: Returns the angle between "this" and v in radians, in the range [0, pi]. If either vector is zero-length, or nearly zero-length, the result will be zero, regardless of the other value
+/// - [`VectorPoint::cross`]: Get the cross product of two Vector Points
+/// - [`VectorPoint::dot`]: dot returns the standard dot product of v and ov.
+/// - [`VectorPoint::abs`]: Returns the absolute value of the point.
+/// - [`VectorPoint::invert`]: Returns the inverse of the point
+/// - [`VectorPoint::len`]: Returns the length of the point
+/// - [`VectorPoint::norm`]: norm returns the vector's norm. (sqrt of norm2)
+/// - [`VectorPoint::norm2`]: norm2 returns the vector's squared norm (self.dot(self))
+/// - [`VectorPoint::normalize`]: Normalize this point to unit length
+/// - [`VectorPoint::distance`]: return the distance from this point to the other point
+/// - [`VectorPoint::largest_abs_component`]: Returns the largest absolute component of the point
+/// - [`VectorPoint::interpolate`]: Interpolate between two points with a given t value
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[repr(C)]
 pub struct VectorPoint<M: Clone = MValue> {

@@ -10,8 +10,11 @@ use serde::{
     ser::SerializeTuple,
 };
 
-trait Bounded {
+/// Trait for types that have a min and max value. Used by [`BBox`] and [`BBox3D`]
+pub trait Bounded {
+    /// Get the minimum value
     fn min_value() -> Self;
+    /// Get the maximum value
     fn max_value() -> Self;
 }
 macro_rules! impl_bounded {
@@ -32,11 +35,46 @@ macro_rules! impl_bounded {
 // Implement for common numeric types
 impl_bounded!(i8, i16, i32, i64, i128, u8, u16, u32, u64, u128, isize, usize, f32, f64);
 
-/// A BBOX is defined in lon-lat space and helps with zooming motion to
-/// see the entire line or polygon
-/// The order is (left, bottom, right, top)
-/// If WM, then the projection is lon-lat
-/// If S2, then the projection is s-t
+/// # Bounding Box
+///
+/// ## Description
+///
+/// A Bounding Box ensures a min-max range of values
+///
+/// The order is (left, bottom, right, top) when storing as a flattened array.
+///
+/// If WM, then the projection is lon-lat. If S2, then the projection is s-t
+///
+/// Defaults to f64 as the base type.
+///
+/// Implements [`MValueCompatible`]
+///
+/// ## Usage
+///
+/// ## From/To
+/// - [`MValue`]
+/// - [`ValueType`]
+///
+/// ### Any Type BBox
+/// - [`BBox::new`]: Creates a new BBox
+/// - [`BBox::point_overlap`]: Checks if a point is within the BBox
+/// - [`BBox::merge`]: Merges another bounding box with this one
+/// - [`BBox::merge_in_place`]: Merges in place another bounding box with this one
+/// - [`BBox::overlap`]: Checks if another bounding box overlaps with this one
+/// - [`BBox::clip`]: Clips the bounding box along an axis
+/// - [`BBox::inside`]: Checks if this bounding box is inside another
+/// - [`BBox::area`]: Returns the area of the bounding box
+///
+/// ### `f64` Type BBox
+/// Note that all the input geometry uses the [`GetXY`] trait.
+/// - [`BBox::from_point`]: Creates a new BBox from a point
+/// - [`BBox::from_linestring`]: Creates a new BBox from a linestring
+/// - [`BBox::from_multi_linestring`]: Creates a new BBox from a multi-linestring
+/// - [`BBox::from_polygon`]: Creates a new BBox from a polygon
+/// - [`BBox::from_multi_polygon`]: Creates a new BBox from a multi-polygon
+/// - [`BBox::extend_from_point`]: Extends the bounding box with a point
+/// - [`BBox::from_uv_zoom`]: Creates a new BBox from zoom-uv coordinates
+/// - [`BBox::from_st_zoom`]: Creates a new BBox from zoom-st coordinates
 #[derive(Copy, Clone, Debug, PartialEq, PartialOrd)]
 pub struct BBox<T = f64> {
     /// left most longitude (WM) or S (S2)
@@ -352,8 +390,47 @@ where
     }
 }
 
-/// A BBOX is defined in lon-lat space and helps with zooming motion to
-/// see the entire 3D line or polygon
+/// # 3D Bounding Box
+///
+/// ## Description
+///
+/// A 3D Bounding Box ensures a min-max range of values and includes a near-far range
+///
+/// The order is (left, bottom, right, top, near, far) when storing as a flattened array.
+///
+/// If WM, then the projection is lon-lat. If S2, then the projection is s-t
+///
+/// Defaults to f64 as the base type.
+///
+/// Implements [`MValueCompatible`] as well as [`Interpolate`].
+///
+/// ## Usage
+///
+/// ## From/To
+/// - [`MValue`]
+/// - [`ValueType`]
+///
+/// ### Any Type BBox
+/// - [`BBox3D::new`]: Creates a new BBox
+/// - [`BBox3D::point_overlap`]: Checks if a point is within the BBox
+/// - [`BBox3D::merge`]: Merges another bounding box with this one
+/// - [`BBox3D::merge_in_place`]: Merges in place another bounding box with this one
+/// - [`BBox3D::overlap`]: Checks if another bounding box overlaps with this one
+/// - [`BBox3D::clip`]: Clips the bounding box along an axis
+/// - [`BBox3D::inside`]: Checks if this bounding box is inside another
+/// - [`BBox3D::from_bbox`]: Creates a new BBox3D from a BBox
+/// - [`BBox3D::area`]: Returns the area of the bounding box
+///
+/// ### `f64` Type BBox
+/// Note that all the input geometry uses the [`GetXY`] and [`GetZ`] traits.
+/// - [`BBox3D::from_point`]: Creates a new BBox from a point
+/// - [`BBox3D::from_linestring`]: Creates a new BBox from a linestring
+/// - [`BBox3D::from_multi_linestring`]: Creates a new BBox from a multi-linestring
+/// - [`BBox3D::from_polygon`]: Creates a new BBox from a polygon
+/// - [`BBox3D::from_multi_polygon`]: Creates a new BBox from a multi-polygon
+/// - [`BBox3D::extend_from_point`]: Extends the bounding box with a point
+/// - [`BBox3D::from_uv_zoom`]: Creates a new BBox from zoom-uv coordinates
+/// - [`BBox3D::from_st_zoom`]: Creates a new BBox from zoom-st coordinates
 #[derive(Copy, Clone, Debug, PartialEq, PartialOrd)]
 pub struct BBox3D<T = f64> {
     /// left most longitude (WM) or S (S2)

@@ -44,7 +44,29 @@ pub type VectorPolygon<M = MValue> = Vec<VectorLineString<M>>;
 /// Definition of a Vector MultiPolygon
 pub type VectorMultiPolygon<M = MValue> = Vec<VectorPolygon<M>>;
 
-/// All possible geometry shapes
+/// # Vector Geometry
+///
+/// ## Description
+/// All possible geometry shapes. Builds ontop of [`VectorBaseGeometry`].
+///
+/// ## Usage
+/// - [`VectorGeometry::bbox`]: Get the bbox of the geometry
+/// - [`VectorGeometry::vec_bbox`]: Get the internal 0-1 clipping style vector bbox
+/// - [`VectorGeometry::point`]: Get the geometry point
+/// - [`VectorGeometry::new_point`]: Create a new point
+/// - [`VectorGeometry::multipoint`]: Get the geometry multi point
+/// - [`VectorGeometry::new_multipoint`]: Create a new multipoint
+/// - [`VectorGeometry::linestring`]: Get the geometry line string
+/// - [`VectorGeometry::new_linestring`]: Create a new linestring
+/// - [`VectorGeometry::multilinestring`]: Get the geometry multi line string
+/// - [`VectorGeometry::new_multilinestring`]: Create a new multi line string
+/// - [`VectorGeometry::polygon`]: Get the geometry polygon
+/// - [`VectorGeometry::new_polygon`]: Create a new polygon
+/// - [`VectorGeometry::multipolygon`]: Get the geometry multi polygon
+/// - [`VectorGeometry::new_multipolygon`]: Create a new multi polygon
+/// - [`VectorGeometry::set_tess`]: Set the tessellation of the geometry (polygon and multipolygon only)
+/// - [`VectorGeometry::set_indices`]: Set the indices of the geometry (polygon and multipolygon only)
+/// - [`VectorGeometry::to_m_geometry`]: Convert the geometry so that all m-values are MValue rather then user defined
 #[derive(Clone, Serialize, Debug, PartialEq)]
 #[serde(untagged)]
 pub enum VectorGeometry<M: Clone + Default = MValue> {
