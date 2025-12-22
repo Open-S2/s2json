@@ -6,14 +6,14 @@ resolver = "2"
 # NOTE: with v1.90.0 we can now `cargo publish --workspace`
 
 [workspace.package]
-version = "1.49.0"
+version = "1.49.1"
 rust-version = "1.91.0"
 edition = "2024"
 authors = ["Craig O'Connor <oconnorct1@gmail.com>"]
 description = "This library supports the S2JSON 1.0 Specification"
 documentation = "https://docs.rs/s2json"
-homepage = "https://github.com/OpenS2/s2json"
-repository = "https://github.com/OpenS2/s2json"
+homepage = "https://github.com/Open-S2/s2json"
+repository = "https://github.com/Open-S2/s2json"
 readme = "README.md"
 categories = ["encoding", "wasm", "embedded", "no-std"]
 keywords = ["open", "vector", "tile", "gis", "low-cost-code"]
@@ -21,9 +21,9 @@ license = "MIT"
 
 [workspace.dependencies]
 # LOCAL
-s2json = { path = "./rust", version = "1.49.0" }
-s2json-core = { path = "./rust-core", version = "1.49.0" }
-s2json-derive = { path = "./rust-derive", version = "1.49.0" }
+s2json = { path = "./rust", version = "1.49.1" }
+s2json-core = { path = "./rust-core", version = "1.49.1" }
+s2json-derive = { path = "./rust-derive", version = "1.49.1" }
 # EXTERNAL
 libm = "0.2"
 pbf = "1.22"
