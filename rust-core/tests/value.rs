@@ -410,4 +410,32 @@ mod tests {
             ValueType::Primitive(PrimitiveValue::F64(x)) if *x == 42.0
         ));
     }
+
+    #[test]
+    fn value_from() {
+        let v = ValueType::Primitive(PrimitiveValue::F32(2.2));
+        let cloned: ValueType = (&v).into();
+        assert_eq!(v, cloned);
+    }
+
+    #[test]
+    fn value_bool_tests() {
+        // prim
+        let v = ValueType::Primitive(PrimitiveValue::F32(2.2));
+        assert!(v.is_prim());
+        assert!(!v.is_vec());
+        assert!(!v.is_nested());
+
+        // arr
+        let v = ValueType::Array(vec![ValuePrimitiveType::Primitive(PrimitiveValue::F32(2.2))]);
+        assert!(!v.is_prim());
+        assert!(v.is_vec());
+        assert!(!v.is_nested());
+
+        // nested
+        let v = ValueType::Nested(Map::new());
+        assert!(!v.is_prim());
+        assert!(!v.is_vec());
+        assert!(v.is_nested());
+    }
 }

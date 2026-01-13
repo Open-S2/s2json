@@ -614,7 +614,10 @@ impl ValueType {
             _ => None,
         }
     }
-
+    /// Returns true if the value is a primitive
+    pub fn is_prim(&self) -> bool {
+        matches!(self, ValueType::Primitive(_))
+    }
     /// Returns the value as a vector
     pub fn to_vec(&self) -> Option<&Vec<ValuePrimitiveType>> {
         match self {
@@ -622,13 +625,20 @@ impl ValueType {
             _ => None,
         }
     }
-
+    /// Returns true if the value is a vector
+    pub fn is_vec(&self) -> bool {
+        matches!(self, ValueType::Array(_))
+    }
     /// Returns the value as a nested object
     pub fn to_nested(&self) -> Option<&Value> {
         match self {
             ValueType::Nested(v) => Some(v),
             _ => None,
         }
+    }
+    /// Returns true if the value is a nested object
+    pub fn is_nested(&self) -> bool {
+        matches!(self, ValueType::Nested(_))
     }
 }
 impl From<&str> for ValueType {
@@ -644,6 +654,11 @@ impl From<&str> for ValueType {
 //         }
 //     }
 // }
+impl From<&ValueType> for ValueType {
+    fn from(v: &ValueType) -> Self {
+        v.clone()
+    }
+}
 impl From<String> for ValueType {
     fn from(s: String) -> Self {
         ValueType::Primitive(PrimitiveValue::String(s))
