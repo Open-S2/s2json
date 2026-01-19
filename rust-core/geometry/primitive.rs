@@ -60,12 +60,38 @@ impl<P: GetXYZ> From<&P> for PointOrPoint3D {
 
 // GET
 
+impl GetXY for (f64, f64) {
+    fn x(&self) -> f64 {
+        self.0
+    }
+    fn y(&self) -> f64 {
+        self.1
+    }
+}
+impl GetXY for (f64, f64, f64) {
+    fn x(&self) -> f64 {
+        self.0
+    }
+    fn y(&self) -> f64 {
+        self.1
+    }
+}
 impl GetXY for Point {
     fn x(&self) -> f64 {
         self.0
     }
     fn y(&self) -> f64 {
         self.1
+    }
+}
+impl GetZ for (f64, f64) {
+    fn z(&self) -> Option<f64> {
+        None
+    }
+}
+impl GetZ for (f64, f64, f64) {
+    fn z(&self) -> Option<f64> {
+        Some(self.2)
     }
 }
 impl GetZ for Point {
@@ -102,15 +128,27 @@ impl GetZ for PointOrPoint3D {
 
 // SET
 
-impl SetXY for Point {
+impl SetXY for (f64, f64) {
     fn set_x(&mut self, x: f64) {
         self.0 = x;
     }
     fn set_y(&mut self, y: f64) {
         self.1 = y;
     }
-    fn set_xy(&mut self, x: f64, y: f64) {
+}
+impl SetXY for (f64, f64, f64) {
+    fn set_x(&mut self, x: f64) {
         self.0 = x;
+    }
+    fn set_y(&mut self, y: f64) {
+        self.1 = y;
+    }
+}
+impl SetXY for Point {
+    fn set_x(&mut self, x: f64) {
+        self.0 = x;
+    }
+    fn set_y(&mut self, y: f64) {
         self.1 = y;
     }
 }
@@ -120,6 +158,11 @@ impl SetXY for Point3D {
     }
     fn set_y(&mut self, y: f64) {
         self.1 = y;
+    }
+}
+impl SetZ for (f64, f64, f64) {
+    fn set_z(&mut self, z: f64) {
+        self.2 = z;
     }
 }
 impl SetZ for Point3D {
@@ -143,6 +186,11 @@ impl SetZ for PointOrPoint3D {
 
 // NEW
 
+impl NewXY for (f64, f64) {
+    fn new_xy(x: f64, y: f64) -> Self {
+        (x, y)
+    }
+}
 impl NewXY for Point {
     fn new_xy(x: f64, y: f64) -> Self {
         Self(x, y)
@@ -171,6 +219,11 @@ impl<M: Clone> NewXYM<M> for Point3D {
 impl<M: Clone> NewXYM<M> for PointOrPoint3D {
     fn new_xym(x: f64, y: f64, _m: M) -> Self {
         Self(x, y, None)
+    }
+}
+impl NewXYZ for (f64, f64, f64) {
+    fn new_xyz(x: f64, y: f64, z: f64) -> Self {
+        (x, y, z)
     }
 }
 impl NewXYZ for Point3D {

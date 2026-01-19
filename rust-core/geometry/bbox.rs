@@ -86,6 +86,16 @@ pub struct BBox<T = f64> {
     /// top most latitude (WM) or S (S2)
     pub top: T,
 }
+impl From<(f64, f64, f64, f64)> for BBox<f64> {
+    fn from(bbox: (f64, f64, f64, f64)) -> Self {
+        BBox { left: bbox.0, bottom: bbox.1, right: bbox.2, top: bbox.3 }
+    }
+}
+impl From<BBox<f64>> for (f64, f64, f64, f64) {
+    fn from(bbox: BBox<f64>) -> Self {
+        (bbox.left, bbox.bottom, bbox.right, bbox.top)
+    }
+}
 impl<T> From<BBox<T>> for MValue
 where
     T: Into<ValueType>,
@@ -447,6 +457,23 @@ pub struct BBox3D<T = f64> {
     /// far most height (WM) or T (S2)
     /// generic height is relative to the surface of the earth in meters
     pub far: T,
+}
+impl From<(f64, f64, f64, f64, f64, f64)> for BBox3D<f64> {
+    fn from(bbox: (f64, f64, f64, f64, f64, f64)) -> Self {
+        BBox3D {
+            left: bbox.0,
+            bottom: bbox.1,
+            right: bbox.2,
+            top: bbox.3,
+            near: bbox.4,
+            far: bbox.5,
+        }
+    }
+}
+impl From<BBox3D<f64>> for (f64, f64, f64, f64, f64, f64) {
+    fn from(bbox: BBox3D<f64>) -> Self {
+        (bbox.left, bbox.bottom, bbox.right, bbox.top, bbox.near, bbox.far)
+    }
 }
 impl<T> From<BBox3D<T>> for MValue
 where

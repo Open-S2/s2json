@@ -2090,4 +2090,48 @@ mod tests {
         assert_eq!(nan_z.cmp(&a), Ordering::Equal);
         assert_eq!(a.cmp(&nan_z), Ordering::Equal);
     }
+
+    #[test]
+    fn test_geo_traits_for_simple() {
+        let point = (1.0, 2.0);
+        assert_eq!(point.x(), 1.0);
+        assert_eq!(point.y(), 2.0);
+        let point: (f64, f64) = NewXY::new_xy(2., 3.);
+        assert_eq!(point.x(), 2.0);
+        assert_eq!(point.y(), 3.0);
+        let mut point = (0., 0.);
+        point.set_x(1.0);
+        point.set_y(2.0);
+        assert_eq!(point.x(), 1.0);
+        assert_eq!(point.y(), 2.0);
+
+        let point_3d = (1.0, 2.0, 3.0);
+        assert_eq!(point_3d.x(), 1.0);
+        assert_eq!(point_3d.y(), 2.0);
+        assert_eq!(point_3d.z(), Some(3.0));
+        let point_3d: (f64, f64, f64) = NewXYZ::new_xyz(2., 3., 4.);
+        assert_eq!(point_3d.x(), 2.0);
+        assert_eq!(point_3d.y(), 3.0);
+        assert_eq!(point_3d.z(), Some(4.0));
+        let mut point_3d = (0., 0., 0.);
+        point_3d.set_x(1.0);
+        point_3d.set_y(2.0);
+        point_3d.set_z(3.0);
+        assert_eq!(point_3d.x(), 1.0);
+        assert_eq!(point_3d.y(), 2.0);
+        assert_eq!(point_3d.z(), Some(3.0));
+    }
+
+    #[test]
+    fn test_bbox_from_simple() {
+        let bbox: BBox = (0., 0., 1., 1.).into();
+        assert_eq!(bbox, BBox::new(0., 0., 1., 1.));
+        let back_to: (f64, f64, f64, f64) = bbox.into();
+        assert_eq!(back_to, (0., 0., 1., 1.));
+
+        let bbox_3d: BBox3D = (0., 0., 1., 1., 0., 1.).into();
+        assert_eq!(bbox_3d, BBox3D::new(0., 0., 1., 1., 0., 1.));
+        let back_to: (f64, f64, f64, f64, f64, f64) = bbox_3d.into();
+        assert_eq!(back_to, (0., 0., 1., 1., 0., 1.));
+    }
 }
