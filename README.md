@@ -38,17 +38,17 @@ S2JSON is a format for encoding a variety of geographic data structures that sim
 
 Notable features of S2JSON are:
 
-* Properties data is clearly defined on how it can be shaped.
-* 🧊 Support for 3D geometries.
-* 🏷️ Support for metadata.
-* ♏ Support for M-Values for each geometry point.
-* 📦 Support for bounding boxes
-* 🫥 Updated spec to handle vector structures.
-* 🔨 Tools for converting between GeoJSON, S2JSON, and quad-tree Tile structures
-* 🪩 Support for `S2Feature` and `S2FeatureCollection` types based upon the S2 Geometry *spherical projection*.
-* ♻️ Feature Properties & M-Values are defined in scope to ensure they can be easily processed by lower level languages as structures, but also adds value to other projects down the line.
-* 🛑 GeoJSON no longer supports `GeometryCollection`.
-* 📝 Attribution can be added to either a `FeatureCollection` or `S2FeatureCollection`
+- Properties data is clearly defined on how it can be shaped.
+- 🧊 Support for 3D geometries.
+- 🏷️ Support for metadata.
+- ♏ Support for M-Values for each geometry point.
+- 📦 Support for bounding boxes
+- 🫥 Updated spec to handle vector structures.
+- 🔨 Tools for converting between GeoJSON, S2JSON, and quad-tree Tile structures
+- 🪩 Support for `S2Feature` and `S2FeatureCollection` types based upon the S2 Geometry _spherical projection_.
+- ♻️ Feature Properties & M-Values are defined in scope to ensure they can be easily processed by lower level languages as structures, but also adds value to other projects down the line.
+- 🛑 GeoJSON no longer supports `GeometryCollection`.
+- 📝 Attribution can be added to either a `FeatureCollection` or `S2FeatureCollection`
 
 ```json
 // GeoJSON example
@@ -93,7 +93,7 @@ Notable features of S2JSON are:
 
 ## Implementations
 
-* [s2-tools](https://github.com/Open-S2/s2-tools)
+- [s2-tools](https://github.com/Open-S2/s2-tools)
 
 ## Install
 
@@ -151,10 +151,10 @@ const feature: Feature = {
   type: 'Feature',
   geometry: {
     type: 'Point',
-    coordinates: [125.6, 10.1]
+    coordinates: [125.6, 10.1],
   },
   properties: {
-    name: 'Dinagat Islands'
+    name: 'Dinagat Islands',
   },
 };
 

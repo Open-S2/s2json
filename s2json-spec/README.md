@@ -4,9 +4,9 @@ A specification for encoding tiled vector data.
 
 ## Implementations & Use Cases
 
-* [s2json](https://github.com/Open-S2/s2json) (Rust and Typescript)
-* [s2-tools](https://github.com/Open-S2/s2-tools) (Rust and Typescript)
-* [s2-vector-tile](https://github.com/Open-S2/s2-vector-tile) (Rust and Typescript)
+- [s2json](https://github.com/Open-S2/s2json) (Rust and Typescript)
+- [s2-tools](https://github.com/Open-S2/s2-tools) (Rust and Typescript)
+- [s2-vector-tile](https://github.com/Open-S2/s2-vector-tile) (Rust and Typescript)
 
 ## Versioning
 
@@ -20,7 +20,7 @@ If you are interested in contributing please refer to the [CONTRIBUTING.md](../C
 
 As this is a modified/repurposed version of the [GeoJSON specification](https://datatracker.ietf.org/doc/html/rfc7946), the authors of this specification are listed below:
 
-* Craig O'Connor
+- Craig O'Connor
 
 ## License
 

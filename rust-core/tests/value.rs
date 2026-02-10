@@ -84,7 +84,7 @@ mod tests {
     fn primitive_f64_serialize() {
         let prim_value = PrimitiveValue::F64(-135435345435345345.0);
         let serialized = serde_json::to_string(&prim_value).unwrap();
-        assert_eq!(serialized, "-1.3543534543534534e17");
+        assert_eq!(serialized, "-1.3543534543534534e+17");
         let deserialize = serde_json::from_str::<PrimitiveValue>(&serialized).unwrap();
         assert_eq!(deserialize, PrimitiveValue::F32(-1.3543534e17));
     }

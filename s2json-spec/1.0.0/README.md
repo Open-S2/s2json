@@ -8,9 +8,9 @@ this document are to be interpreted as described in [RFC 2119](https://www.ietf.
 
 The ordering of the members of any JSON object defined in this document MUST be considered irrelevant, as specified by [RFC7159](https://www.ietf.org/rfc/rfc7159.txt).
 
-Some examples use the combination of a JavaScript single-line comment (//) followed by an ellipsis (...) as placeholder notation for content deemed irrelevant by the authors.  These placeholders must of course be deleted or otherwise replaced, before attempting to validate the corresponding JSON code example.
+Some examples use the combination of a JavaScript single-line comment (//) followed by an ellipsis (...) as placeholder notation for content deemed irrelevant by the authors. These placeholders must of course be deleted or otherwise replaced, before attempting to validate the corresponding JSON code example.
 
-Whitespace is used in the examples inside this document to help illustrate the data structures, but it is not required.  Unquoted whitespace is not significant in JSON.
+Whitespace is used in the examples inside this document to help illustrate the data structures, but it is not required. Unquoted whitespace is not significant in JSON.
 
 WG: [World Geodetic System 1984 (WGS84)](https://gisgeography.com/wgs84-world-geodetic-system/)
 S2: [S2 Geometry](http://s2geometry.io/about/overview)
@@ -61,7 +61,7 @@ Example of WGS84 coordinates for a point:
   "type": "Feature",
   "geometry": {
     "type": "Point",
-    "coordinates": [-123.3656, 48.4284]  // Longitude, Latitude
+    "coordinates": [-123.3656, 48.4284] // Longitude, Latitude
   },
   "properties": {
     "name": "Example Location"
@@ -84,7 +84,7 @@ Example of an S2 Geometry-encoded feature:
   "type": "S2Feature",
   "geometry": {
     "type": "Point",
-    "coordinates": [0.1, 0.5]  // S2 cell ID as coordinates
+    "coordinates": [0.1, 0.5] // S2 cell ID as coordinates
   },
   "face": 2,
   "properties": {
@@ -195,10 +195,7 @@ Example:
     [100.0, 0.0],
     [101.0, 1.0]
   ],
-  "mValues": [
-    { "foo": "bar" },
-    { "foo": "baz" }
-  ]
+  "mValues": [{ "foo": "bar" }, { "foo": "baz" }]
 }
 ```
 
@@ -639,7 +636,7 @@ Example in GeoJSON:
 ```json
 {
   "type": "Point",
-  "coordinates": [-122.4233, 37.8264]  // Longitude, Latitude
+  "coordinates": [-122.4233, 37.8264] // Longitude, Latitude
 }
 ```
 
@@ -648,7 +645,7 @@ Example in S2 Geometry:
 ```json
 {
   "type": "Point",
-  "coordinates": [0.345, 0.567]  // s, t coordinates
+  "coordinates": [0.345, 0.567] // s, t coordinates
 }
 ```
 
@@ -665,7 +662,7 @@ Example in GeoJSON:
 ```json
 {
   "type": "Point",
-  "coordinates": [-122.4233, 37.8264, 30.5]  // Longitude, Latitude, Altitude in meters
+  "coordinates": [-122.4233, 37.8264, 30.5] // Longitude, Latitude, Altitude in meters
 }
 ```
 
@@ -674,7 +671,7 @@ Example in S2 Geometry:
 ```json
 {
   "type": "Point",
-  "coordinates": [0.345, 0.567, 15.0]  // s, t coordinates, Altitude in meters
+  "coordinates": [0.345, 0.567, 15.0] // s, t coordinates, Altitude in meters
 }
 ```
 
@@ -692,9 +689,9 @@ Example in GeoJSON:
 {
   "type": "MultiPoint",
   "coordinates": [
-    [-122.4233, 37.8264],  // Longitude, Latitude of the first point
-    [-122.4232, 37.8265],  // Longitude, Latitude of the second point
-    [-122.4231, 37.8266]   // Longitude, Latitude of the third point
+    [-122.4233, 37.8264], // Longitude, Latitude of the first point
+    [-122.4232, 37.8265], // Longitude, Latitude of the second point
+    [-122.4231, 37.8266] // Longitude, Latitude of the third point
   ]
 }
 ```
@@ -705,9 +702,9 @@ Example in S2 Geometry:
 {
   "type": "MultiPoint",
   "coordinates": [
-    [0.345, 0.567],  // s, t coordinates of the first point
-    [0.346, 0.568],  // s, t coordinates of the second point
-    [0.347, 0.569]   // s, t coordinates of the third point
+    [0.345, 0.567], // s, t coordinates of the first point
+    [0.346, 0.568], // s, t coordinates of the second point
+    [0.347, 0.569] // s, t coordinates of the third point
   ]
 }
 ```
@@ -726,9 +723,9 @@ Example in GeoJSON:
 {
   "type": "MultiPoint",
   "coordinates": [
-    [-122.4233, 37.8264, 10.0],  // Longitude, Latitude, Altitude of the first point
-    [-122.4232, 37.8265, 20.0],  // Longitude, Latitude, Altitude of the second point
-    [-122.4231, 37.8266, 30.0]   // Longitude, Latitude, Altitude of the third point
+    [-122.4233, 37.8264, 10.0], // Longitude, Latitude, Altitude of the first point
+    [-122.4232, 37.8265, 20.0], // Longitude, Latitude, Altitude of the second point
+    [-122.4231, 37.8266, 30.0] // Longitude, Latitude, Altitude of the third point
   ]
 }
 ```
@@ -739,9 +736,9 @@ Example in S2 Geometry:
 {
   "type": "MultiPoint",
   "coordinates": [
-    [0.345, 0.567, 5.0],  // s, t coordinates, Altitude of the first point
-    [0.346, 0.568, 10.0],  // s, t coordinates, Altitude of the second point
-    [0.347, 0.569, 15.0]   // s, t coordinates, Altitude of the third point
+    [0.345, 0.567, 5.0], // s, t coordinates, Altitude of the first point
+    [0.346, 0.568, 10.0], // s, t coordinates, Altitude of the second point
+    [0.347, 0.569, 15.0] // s, t coordinates, Altitude of the third point
   ]
 }
 ```
@@ -758,9 +755,9 @@ Example in GeoJSON:
 {
   "type": "LineString",
   "coordinates": [
-    [-122.4233, 37.8264],  // Longitude, Latitude of the first point
-    [-122.4232, 37.8265],  // Longitude, Latitude of the second point
-    [-122.4231, 37.8266]   // Longitude, Latitude of the third point
+    [-122.4233, 37.8264], // Longitude, Latitude of the first point
+    [-122.4232, 37.8265], // Longitude, Latitude of the second point
+    [-122.4231, 37.8266] // Longitude, Latitude of the third point
   ]
 }
 ```
@@ -771,9 +768,9 @@ Example in S2 Geometry:
 {
   "type": "LineString",
   "coordinates": [
-    [0.345, 0.567],  // s, t coordinates of the first point
-    [0.346, 0.568],  // s, t coordinates of the second point
-    [0.347, 0.569]   // s, t coordinates of the third point
+    [0.345, 0.567], // s, t coordinates of the first point
+    [0.346, 0.568], // s, t coordinates of the second point
+    [0.347, 0.569] // s, t coordinates of the third point
   ]
 }
 ```
@@ -792,9 +789,9 @@ Example in GeoJSON:
 {
   "type": "LineString",
   "coordinates": [
-    [-122.4233, 37.8264, 5.0],  // Longitude, Latitude, Altitude of the first point
-    [-122.4232, 37.8265, 10.0],  // Longitude, Latitude, Altitude of the second point
-    [-122.4231, 37.8266, 15.0]   // Longitude, Latitude, Altitude of the third point
+    [-122.4233, 37.8264, 5.0], // Longitude, Latitude, Altitude of the first point
+    [-122.4232, 37.8265, 10.0], // Longitude, Latitude, Altitude of the second point
+    [-122.4231, 37.8266, 15.0] // Longitude, Latitude, Altitude of the third point
   ]
 }
 ```
@@ -805,9 +802,9 @@ Example in S2 Geometry:
 {
   "type": "LineString",
   "coordinates": [
-    [0.345, 0.567, 2.0],  // s, t coordinates, Altitude of the first point
-    [0.346, 0.568, 3.0],  // s, t coordinates, Altitude of the second point
-    [0.347, 0.569, 4.0]   // s, t coordinates, Altitude of the third point
+    [0.345, 0.567, 2.0], // s, t coordinates, Altitude of the first point
+    [0.346, 0.568, 3.0], // s, t coordinates, Altitude of the second point
+    [0.347, 0.569, 4.0] // s, t coordinates, Altitude of the third point
   ]
 }
 ```
@@ -826,12 +823,14 @@ Example in GeoJSON:
 {
   "type": "MultiLineString",
   "coordinates": [
-    [ // First LineString
+    [
+      // First LineString
       [-122.4233, 37.8264],
       [-122.4232, 37.8265],
       [-122.4231, 37.8266]
     ],
-    [ // Second LineString
+    [
+      // Second LineString
       [-122.4243, 37.8274],
       [-122.4242, 37.8275],
       [-122.4241, 37.8276]
@@ -846,15 +845,17 @@ Example in S2 Geometry:
 {
   "type": "MultiLineString",
   "coordinates": [
-    [ // First LineString
+    [
+      // First LineString
       [0.345, 0.567],
       [0.346, 0.568],
       [0.347, 0.569]
     ],
-    [ // Second LineString
-      [0.348, 0.570],
+    [
+      // Second LineString
+      [0.348, 0.57],
       [0.349, 0.571],
-      [0.350, 0.572]
+      [0.35, 0.572]
     ]
   ]
 }
@@ -874,12 +875,14 @@ Example in GeoJSON:
 {
   "type": "MultiLineString",
   "coordinates": [
-    [ // First LineString
+    [
+      // First LineString
       [-122.4233, 37.8264, 10.0],
       [-122.4232, 37.8265, 15.0],
       [-122.4231, 37.8266, 20.0]
     ],
-    [ // Second LineString
+    [
+      // Second LineString
       [-122.4243, 37.8274, 10.0],
       [-122.4242, 37.8275, 15.0],
       [-122.4241, 37.8276, 20.0]
@@ -894,15 +897,17 @@ Example in S2 Geometry:
 {
   "type": "MultiLineString",
   "coordinates": [
-    [ // First LineString
+    [
+      // First LineString
       [0.345, 0.567, 2.0],
       [0.346, 0.568, 3.0],
       [0.347, 0.569, 4.0]
     ],
-    [ // Second LineString
-      [0.348, 0.570, 2.0],
+    [
+      // Second LineString
+      [0.348, 0.57, 2.0],
       [0.349, 0.571, 3.0],
-      [0.350, 0.572, 4.0]
+      [0.35, 0.572, 4.0]
     ]
   ]
 }
@@ -922,13 +927,15 @@ Example in GeoJSON:
 {
   "type": "Polygon",
   "coordinates": [
-    [ // Outer boundary
+    [
+      // Outer boundary
       [-122.4233, 37.8264],
       [-122.4232, 37.8265],
       [-122.4231, 37.8266],
       [-122.4233, 37.8264] // Closing the loop
     ],
-    [ // Inner hole
+    [
+      // Inner hole
       [-122.42325, 37.82645],
       [-122.42315, 37.82655],
       [-122.42305, 37.82665],
@@ -944,7 +951,8 @@ Example in S2 Geometry:
 {
   "type": "Polygon",
   "coordinates": [
-    [ // Outer boundary
+    [
+      // Outer boundary
       [0.345, 0.567],
       [0.346, 0.568],
       [0.347, 0.569],
@@ -968,13 +976,15 @@ Example in GeoJSON:
 {
   "type": "Polygon",
   "coordinates": [
-    [ // Outer boundary with altitude
+    [
+      // Outer boundary with altitude
       [-122.4233, 37.8264, 5.0],
       [-122.4232, 37.8265, 5.0],
       [-122.4231, 37.8266, 5.0],
       [-122.4233, 37.8264, 5.0] // Closing the loop, counter-clockwise order
     ],
-    [ // Inner hole with altitude
+    [
+      // Inner hole with altitude
       [-122.42325, 37.82645, 10.0],
       [-122.42315, 37.82655, 10.0],
       [-122.42305, 37.82665, 10.0],
@@ -990,7 +1000,8 @@ Example in S2 Geometry:
 {
   "type": "Polygon",
   "coordinates": [
-    [ // Outer boundary with altitude
+    [
+      // Outer boundary with altitude
       [0.345, 0.567, 2.0],
       [0.346, 0.568, 2.0],
       [0.347, 0.569, 2.0],
@@ -1014,22 +1025,27 @@ Example in GeoJSON:
 {
   "type": "MultiPolygon",
   "coordinates": [
-    [ // First Polygon
-      [ // Outer boundary
+    [
+      // First Polygon
+      [
+        // Outer boundary
         [-122.4233, 37.8264],
         [-122.4232, 37.8265],
         [-122.4231, 37.8266],
         [-122.4233, 37.8264] // Closing the loop, counter-clockwise order
       ]
     ],
-    [ // Second Polygon
-      [ // Outer boundary
+    [
+      // Second Polygon
+      [
+        // Outer boundary
         [-122.4223, 37.8274],
         [-122.4222, 37.8275],
         [-122.4221, 37.8276],
         [-122.4223, 37.8274] // Closing the loop, counter-clockwise order
       ],
-      [ // Inner hole
+      [
+        // Inner hole
         [-122.42225, 37.82745],
         [-122.42215, 37.82755],
         [-122.42205, 37.82765],
@@ -1046,22 +1062,27 @@ Example in S2 Geometry:
 {
   "type": "MultiPolygon",
   "coordinates": [
-    [ // First Polygon
-      [ // Outer boundary
+    [
+      // First Polygon
+      [
+        // Outer boundary
         [0.345, 0.567],
         [0.346, 0.568],
         [0.347, 0.569],
         [0.345, 0.567] // Closing the loop, counter-clockwise order
       ]
     ],
-    [ // Second Polygon
-      [ // Outer boundary
-        [0.348, 0.570],
+    [
+      // Second Polygon
+      [
+        // Outer boundary
+        [0.348, 0.57],
         [0.349, 0.571],
-        [0.350, 0.572],
-        [0.348, 0.570] // Closing the loop, counter-clockwise order
+        [0.35, 0.572],
+        [0.348, 0.57] // Closing the loop, counter-clockwise order
       ],
-      [ // Inner hole
+      [
+        // Inner hole
         [0.349, 0.571],
         [0.3495, 0.5715],
         [0.349, 0.572],
@@ -1086,22 +1107,27 @@ Example in GeoJSON:
 {
   "type": "MultiPolygon",
   "coordinates": [
-    [ // First Polygon
-      [ // Outer boundary
+    [
+      // First Polygon
+      [
+        // Outer boundary
         [-122.4233, 37.8264, 5.0],
         [-122.4232, 37.8265, 5.0],
         [-122.4231, 37.8266, 5.0],
         [-122.4233, 37.8264, 5.0] // Closing the loop, counter-clockwise order
       ]
     ],
-    [ // Second Polygon
-      [ // Outer boundary
+    [
+      // Second Polygon
+      [
+        // Outer boundary
         [-122.4223, 37.8274, 10.0],
         [-122.4222, 37.8275, 10.0],
         [-122.4221, 37.8276, 10.0],
         [-122.4223, 37.8274, 10.0] // Closing the loop, counter-clockwise order
       ],
-      [ // Inner hole
+      [
+        // Inner hole
         [-122.42225, 37.82745, 15.0],
         [-122.42215, 37.82755, 15.0],
         [-122.42205, 37.82765, 15.0],
@@ -1118,22 +1144,27 @@ Example in S2 Geometry:
 {
   "type": "MultiPolygon",
   "coordinates": [
-    [ // First Polygon
-      [ // Outer boundary
+    [
+      // First Polygon
+      [
+        // Outer boundary
         [0.345, 0.567, 2.0],
         [0.346, 0.568, 2.0],
         [0.347, 0.569, 2.0],
         [0.345, 0.567, 2.0] // Closing the loop, counter-clockwise order
       ]
     ],
-    [ // Second Polygon
-      [ // Outer boundary
-        [0.348, 0.570, 3.0],
+    [
+      // Second Polygon
+      [
+        // Outer boundary
+        [0.348, 0.57, 3.0],
         [0.349, 0.571, 3.0],
-        [0.350, 0.572, 3.0],
-        [0.348, 0.570, 3.0] // Closing the loop, counter-clockwise order
+        [0.35, 0.572, 3.0],
+        [0.348, 0.57, 3.0] // Closing the loop, counter-clockwise order
       ],
-      [ // Inner hole
+      [
+        // Inner hole
         [0.349, 0.571, 4.0],
         [0.3495, 0.5715, 4.0],
         [0.349, 0.572, 4.0],
@@ -1168,14 +1199,8 @@ Example:
     ]
   ],
   "mValues": [
-    [
-      { "foo": "bar" },
-      { "foo": "baz" }
-    ],
-    [
-      { "foo": "qux" },
-      { "foo": "quux" }
-    ]
+    [{ "foo": "bar" }, { "foo": "baz" }],
+    [{ "foo": "qux" }, { "foo": "quux" }]
   ]
 }
 ```

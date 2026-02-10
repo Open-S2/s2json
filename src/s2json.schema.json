@@ -15,7 +15,12 @@
         "type": { "type": "string", "enum": ["FeatureCollection"] },
         "features": {
           "type": "array",
-          "items": { "oneOf": [{ "$ref": "#/definitions/Feature" }, { "$ref": "#/definitions/VectorFeature" }] }
+          "items": {
+            "oneOf": [
+              { "$ref": "#/definitions/Feature" },
+              { "$ref": "#/definitions/VectorFeature" }
+            ]
+          }
         },
         "bbox": { "$ref": "#/definitions/bbox2D" }
       },
@@ -31,7 +36,12 @@
           "items": { "$ref": "#/definitions/S2Feature" }
         },
         "bbox": { "$ref": "#/definitions/bbox2D" },
-        "faces": { "type": "array", "items": { "type": "number", "enum": [0, 1, 2, 3, 4, 5] }, "uniqueItems": true, "maxItems": 6 }
+        "faces": {
+          "type": "array",
+          "items": { "type": "number", "enum": [0, 1, 2, 3, 4, 5] },
+          "uniqueItems": true,
+          "maxItems": 6
+        }
       },
       "required": ["type", "features", "faces"],
       "additionalProperties": false
@@ -105,10 +115,7 @@
       }
     },
     "value": {
-      "oneOf": [
-        { "$ref": "#/definitions/primitive" },
-        { "$ref": "#/definitions/valueArray" }
-      ]
+      "oneOf": [{ "$ref": "#/definitions/primitive" }, { "$ref": "#/definitions/valueArray" }]
     },
     "geometry": {
       "oneOf": [
@@ -288,9 +295,18 @@
       "additionalProperties": false
     },
     "vectorLineOffset": { "type": "number" },
-    "vectorMultiLineOffset": { "type": "array", "items": { "$ref": "#/definitions/vectorLineOffset" } },
-    "vectorPolygonOffset": { "type": "array", "items": { "$ref": "#/definitions/vectorLineOffset" } },
-    "vectorMultiPolygonOffset": { "type": "array", "items": { "$ref": "#/definitions/vectorPolygonOffset" } },
+    "vectorMultiLineOffset": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/vectorLineOffset" }
+    },
+    "vectorPolygonOffset": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/vectorLineOffset" }
+    },
+    "vectorMultiPolygonOffset": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/vectorPolygonOffset" }
+    },
     "vectorPoint": {
       "type": "object",
       "properties": {
@@ -314,8 +330,12 @@
         "type": { "type": "string", "enum": ["Point"] },
         "is3D": { "type": "boolean" },
         "coordinates": { "$ref": "#/definitions/vectorPoint" },
-        "bbox": { "oneOf": [{ "$ref": "#/definitions/bbox2D" }, { "$ref": "#/definitions/bbox3D" }] },
-        "vecBBox": { "oneOf": [{ "$ref": "#/definitions/bbox2D" }, { "$ref": "#/definitions/bbox3D" }] }
+        "bbox": {
+          "oneOf": [{ "$ref": "#/definitions/bbox2D" }, { "$ref": "#/definitions/bbox3D" }]
+        },
+        "vecBBox": {
+          "oneOf": [{ "$ref": "#/definitions/bbox2D" }, { "$ref": "#/definitions/bbox3D" }]
+        }
       },
       "required": ["type", "coordinates", "is3D"],
       "additionalProperties": false
@@ -326,8 +346,12 @@
         "type": { "type": "string", "enum": ["MultiPoint"] },
         "is3D": { "type": "boolean" },
         "coordinates": { "$ref": "#/definitions/vectorMultiPoint" },
-        "bbox": { "oneOf": [{ "$ref": "#/definitions/bbox2D" }, { "$ref": "#/definitions/bbox3D" }] },
-        "vecBBox": { "oneOf": [{ "$ref": "#/definitions/bbox2D" }, { "$ref": "#/definitions/bbox3D" }] }
+        "bbox": {
+          "oneOf": [{ "$ref": "#/definitions/bbox2D" }, { "$ref": "#/definitions/bbox3D" }]
+        },
+        "vecBBox": {
+          "oneOf": [{ "$ref": "#/definitions/bbox2D" }, { "$ref": "#/definitions/bbox3D" }]
+        }
       },
       "required": ["type", "coordinates", "is3D"],
       "additionalProperties": false
@@ -338,8 +362,12 @@
         "type": { "type": "string", "enum": ["LineString"] },
         "is3D": { "type": "boolean" },
         "coordinates": { "$ref": "#/definitions/vectorLine" },
-        "bbox": { "oneOf": [{ "$ref": "#/definitions/bbox2D" }, { "$ref": "#/definitions/bbox3D" }] },
-        "vecBBox": { "oneOf": [{ "$ref": "#/definitions/bbox2D" }, { "$ref": "#/definitions/bbox3D" }] },
+        "bbox": {
+          "oneOf": [{ "$ref": "#/definitions/bbox2D" }, { "$ref": "#/definitions/bbox3D" }]
+        },
+        "vecBBox": {
+          "oneOf": [{ "$ref": "#/definitions/bbox2D" }, { "$ref": "#/definitions/bbox3D" }]
+        },
         "offset": { "$ref": "#/definitions/vectorLineOffset" }
       },
       "required": ["type", "coordinates", "is3D"],
@@ -351,8 +379,12 @@
         "type": { "type": "string", "enum": ["MultiLineString"] },
         "is3D": { "type": "boolean" },
         "coordinates": { "$ref": "#/definitions/vectorMultiLine" },
-        "bbox": { "oneOf": [{ "$ref": "#/definitions/bbox2D" }, { "$ref": "#/definitions/bbox3D" }] },
-        "vecBBox": { "oneOf": [{ "$ref": "#/definitions/bbox2D" }, { "$ref": "#/definitions/bbox3D" }] },
+        "bbox": {
+          "oneOf": [{ "$ref": "#/definitions/bbox2D" }, { "$ref": "#/definitions/bbox3D" }]
+        },
+        "vecBBox": {
+          "oneOf": [{ "$ref": "#/definitions/bbox2D" }, { "$ref": "#/definitions/bbox3D" }]
+        },
         "offset": { "$ref": "#/definitions/vectorMultiLineOffset" }
       },
       "required": ["type", "coordinates", "is3D"],
@@ -364,8 +396,12 @@
         "type": { "type": "string", "enum": ["Polygon"] },
         "is3D": { "type": "boolean" },
         "coordinates": { "$ref": "#/definitions/vectorPolygon" },
-        "bbox": { "oneOf": [{ "$ref": "#/definitions/bbox2D" }, { "$ref": "#/definitions/bbox3D" }] },
-        "vecBBox": { "oneOf": [{ "$ref": "#/definitions/bbox2D" }, { "$ref": "#/definitions/bbox3D" }] },
+        "bbox": {
+          "oneOf": [{ "$ref": "#/definitions/bbox2D" }, { "$ref": "#/definitions/bbox3D" }]
+        },
+        "vecBBox": {
+          "oneOf": [{ "$ref": "#/definitions/bbox2D" }, { "$ref": "#/definitions/bbox3D" }]
+        },
         "offset": { "$ref": "#/definitions/vectorPolygonOffset" }
       },
       "required": ["type", "coordinates", "is3D"],
@@ -377,8 +413,12 @@
         "type": { "type": "string", "enum": ["MultiPolygon"] },
         "is3D": { "type": "boolean" },
         "coordinates": { "$ref": "#/definitions/vectorMultiPolygon" },
-        "bbox": { "oneOf": [{ "$ref": "#/definitions/bbox2D" }, { "$ref": "#/definitions/bbox3D" }] },
-        "vecBBox": { "oneOf": [{ "$ref": "#/definitions/bbox2D" }, { "$ref": "#/definitions/bbox3D" }] },
+        "bbox": {
+          "oneOf": [{ "$ref": "#/definitions/bbox2D" }, { "$ref": "#/definitions/bbox3D" }]
+        },
+        "vecBBox": {
+          "oneOf": [{ "$ref": "#/definitions/bbox2D" }, { "$ref": "#/definitions/bbox3D" }]
+        },
         "offset": { "$ref": "#/definitions/vectorMultiPolygonOffset" }
       },
       "required": ["type", "coordinates", "is3D"],
