@@ -9,6 +9,113 @@ mod tests {
 
     #[test]
     fn test_bbox_value_type_conversion() {
+        let bbox = BBox::new(0., 0., 1., 1.);
+        let value: MValue = bbox.into();
+        assert_eq!(
+            value,
+            MValue::from([
+                ("left".into(), bbox.left.into()),
+                ("bottom".into(), bbox.bottom.into()),
+                ("right".into(), bbox.right.into()),
+                ("top".into(), bbox.top.into()),
+            ])
+        );
+        let back_to_bbox: BBox = value.into();
+        assert_eq!(back_to_bbox, bbox);
+
+        let value: MValue = (&bbox).into();
+        assert_eq!(
+            value,
+            MValue::from([
+                ("left".into(), bbox.left.into()),
+                ("bottom".into(), bbox.bottom.into()),
+                ("right".into(), bbox.right.into()),
+                ("top".into(), bbox.top.into()),
+            ])
+        );
+        let back_to_bbox: BBox = (&value).into();
+        assert_eq!(back_to_bbox, bbox);
+
+        let value: ValueType = bbox.into();
+        assert_eq!(
+            value,
+            (MValue::from([
+                ("left".into(), bbox.left.into()),
+                ("bottom".into(), bbox.bottom.into()),
+                ("right".into(), bbox.right.into()),
+                ("top".into(), bbox.top.into()),
+            ]))
+            .into()
+        );
+        let back_to_bbox: BBox = (&value).into();
+        assert_eq!(back_to_bbox, bbox);
+
+        // to feature
+        let vector_feature: VectorFeature = bbox.into();
+        let BBox { left, bottom, right, top } = bbox;
+        assert_eq!(
+            vector_feature,
+            VectorFeature {
+                _type: VectorFeatureType::VectorFeature,
+                id: None,
+                face: 0.into(),
+                properties: Properties::from([("bbox".into(), bbox.into())]),
+                geometry: VectorGeometry::new_polygon(
+                    vec![vec![
+                        VectorPoint::from_xy(left, bottom),
+                        VectorPoint::from_xy(right, bottom),
+                        VectorPoint::from_xy(right, top),
+                        VectorPoint::from_xy(left, top),
+                        VectorPoint::from_xy(left, bottom),
+                    ]],
+                    Some(bbox.into()),
+                ),
+                metadata: None,
+            }
+        );
+
+        // as a BBOX
+        let bbox_orig = bbox;
+        let bbox: BBOX = bbox.into();
+        assert_eq!(bbox, bbox);
+
+        let value: ValueType = bbox.into();
+        assert_eq!(
+            value,
+            (MValue::from([
+                ("left".into(), bbox_orig.left.into()),
+                ("bottom".into(), bbox_orig.bottom.into()),
+                ("right".into(), bbox_orig.right.into()),
+                ("top".into(), bbox_orig.top.into()),
+            ]))
+            .into()
+        );
+
+        let vector_feature: VectorFeature = bbox.into();
+        assert_eq!(
+            vector_feature,
+            VectorFeature {
+                _type: VectorFeatureType::VectorFeature,
+                id: None,
+                face: 0.into(),
+                properties: Properties::from([("bbox".into(), bbox.into())]),
+                geometry: VectorGeometry::new_polygon(
+                    vec![vec![
+                        VectorPoint::from_xy(left, bottom),
+                        VectorPoint::from_xy(right, bottom),
+                        VectorPoint::from_xy(right, top),
+                        VectorPoint::from_xy(left, top),
+                        VectorPoint::from_xy(left, bottom),
+                    ]],
+                    Some(bbox_orig.into()),
+                ),
+                metadata: None,
+            }
+        );
+    }
+
+    #[test]
+    fn test_bbox_3d_value_type_conversion() {
         let bbox = BBox3D::new(0., 0., 1., 1., 0., 1.);
         let value: MValue = bbox.into();
         assert_eq!(
@@ -39,6 +146,115 @@ mod tests {
         );
         let back_to_bbox: BBox3D = (&value).into();
         assert_eq!(back_to_bbox, bbox);
+
+        let value: ValueType = bbox.into();
+        assert_eq!(
+            value,
+            (MValue::from([
+                ("left".into(), bbox.left.into()),
+                ("bottom".into(), bbox.bottom.into()),
+                ("right".into(), bbox.right.into()),
+                ("top".into(), bbox.top.into()),
+                ("near".into(), bbox.near.into()),
+                ("far".into(), bbox.far.into()),
+            ]))
+            .into()
+        );
+        let back_to_bbox: BBox3D = (&value).into();
+        assert_eq!(back_to_bbox, bbox);
+
+        // to feature
+        let vector_feature: VectorFeature = bbox.into();
+        let BBox3D { left, bottom, right, top, .. } = bbox;
+        assert_eq!(
+            vector_feature,
+            VectorFeature {
+                _type: VectorFeatureType::VectorFeature,
+                id: None,
+                face: 0.into(),
+                properties: Properties::from([("bbox".into(), bbox.into())]),
+                geometry: VectorGeometry::new_polygon(
+                    vec![vec![
+                        VectorPoint::from_xy(left, bottom),
+                        VectorPoint::from_xy(right, bottom),
+                        VectorPoint::from_xy(right, top),
+                        VectorPoint::from_xy(left, top),
+                        VectorPoint::from_xy(left, bottom),
+                    ]],
+                    Some(bbox.into()),
+                ),
+                metadata: None,
+            }
+        );
+
+        // as a BBOX
+        let bbox_orig = bbox;
+        let bbox: BBOX = bbox.into();
+        assert_eq!(bbox, bbox);
+
+        let value: ValueType = bbox.into();
+        assert_eq!(
+            value,
+            (MValue::from([
+                ("left".into(), bbox_orig.left.into()),
+                ("bottom".into(), bbox_orig.bottom.into()),
+                ("right".into(), bbox_orig.right.into()),
+                ("top".into(), bbox_orig.top.into()),
+                ("near".into(), bbox_orig.near.into()),
+                ("far".into(), bbox_orig.far.into()),
+            ]))
+            .into()
+        );
+
+        let vector_feature: VectorFeature = bbox.into();
+        assert_eq!(
+            vector_feature,
+            VectorFeature {
+                _type: VectorFeatureType::VectorFeature,
+                id: None,
+                face: 0.into(),
+                properties: Properties::from([("bbox".into(), bbox.into())]),
+                geometry: VectorGeometry::new_polygon(
+                    vec![vec![
+                        VectorPoint::from_xy(left, bottom),
+                        VectorPoint::from_xy(right, bottom),
+                        VectorPoint::from_xy(right, top),
+                        VectorPoint::from_xy(left, top),
+                        VectorPoint::from_xy(left, bottom),
+                    ]],
+                    Some(bbox_orig.into()),
+                ),
+                metadata: None,
+            }
+        );
+    }
+
+    #[test]
+    fn test_bbox_expecting_trigger() {
+        // We provide a string "invalid" instead of an array [1, 2, 3, 4]
+        let json = r#""not a sequence""#;
+
+        let result: Result<BBox<f64>, _> = serde_json::from_str(json);
+
+        assert!(result.is_err());
+
+        // This check confirms that your 'expecting' string was used in the error message
+        let err_message = result.unwrap_err().to_string();
+        assert!(err_message.contains("a sequence of four numbers"));
+    }
+
+    #[test]
+    fn test_bbox3d_expecting_trigger() {
+        // We provide a string "invalid" instead of an array [1, 2, 3, 4, 5, 6]
+        let json = r#""not a sequence""#;
+
+        let result: Result<BBox3D<f64>, _> = serde_json::from_str(json);
+
+        assert!(result.is_err());
+
+        // This check confirms that your 'expecting' string was used in the error message
+        let err_message = result.unwrap_err().to_string();
+        assert!(err_message.contains("a sequence of six numbers"));
     }
 
     #[test]
@@ -2104,6 +2320,7 @@ mod tests {
         point.set_y(2.0);
         assert_eq!(point.x(), 1.0);
         assert_eq!(point.y(), 2.0);
+        assert_eq!(point.z(), None);
 
         let point_3d = (1.0, 2.0, 3.0);
         assert_eq!(point_3d.x(), 1.0);

@@ -308,7 +308,7 @@ impl<M, P: Clone + Default, D: Clone + Default> Default for VectorFeature<M, P, 
     }
 }
 impl<M, P: Clone + Default, D: Clone + Default> VectorFeature<M, P, D> {
-    /// Create a new VectorFeature in the WG format
+    /// Create a new VectorFeature in the WG/WM format
     pub fn new_wm(
         id: Option<u64>,
         properties: P,
@@ -318,7 +318,7 @@ impl<M, P: Clone + Default, D: Clone + Default> VectorFeature<M, P, D> {
         Self { _type: "VectorFeature".into(), face: 0.into(), id, properties, geometry, metadata }
     }
 
-    /// Create a new VectorFeature in the WG format
+    /// Create a new VectorFeature in the S2 format
     pub fn new_s2(
         id: Option<u64>,
         face: Face,

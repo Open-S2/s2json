@@ -1,5 +1,5 @@
 use crate::*;
-use alloc::fmt;
+use alloc::{fmt, vec};
 use core::{
     cmp::Ordering,
     ops::{Mul, MulAssign, Sub},
@@ -146,6 +146,43 @@ where
             right: mvalue.get("right").unwrap().clone().into(),
             top: mvalue.get("top").unwrap().clone().into(),
         }
+    }
+}
+impl<T> From<BBox<T>> for ValueType
+where
+    T: Into<ValueType>,
+{
+    fn from(bbox: BBox<T>) -> Self {
+        MValue::from(bbox).into()
+    }
+}
+impl<T> From<&ValueType> for BBox<T>
+where
+    T: From<ValueType>,
+{
+    fn from(bbox: &ValueType) -> Self {
+        MValue::from(bbox).into()
+    }
+}
+impl From<BBox> for VectorFeature {
+    fn from(bbox: BBox) -> Self {
+        let BBox { left, bottom, right, top } = bbox;
+
+        VectorFeature::new_wm(
+            None,
+            Properties::from([("bbox".into(), bbox.into())]),
+            VectorGeometry::new_polygon(
+                vec![vec![
+                    VectorPoint::from_xy(left, bottom),
+                    VectorPoint::from_xy(right, bottom),
+                    VectorPoint::from_xy(right, top),
+                    VectorPoint::from_xy(left, top),
+                    VectorPoint::from_xy(left, bottom),
+                ]],
+                Some(bbox.into()),
+            ),
+            None,
+        )
     }
 }
 impl<T> MValueCompatible for BBox<T>
@@ -535,6 +572,43 @@ where
         }
     }
 }
+impl<T> From<BBox3D<T>> for ValueType
+where
+    T: Into<ValueType>,
+{
+    fn from(bbox: BBox3D<T>) -> Self {
+        MValue::from(bbox).into()
+    }
+}
+impl<T> From<&ValueType> for BBox3D<T>
+where
+    T: From<ValueType>,
+{
+    fn from(bbox: &ValueType) -> Self {
+        MValue::from(bbox).into()
+    }
+}
+impl From<BBox3D> for VectorFeature {
+    fn from(bbox: BBox3D) -> Self {
+        let BBox3D { left, bottom, right, top, .. } = bbox;
+
+        VectorFeature::new_wm(
+            None,
+            Properties::from([("bbox".into(), bbox.into())]),
+            VectorGeometry::new_polygon(
+                vec![vec![
+                    VectorPoint::from_xy(left, bottom),
+                    VectorPoint::from_xy(right, bottom),
+                    VectorPoint::from_xy(right, top),
+                    VectorPoint::from_xy(left, top),
+                    VectorPoint::from_xy(left, bottom),
+                ]],
+                Some(bbox),
+            ),
+            None,
+        )
+    }
+}
 impl<T> MValueCompatible for BBox3D<T>
 where
     ValueType: From<T>,
@@ -837,7 +911,7 @@ where
     }
 }
 
-/// BBox or BBox3D
+/// BBox or BBox3D. Mostly an internal tool
 #[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq)]
 pub enum BBOX {
     /// 2D bounding box
@@ -858,6 +932,22 @@ impl From<BBox> for BBOX {
 impl From<BBox3D> for BBOX {
     fn from(bbox: BBox3D) -> Self {
         BBOX::BBox3D(bbox)
+    }
+}
+impl From<BBOX> for ValueType {
+    fn from(bbox: BBOX) -> Self {
+        match bbox {
+            BBOX::BBox(b) => b.into(),
+            BBOX::BBox3D(b) => b.into(),
+        }
+    }
+}
+impl From<BBOX> for VectorFeature {
+    fn from(bbox: BBOX) -> Self {
+        match bbox {
+            BBOX::BBox(b) => b.into(),
+            BBOX::BBox3D(b) => b.into(),
+        }
     }
 }
 impl Eq for BBOX {}
