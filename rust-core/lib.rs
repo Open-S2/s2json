@@ -303,7 +303,7 @@ impl<M, P: Clone + Default, D: Clone + Default> Default for VectorFeature<M, P, 
     fn default() -> Self {
         Self {
             _type: "VectorFeature".into(),
-            face: 0.into(),
+            face: Face::WM,
             id: None,
             properties: Default::default(),
             geometry: Default::default(),

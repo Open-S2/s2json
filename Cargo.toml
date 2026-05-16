@@ -6,7 +6,7 @@ resolver = "2"
 # NOTE: with v1.90.0 we can now `cargo publish --workspace`
 
 [workspace.package]
-version = "1.53.0"
+version = "1.53.1"
 rust-version = "1.91.0"
 edition = "2024"
 authors = ["Craig O'Connor <oconnorct1@gmail.com>"]
