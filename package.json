@@ -1,7 +1,7 @@
 {
   "name": "s2json-spec",
   "publisher": "OpenS2",
-  "version": "1.12.1",
+  "version": "1.12.2",
   "description": "S2JSON is a specification for encoding a variety of geographic data structures",
   "keywords": [
     "vector",
@@ -33,7 +33,7 @@
     "fmt": "bunx oxfmt src tools benchmarks --check",
     "fmt:fix": "bunx oxfmt -- --write",
     "format": "bunx oxfmt:fix && bun run lint:fix",
-    "build": "rm -rf dist && mkdir dist && rm -f -- tsconfig.tsbuildinfo && tsc -b tsconfig.build.json",
+    "build": "rm -rf dist && mkdir dist && rm -f -- tsconfig.tsbuildinfo && bunx tsc -p tsconfig.build.json",
     "test:dev": "bun test --watch --coverage",
     "test": "bun test",
     "test:watch": "bun test --watch",
