@@ -26,6 +26,8 @@ mod tests {
         assert_eq!(u8::from(face), 4);
         let face = Face::Face5;
         assert_eq!(u8::from(face), 5);
+        let face = Face::WM;
+        assert_eq!(u8::from(face), 6);
 
         assert_eq!(Face::Face0, Face::from(0));
         assert_eq!(Face::Face1, Face::from(1));
@@ -33,6 +35,7 @@ mod tests {
         assert_eq!(Face::Face3, Face::from(3));
         assert_eq!(Face::Face4, Face::from(4));
         assert_eq!(Face::Face5, Face::from(5));
+        assert_eq!(Face::WM, Face::from(6));
     }
 
     #[test]
@@ -161,7 +164,7 @@ mod tests {
         );
         assert_eq!(fc.properties, Properties::new());
         assert_eq!(fc.metadata, None);
-        assert_eq!(fc.face, 0.into());
+        assert_eq!(fc.face, Face::WM);
 
         // S2
 
@@ -442,12 +445,18 @@ mod tests {
         assert_eq!(serialized, "5");
         let deserialize = serde_json::from_str::<Face>(&serialized).unwrap();
         assert_eq!(deserialize, Face::Face5);
+
+        let face_6 = Face::WM;
+        let serialized = serde_json::to_string(&face_6).unwrap();
+        assert_eq!(serialized, "6");
+        let deserialize = serde_json::from_str::<Face>(&serialized).unwrap();
+        assert_eq!(deserialize, Face::WM);
     }
 
     #[test]
     #[should_panic(expected = "Invalid face value")]
     fn serde_face_err() {
-        let _ = serde_json::from_str::<Face>("6").unwrap();
+        let _ = serde_json::from_str::<Face>("7").unwrap();
     }
 
     #[test]

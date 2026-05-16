@@ -38,9 +38,9 @@
         "bbox": { "$ref": "#/definitions/bbox2D" },
         "faces": {
           "type": "array",
-          "items": { "type": "number", "enum": [0, 1, 2, 3, 4, 5] },
+          "items": { "type": "number", "enum": [0, 1, 2, 3, 4, 5, 6] },
           "uniqueItems": true,
-          "maxItems": 6
+          "maxItems": 7
         }
       },
       "required": ["type", "features", "faces"],
@@ -77,7 +77,7 @@
         "type": { "type": "string", "enum": ["S2Feature"] },
         "geometry": { "$ref": "#/definitions/vectorGeometry" },
         "properties": { "$ref": "#/definitions/properties" },
-        "face": { "type": "number", "enum": [0, 1, 2, 3, 4, 5] },
+        "face": { "type": "number", "enum": [0, 1, 2, 3, 4, 5, 6] },
         "metadata": { "type": "object" }
       },
       "required": ["type", "geometry", "properties", "face"],

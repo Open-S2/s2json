@@ -58,7 +58,7 @@ mod tests {
             VectorFeature {
                 _type: VectorFeatureType::VectorFeature,
                 id: None,
-                face: 0.into(),
+                face: Face::WM,
                 properties: Properties::from([("bbox".into(), bbox.into())]),
                 geometry: VectorGeometry::new_polygon(
                     vec![vec![
@@ -97,7 +97,7 @@ mod tests {
             VectorFeature {
                 _type: VectorFeatureType::VectorFeature,
                 id: None,
-                face: 0.into(),
+                face: Face::WM,
                 properties: Properties::from([("bbox".into(), bbox.into())]),
                 geometry: VectorGeometry::new_polygon(
                     vec![vec![
@@ -171,7 +171,7 @@ mod tests {
             VectorFeature {
                 _type: VectorFeatureType::VectorFeature,
                 id: None,
-                face: 0.into(),
+                face: Face::WM,
                 properties: Properties::from([("bbox".into(), bbox.into())]),
                 geometry: VectorGeometry::new_polygon(
                     vec![vec![
@@ -212,7 +212,7 @@ mod tests {
             VectorFeature {
                 _type: VectorFeatureType::VectorFeature,
                 id: None,
-                face: 0.into(),
+                face: Face::WM,
                 properties: Properties::from([("bbox".into(), bbox.into())]),
                 geometry: VectorGeometry::new_polygon(
                     vec![vec![

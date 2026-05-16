@@ -18,8 +18,11 @@ export type Projection = 'WG' | 'S2';
 
 /// S2 specific type
 
-/** cube-face on the S2 sphere */
-export type Face = 0 | 1 | 2 | 3 | 4 | 5;
+/**
+ * Cube-face on the S2 sphere
+ * Includes the WebMercator face (6) incase datasets support both projections
+ */
+export type Face = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 /// FeatureCollections
 

@@ -42,7 +42,7 @@ pub enum Projection {
 
 //? S2 specific type
 
-/// Cube-face on the S2 sphere
+/// Cube-face on the S2 sphere. Includes the WebMercator face incase datasets support both projections
 #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Default)]
 pub enum Face {
     /// Face 0
@@ -58,6 +58,8 @@ pub enum Face {
     Face4 = 4,
     /// Face 5
     Face5 = 5,
+    /// WebMercator (WM) Face
+    WM = 6,
 }
 impl From<Face> for u8 {
     fn from(face: Face) -> Self {
@@ -72,6 +74,7 @@ impl From<u8> for Face {
             3 => Face::Face3,
             4 => Face::Face4,
             5 => Face::Face5,
+            6 => Face::WM,
             _ => Face::Face0,
         }
     }
@@ -98,6 +101,7 @@ impl<'de> serde::Deserialize<'de> for Face {
             3 => Ok(Face::Face3),
             4 => Ok(Face::Face4),
             5 => Ok(Face::Face5),
+            6 => Ok(Face::WM),
             _ => Err(serde::de::Error::custom("Invalid face value")),
         }
     }
@@ -315,7 +319,7 @@ impl<M, P: Clone + Default, D: Clone + Default> VectorFeature<M, P, D> {
         geometry: VectorGeometry<D>,
         metadata: Option<M>,
     ) -> Self {
-        Self { _type: "VectorFeature".into(), face: 0.into(), id, properties, geometry, metadata }
+        Self { _type: "VectorFeature".into(), face: Face::WM, id, properties, geometry, metadata }
     }
 
     /// Create a new VectorFeature in the S2 format
