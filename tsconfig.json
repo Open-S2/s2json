@@ -112,6 +112,7 @@
     "build.ts",
     "benchmarks/**/*.ts",
     "src/**/*.ts",
+    "src/**/*.json",
     "config/**/*.ts",
     "tests/**/*.ts",
     "tools/**/*.ts",
