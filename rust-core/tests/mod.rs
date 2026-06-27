@@ -50,7 +50,7 @@ mod tests {
         let f: VectorFeature = Default::default();
         assert_eq!(f._type, "VectorFeature".into());
         assert_eq!(f.id, None);
-        assert_eq!(f.face, 0.into());
+        assert_eq!(f.face, 6.into());
         assert_eq!(f.properties, Properties::default());
         assert_eq!(f.geometry, VectorGeometry::default());
         assert_eq!(f.metadata, None);
@@ -78,6 +78,140 @@ mod tests {
     }
 
     #[test]
+    fn feature_collection_from_vector_feature_array() {
+        let features: Vec<VectorFeature> = vec![
+            VectorFeature {
+                _type: "VectorFeature".into(),
+                id: None,
+                face: 0.into(),
+                properties: Properties::default(),
+                geometry: VectorGeometry::new_linestring(
+                    vec![
+                        VectorPoint { x: 0., y: 0., z: None, m: None, t: None },
+                        VectorPoint { x: 2., y: 1.5, z: None, m: None, t: None },
+                    ],
+                    None,
+                ),
+                metadata: None,
+            },
+            VectorFeature {
+                _type: "VectorFeature".into(),
+                id: None,
+                face: 0.into(),
+                properties: Properties::default(),
+                geometry: VectorGeometry::new_point(
+                    VectorPoint { x: -2., y: -2., z: None, m: None, t: None },
+                    None,
+                ),
+                metadata: None,
+            },
+        ];
+        let fc = FeatureCollection::from(features.clone());
+        assert_eq!(fc._type, FeatureCollectionType::FeatureCollection);
+        assert_eq!(fc.features.len(), 2);
+        assert_eq!(fc.attributions, None);
+        assert_eq!(fc.bbox, Some(BBox::new(-2., -2., 2., 1.5)));
+
+        let features: Vec<Features> = features.into_iter().map(|f| f.into()).collect();
+        let fc = FeatureCollection::from(features);
+        assert_eq!(fc._type, FeatureCollectionType::FeatureCollection);
+        assert_eq!(fc.features.len(), 2);
+        assert_eq!(fc.attributions, None);
+        assert_eq!(fc.bbox, Some(BBox::new(-2., -2., 2., 1.5)));
+
+        // just ensure it works
+        let _fcs = FeatureCollections::from(fc.clone());
+        let _jc = JSONCollection::from(fc);
+    }
+
+    #[test]
+    fn feature_collection_from_feature_array() {
+        let features: Vec<Feature> = vec![
+            Feature {
+                _type: "Feature".into(),
+                id: None,
+                properties: Properties::default(),
+                geometry: Geometry::Point(PointGeometry {
+                    _type: "Point".into(),
+                    coordinates: Point(0., 0.),
+                    m_values: None,
+                    bbox: None,
+                }),
+                metadata: None,
+            },
+            Feature {
+                _type: "Feature".into(),
+                id: None,
+                properties: Properties::default(),
+                geometry: Geometry::Point(PointGeometry {
+                    _type: "Point".into(),
+                    coordinates: Point(-2., -2.),
+                    m_values: None,
+                    bbox: None,
+                }),
+                metadata: None,
+            },
+        ];
+        let fc = FeatureCollection::from(features.clone());
+        assert_eq!(fc._type, FeatureCollectionType::FeatureCollection);
+        assert_eq!(fc.features.len(), 2);
+        assert_eq!(fc.attributions, None);
+        assert_eq!(fc.bbox, Some(BBox::new(-2., -2., 0., 0.)));
+
+        let features: Vec<Features> = features.into_iter().map(|f| f.into()).collect();
+        let fc = FeatureCollection::from(features);
+        assert_eq!(fc._type, FeatureCollectionType::FeatureCollection);
+        assert_eq!(fc.features.len(), 2);
+        assert_eq!(fc.attributions, None);
+        assert_eq!(fc.bbox, Some(BBox::new(-2., -2., 0., 0.)));
+
+        // just ensure it works
+        let _fcs = FeatureCollections::from(fc.clone());
+        let _jc = JSONCollection::from(fc);
+    }
+
+    #[test]
+    fn s2_feature_collection_from_vector_feature_array() {
+        let features: Vec<VectorFeature> = vec![
+            VectorFeature {
+                _type: "VectorFeature".into(),
+                id: None,
+                face: 0.into(),
+                properties: Properties::default(),
+                geometry: VectorGeometry::new_linestring(
+                    vec![
+                        VectorPoint { x: 0., y: 0., z: None, m: None, t: None },
+                        VectorPoint { x: 2., y: 1.5, z: None, m: None, t: None },
+                    ],
+                    None,
+                ),
+                metadata: None,
+            },
+            VectorFeature {
+                _type: "VectorFeature".into(),
+                id: None,
+                face: 1.into(),
+                properties: Properties::default(),
+                geometry: VectorGeometry::new_point(
+                    VectorPoint { x: -2., y: -2., z: None, m: None, t: None },
+                    None,
+                ),
+                metadata: None,
+            },
+        ];
+
+        let fc = S2FeatureCollection::from(features);
+        assert_eq!(fc._type, S2FeatureCollectionType::S2FeatureCollection);
+        assert_eq!(fc.features.len(), 2);
+        assert_eq!(fc.attributions, None);
+        assert_eq!(fc.bbox, Some(BBox::new(-2., -2., 2., 1.5)));
+
+        // just ensure it works
+        let _fcs = FeatureCollections::from(fc.clone());
+        let _jc = JSONCollection::from(fc);
+    }
+
+    #[test]
     fn s2_feature_collection_new() {
         let mut attributions = Attributions::new();
         attributions.insert("Open S2".into(), "https://opens2.com/legal/data".into());
@@ -100,6 +234,9 @@ mod tests {
         );
         let back_to_fc: S2FeatureCollection = serde_json::from_str(&string).unwrap();
         assert_eq!(back_to_fc, fc);
+
+        // just ensure it works
+        let _fcs = FeatureCollections::from(fc);
     }
 
     #[test]
@@ -128,6 +265,8 @@ mod tests {
         );
         assert_eq!(fc.properties, Properties::new());
         assert_eq!(fc.metadata, None);
+
+        let _jc = JSONCollection::from(fc.clone());
     }
 
     #[test]
@@ -165,6 +304,8 @@ mod tests {
         assert_eq!(fc.properties, Properties::new());
         assert_eq!(fc.metadata, None);
         assert_eq!(fc.face, Face::WM);
+
+        let _jc = JSONCollection::from(fc);
 
         // S2
 
@@ -208,6 +349,8 @@ mod tests {
         assert_eq!(fc.properties, Properties::new());
         assert_eq!(fc.metadata, Some(MetaTest { name: "test".into(), value: "value".into() }));
         assert_eq!(fc.face, 3.into());
+
+        let _jc = JSONCollection::from(fc.clone());
 
         // TODO: BRING THIS BACK
         // let fc_to_str = serde_json::to_string(&fc).unwrap();

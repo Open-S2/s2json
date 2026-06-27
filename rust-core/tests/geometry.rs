@@ -1084,7 +1084,8 @@ mod tests {
 
     #[test]
     fn test_vector_geometry_bbox() {
-        let vgt_point: VectorGeometry = VectorGeometry::Point(VectorPointGeometry {
+        // POINT
+        let mut vgt_point: VectorGeometry = VectorGeometry::Point(VectorPointGeometry {
             _type: "Point".into(),
             coordinates: VectorPoint { x: 0.0, y: 1.0, z: Some(2.0), m: None, t: None },
             bbox: Some(BBox3D {
@@ -1108,9 +1109,24 @@ mod tests {
             indices: None,
             tessellation: None,
         });
-        assert_eq!(vgt_point.bbox().unwrap(), BBox3D::new(-1.0, -2.0, -3.0, -4.0, -5.0, -6.0));
+        assert_eq!(vgt_point.bbox(), BBox3D::new(-1.0, -2.0, -3.0, -4.0, -5.0, -6.0));
         assert_eq!(vgt_point.vec_bbox().unwrap(), BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 2.0));
-        let vgt_multi_point: VectorGeometry =
+
+        // POINT NO BBOX
+        let mut vgt_point: VectorGeometry = VectorGeometry::Point(VectorPointGeometry {
+            _type: "Point".into(),
+            coordinates: VectorPoint { x: 0.0, y: 1.0, z: Some(2.0), m: None, t: None },
+            bbox: None,
+            is_3d: true,
+            offset: None,
+            vec_bbox: None,
+            indices: None,
+            tessellation: None,
+        });
+        assert_eq!(vgt_point.bbox(), BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 2.0));
+
+        // MULTIPOINT
+        let mut vgt_multi_point: VectorGeometry =
             VectorGeometry::MultiPoint(VectorMultiPointGeometry {
                 _type: "MultiPoint".into(),
                 coordinates: vec![VectorPoint { x: 0.0, y: 1.0, z: Some(2.0), m: None, t: None }],
@@ -1135,12 +1151,25 @@ mod tests {
                 indices: None,
                 tessellation: None,
             });
-        assert_eq!(
-            vgt_multi_point.bbox().unwrap(),
-            BBox3D::new(-1.0, -2.0, -3.0, -4.0, -5.0, -6.0)
-        );
+        assert_eq!(vgt_multi_point.bbox(), BBox3D::new(-1.0, -2.0, -3.0, -4.0, -5.0, -6.0));
         assert_eq!(vgt_multi_point.vec_bbox().unwrap(), BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 2.0));
-        let vgt_line_string: VectorGeometry =
+
+        // MULTIPOINT No BBOX
+        let mut vgt_multi_point: VectorGeometry =
+            VectorGeometry::MultiPoint(VectorMultiPointGeometry {
+                _type: "MultiPoint".into(),
+                coordinates: vec![VectorPoint { x: 0.0, y: 1.0, z: Some(2.0), m: None, t: None }],
+                bbox: None,
+                is_3d: true,
+                offset: None,
+                vec_bbox: None,
+                indices: None,
+                tessellation: None,
+            });
+        assert_eq!(vgt_multi_point.bbox(), BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 2.0));
+
+        // LINESTRING
+        let mut vgt_line_string: VectorGeometry =
             VectorGeometry::LineString(VectorLineStringGeometry {
                 _type: "LineString".into(),
                 coordinates: vec![VectorPoint { x: 0.0, y: 1.0, z: Some(2.0), m: None, t: None }],
@@ -1165,12 +1194,25 @@ mod tests {
                 indices: None,
                 tessellation: None,
             });
-        assert_eq!(
-            vgt_line_string.bbox().unwrap(),
-            BBox3D::new(-1.0, -2.0, -3.0, -4.0, -5.0, -6.0)
-        );
+        assert_eq!(vgt_line_string.bbox(), BBox3D::new(-1.0, -2.0, -3.0, -4.0, -5.0, -6.0));
         assert_eq!(vgt_line_string.vec_bbox().unwrap(), BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 2.0));
-        let vgt_multi_line_string: VectorGeometry =
+
+        // LINESTRING NO BBOX
+        let mut vgt_line_string: VectorGeometry =
+            VectorGeometry::LineString(VectorLineStringGeometry {
+                _type: "LineString".into(),
+                coordinates: vec![VectorPoint { x: 0.0, y: 1.0, z: Some(2.0), m: None, t: None }],
+                bbox: None,
+                is_3d: true,
+                offset: None,
+                vec_bbox: None,
+                indices: None,
+                tessellation: None,
+            });
+        assert_eq!(vgt_line_string.bbox(), BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 2.0));
+
+        // MULTILINESTRING
+        let mut vgt_multi_line_string: VectorGeometry =
             VectorGeometry::MultiLineString(VectorMultiLineStringGeometry {
                 _type: "MultiLineString".into(),
                 coordinates: vec![vec![VectorPoint {
@@ -1201,15 +1243,34 @@ mod tests {
                 indices: None,
                 tessellation: None,
             });
-        assert_eq!(
-            vgt_multi_line_string.bbox().unwrap(),
-            BBox3D::new(-1.0, -2.0, -3.0, -4.0, -5.0, -6.0)
-        );
+        assert_eq!(vgt_multi_line_string.bbox(), BBox3D::new(-1.0, -2.0, -3.0, -4.0, -5.0, -6.0));
         assert_eq!(
             vgt_multi_line_string.vec_bbox().unwrap(),
             BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 2.0)
         );
-        let vgt_polygon: VectorGeometry = VectorGeometry::Polygon(VectorPolygonGeometry {
+
+        // MULTILINESTRING NO BBOX
+        let mut vgt_multi_line_string: VectorGeometry =
+            VectorGeometry::MultiLineString(VectorMultiLineStringGeometry {
+                _type: "MultiLineString".into(),
+                coordinates: vec![vec![VectorPoint {
+                    x: 0.0,
+                    y: 1.0,
+                    z: Some(2.0),
+                    m: None,
+                    t: None,
+                }]],
+                bbox: None,
+                is_3d: true,
+                offset: None,
+                vec_bbox: None,
+                indices: None,
+                tessellation: None,
+            });
+        assert_eq!(vgt_multi_line_string.bbox(), BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 2.0));
+
+        // POLYGON
+        let mut vgt_polygon: VectorGeometry = VectorGeometry::Polygon(VectorPolygonGeometry {
             _type: "Polygon".into(),
             coordinates: vec![vec![VectorPoint { x: 0.0, y: 1.0, z: Some(2.0), m: None, t: None }]],
             bbox: Some(BBox3D {
@@ -1233,9 +1294,24 @@ mod tests {
             indices: None,
             tessellation: None,
         });
-        assert_eq!(vgt_polygon.bbox().unwrap(), BBox3D::new(-1.0, -2.0, -3.0, -4.0, -5.0, -6.0));
+        assert_eq!(vgt_polygon.bbox(), BBox3D::new(-1.0, -2.0, -3.0, -4.0, -5.0, -6.0));
         assert_eq!(vgt_polygon.vec_bbox().unwrap(), BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 2.0));
-        let vgt_multi_polygon: VectorGeometry =
+
+        // POLYGON NO BBOX
+        let mut vgt_polygon: VectorGeometry = VectorGeometry::Polygon(VectorPolygonGeometry {
+            _type: "Polygon".into(),
+            coordinates: vec![vec![VectorPoint { x: 0.0, y: 1.0, z: Some(2.0), m: None, t: None }]],
+            bbox: None,
+            is_3d: true,
+            offset: None,
+            vec_bbox: None,
+            indices: None,
+            tessellation: None,
+        });
+        assert_eq!(vgt_polygon.bbox(), BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 2.0));
+
+        // MULTIPOLYGON
+        let mut vgt_multi_polygon: VectorGeometry =
             VectorGeometry::MultiPolygon(VectorMultiPolygonGeometry {
                 _type: "MultiPolygon".into(),
                 coordinates: vec![vec![vec![VectorPoint {
@@ -1266,14 +1342,292 @@ mod tests {
                 indices: None,
                 tessellation: None,
             });
-        assert_eq!(
-            vgt_multi_polygon.bbox().unwrap(),
-            BBox3D::new(-1.0, -2.0, -3.0, -4.0, -5.0, -6.0)
-        );
+        assert_eq!(vgt_multi_polygon.bbox(), BBox3D::new(-1.0, -2.0, -3.0, -4.0, -5.0, -6.0));
         assert_eq!(
             vgt_multi_polygon.vec_bbox().unwrap(),
             BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 2.0)
         );
+
+        // MULTIPOLYGON NO BBOX
+        let mut vgt_multi_polygon: VectorGeometry =
+            VectorGeometry::MultiPolygon(VectorMultiPolygonGeometry {
+                _type: "MultiPolygon".into(),
+                coordinates: vec![vec![vec![VectorPoint {
+                    x: 0.0,
+                    y: 1.0,
+                    z: Some(2.0),
+                    m: None,
+                    t: None,
+                }]]],
+                bbox: None,
+                is_3d: true,
+                offset: None,
+                vec_bbox: None,
+                indices: None,
+                tessellation: None,
+            });
+        assert_eq!(vgt_multi_polygon.bbox(), BBox3D::new(0.0, 1.0, 0.0, 1.0, 2.0, 2.0));
+    }
+
+    #[test]
+    fn test_geometry_bbox() {
+        // POINT
+        let mut point: Geometry = Geometry::Point(PointGeometry {
+            _type: "Point".into(),
+            coordinates: Point(0.0, 0.0),
+            bbox: Some(BBox { left: -1.0, bottom: -2.0, right: -3.0, top: -4.0 }),
+            ..Default::default()
+        });
+        assert_eq!(point.bbox(), BBox3D::new(-1.0, -2.0, -3.0, -4.0, 0.0, 0.0));
+
+        // POINT NO BBOX
+        let mut point: Geometry = Geometry::Point(PointGeometry {
+            _type: "Point".into(),
+            coordinates: Point(0.0, 0.0),
+            bbox: None,
+            ..Default::default()
+        });
+        assert_eq!(point.bbox(), BBox3D::new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+
+        // MULTIPOINT
+        let mut multi_point: Geometry = Geometry::MultiPoint(MultiPointGeometry {
+            _type: "MultiPoint".into(),
+            coordinates: vec![Point(0.0, 0.0)],
+            bbox: Some(BBox { left: -1.0, bottom: -2.0, right: -3.0, top: -4.0 }),
+            ..Default::default()
+        });
+        assert_eq!(multi_point.bbox(), BBox3D::new(-1.0, -2.0, -3.0, -4.0, 0.0, 0.0));
+
+        // MULTIPOINT NO BBOX
+        let mut multi_point: Geometry = Geometry::MultiPoint(MultiPointGeometry {
+            _type: "MultiPoint".into(),
+            coordinates: vec![Point(0.0, 0.0)],
+            bbox: None,
+            ..Default::default()
+        });
+        assert_eq!(multi_point.bbox(), BBox3D::new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+
+        // LINESTRING
+        let mut line_string: Geometry = Geometry::LineString(LineStringGeometry {
+            _type: "LineString".into(),
+            coordinates: vec![Point(0.0, 0.0)],
+            bbox: Some(BBox { left: -1.0, bottom: -2.0, right: -3.0, top: -4.0 }),
+            ..Default::default()
+        });
+        assert_eq!(line_string.bbox(), BBox3D::new(-1.0, -2.0, -3.0, -4.0, 0.0, 0.0));
+
+        // LINESTRING NO BBOX
+        let mut line_string: Geometry = Geometry::LineString(LineStringGeometry {
+            _type: "LineString".into(),
+            coordinates: vec![Point(0.0, 0.0)],
+            bbox: None,
+            ..Default::default()
+        });
+        assert_eq!(line_string.bbox(), BBox3D::new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+
+        // MULTILINESTRING
+        let mut multi_line_string: Geometry = Geometry::MultiLineString(MultiLineStringGeometry {
+            _type: "MultiLineString".into(),
+            coordinates: vec![vec![Point(0.0, 0.0)]],
+            bbox: Some(BBox { left: -1.0, bottom: -2.0, right: -3.0, top: -4.0 }),
+            ..Default::default()
+        });
+        assert_eq!(multi_line_string.bbox(), BBox3D::new(-1.0, -2.0, -3.0, -4.0, 0.0, 0.0));
+
+        // MULTILINESTRING NO BBOX
+        let mut multi_line_string: Geometry = Geometry::MultiLineString(MultiLineStringGeometry {
+            _type: "MultiLineString".into(),
+            coordinates: vec![vec![Point(0.0, 0.0)]],
+            bbox: None,
+            ..Default::default()
+        });
+        assert_eq!(multi_line_string.bbox(), BBox3D::new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+
+        // POLYGON
+        let mut polygon: Geometry = Geometry::Polygon(PolygonGeometry {
+            _type: "Polygon".into(),
+            coordinates: vec![vec![Point(0.0, 0.0)]],
+            bbox: Some(BBox { left: -1.0, bottom: -2.0, right: -3.0, top: -4.0 }),
+            ..Default::default()
+        });
+        assert_eq!(polygon.bbox(), BBox3D::new(-1.0, -2.0, -3.0, -4.0, 0.0, 0.0));
+
+        // POLYGON NO BBOX
+        let mut polygon: Geometry = Geometry::Polygon(PolygonGeometry {
+            _type: "Polygon".into(),
+            coordinates: vec![vec![Point(0.0, 0.0)]],
+            bbox: None,
+            ..Default::default()
+        });
+        assert_eq!(polygon.bbox(), BBox3D::new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+
+        // MULTIPOLYGON
+        let mut polygon: Geometry = Geometry::MultiPolygon(MultiPolygonGeometry {
+            _type: "MultiPolygon".into(),
+            coordinates: vec![vec![vec![Point(0.0, 0.0)]]],
+            bbox: Some(BBox { left: -1.0, bottom: -2.0, right: -3.0, top: -4.0 }),
+            ..Default::default()
+        });
+        assert_eq!(polygon.bbox(), BBox3D::new(-1.0, -2.0, -3.0, -4.0, 0.0, 0.0));
+
+        // MULTIPOLYGON NO BBOX
+        let mut polygon: Geometry = Geometry::MultiPolygon(MultiPolygonGeometry {
+            _type: "MultiPolygon".into(),
+            coordinates: vec![vec![vec![Point(0.0, 0.0)]]],
+            bbox: None,
+            ..Default::default()
+        });
+        assert_eq!(polygon.bbox(), BBox3D::new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+
+        // POINT 3D
+        let mut point: Geometry = Geometry::Point3D(Point3DGeometry {
+            _type: "Point3D".into(),
+            coordinates: Point3D(0.0, 0.0, 0.0),
+            bbox: Some(BBox3D {
+                left: -1.0,
+                bottom: -2.0,
+                right: -3.0,
+                top: -4.0,
+                near: -5.0,
+                far: -6.0,
+            }),
+            ..Default::default()
+        });
+        assert_eq!(point.bbox(), BBox3D::new(-1.0, -2.0, -3.0, -4.0, -5.0, -6.0));
+
+        // POINT 3D NO BBOX
+        let mut point: Geometry = Geometry::Point3D(Point3DGeometry {
+            _type: "Point3D".into(),
+            coordinates: Point3D(0.0, 0.0, 0.0),
+            bbox: None,
+            ..Default::default()
+        });
+        assert_eq!(point.bbox(), BBox3D::new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+
+        // MULTIPOINT 3D
+        let mut point: Geometry = Geometry::MultiPoint3D(MultiPoint3DGeometry {
+            _type: "MultiPoint3D".into(),
+            coordinates: vec![Point3D(0.0, 0.0, 0.0)],
+            bbox: Some(BBox3D {
+                left: -1.0,
+                bottom: -2.0,
+                right: -3.0,
+                top: -4.0,
+                near: -5.0,
+                far: -6.0,
+            }),
+            ..Default::default()
+        });
+        assert_eq!(point.bbox(), BBox3D::new(-1.0, -2.0, -3.0, -4.0, -5.0, -6.0));
+
+        // MULTIPOINT 3D NO BBOX
+        let mut point: Geometry = Geometry::MultiPoint3D(MultiPoint3DGeometry {
+            _type: "MultiPoint3D".into(),
+            coordinates: vec![Point3D(0.0, 0.0, 0.0)],
+            bbox: None,
+            ..Default::default()
+        });
+        assert_eq!(point.bbox(), BBox3D::new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+
+        // LINESTRING 3D
+        let mut line: Geometry = Geometry::LineString3D(LineString3DGeometry {
+            _type: "LineString3D".into(),
+            coordinates: vec![Point3D(0.0, 0.0, 0.0)],
+            bbox: Some(BBox3D {
+                left: -1.0,
+                bottom: -2.0,
+                right: -3.0,
+                top: -4.0,
+                near: -5.0,
+                far: -6.0,
+            }),
+            ..Default::default()
+        });
+        assert_eq!(line.bbox(), BBox3D::new(-1.0, -2.0, -3.0, -4.0, -5.0, -6.0));
+
+        // LINESTRING 3D NO BBOX
+        let mut line: Geometry = Geometry::LineString3D(LineString3DGeometry {
+            _type: "LineString3D".into(),
+            coordinates: vec![Point3D(0.0, 0.0, 0.0)],
+            bbox: None,
+            ..Default::default()
+        });
+        assert_eq!(line.bbox(), BBox3D::new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+
+        // MULTILINESTRING 3D
+        let mut line: Geometry = Geometry::MultiLineString3D(MultiLineString3DGeometry {
+            _type: "MultiLineString3D".into(),
+            coordinates: vec![vec![Point3D(0.0, 0.0, 0.0)]],
+            bbox: Some(BBox3D {
+                left: -1.0,
+                bottom: -2.0,
+                right: -3.0,
+                top: -4.0,
+                near: -5.0,
+                far: -6.0,
+            }),
+            ..Default::default()
+        });
+        assert_eq!(line.bbox(), BBox3D::new(-1.0, -2.0, -3.0, -4.0, -5.0, -6.0));
+
+        // MULTILINESTRING 3D NO BBOX
+        let mut line: Geometry = Geometry::MultiLineString3D(MultiLineString3DGeometry {
+            _type: "MultiLineString3D".into(),
+            coordinates: vec![vec![Point3D(0.0, 0.0, 0.0)]],
+            bbox: None,
+            ..Default::default()
+        });
+        assert_eq!(line.bbox(), BBox3D::new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+
+        // POLYGON 3D
+        let mut polygon: Geometry = Geometry::Polygon3D(Polygon3DGeometry {
+            _type: "Polygon3D".into(),
+            coordinates: vec![vec![Point3D(0.0, 0.0, 0.0)]],
+            bbox: Some(BBox3D {
+                left: -1.0,
+                bottom: -2.0,
+                right: -3.0,
+                top: -4.0,
+                near: -5.0,
+                far: -6.0,
+            }),
+            ..Default::default()
+        });
+        assert_eq!(polygon.bbox(), BBox3D::new(-1.0, -2.0, -3.0, -4.0, -5.0, -6.0));
+
+        // POLYGON 3D NO BBOX
+        let mut polygon: Geometry = Geometry::Polygon3D(Polygon3DGeometry {
+            _type: "Polygon3D".into(),
+            coordinates: vec![vec![Point3D(0.0, 0.0, 0.0)]],
+            bbox: None,
+            ..Default::default()
+        });
+        assert_eq!(polygon.bbox(), BBox3D::new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+
+        // MULTIPOLYGON 3D
+        let mut polygon: Geometry = Geometry::MultiPolygon3D(MultiPolygon3DGeometry {
+            _type: "MultiPolygon3D".into(),
+            coordinates: vec![vec![vec![Point3D(0.0, 0.0, 0.0)]]],
+            bbox: Some(BBox3D {
+                left: -1.0,
+                bottom: -2.0,
+                right: -3.0,
+                top: -4.0,
+                near: -5.0,
+                far: -6.0,
+            }),
+            ..Default::default()
+        });
+        assert_eq!(polygon.bbox(), BBox3D::new(-1.0, -2.0, -3.0, -4.0, -5.0, -6.0));
+
+        // MULTIPOLYGON 3D NO BBOX
+        let mut polygon: Geometry = Geometry::MultiPolygon3D(MultiPolygon3DGeometry {
+            _type: "MultiPolygon3D".into(),
+            coordinates: vec![vec![vec![Point3D(0.0, 0.0, 0.0)]]],
+            bbox: None,
+            ..Default::default()
+        });
+        assert_eq!(polygon.bbox(), BBox3D::new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
     }
 
     #[test]

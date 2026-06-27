@@ -85,14 +85,44 @@ pub enum VectorGeometry<M: Clone + Default = MValue> {
 }
 impl<M: Clone + Default> VectorGeometry<M> {
     /// Get the bbox of the geometry
-    pub fn bbox(&self) -> &Option<BBox3D> {
+    pub fn bbox(&mut self) -> BBox3D {
         match self {
-            VectorGeometry::Point(g) => &g.bbox,
-            VectorGeometry::MultiPoint(g) => &g.bbox,
-            VectorGeometry::LineString(g) => &g.bbox,
-            VectorGeometry::MultiLineString(g) => &g.bbox,
-            VectorGeometry::Polygon(g) => &g.bbox,
-            VectorGeometry::MultiPolygon(g) => &g.bbox,
+            VectorGeometry::Point(g) => {
+                if g.bbox.is_none() {
+                    g.bbox = Some(BBox3D::from_point(&g.coordinates));
+                }
+                g.bbox.unwrap()
+            }
+            VectorGeometry::MultiPoint(g) => {
+                if g.bbox.is_none() {
+                    g.bbox = Some(BBox3D::from_linestring(&g.coordinates));
+                }
+                g.bbox.unwrap()
+            }
+            VectorGeometry::LineString(g) => {
+                if g.bbox.is_none() {
+                    g.bbox = Some(BBox3D::from_linestring(&g.coordinates));
+                }
+                g.bbox.unwrap()
+            }
+            VectorGeometry::MultiLineString(g) => {
+                if g.bbox.is_none() {
+                    g.bbox = Some(BBox3D::from_multi_linestring(&g.coordinates));
+                }
+                g.bbox.unwrap()
+            }
+            VectorGeometry::Polygon(g) => {
+                if g.bbox.is_none() {
+                    g.bbox = Some(BBox3D::from_polygon(&g.coordinates));
+                }
+                g.bbox.unwrap()
+            }
+            VectorGeometry::MultiPolygon(g) => {
+                if g.bbox.is_none() {
+                    g.bbox = Some(BBox3D::from_multi_polygon(&g.coordinates));
+                }
+                g.bbox.unwrap()
+            }
         }
     }
 

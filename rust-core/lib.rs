@@ -22,7 +22,7 @@ pub mod shape;
 /// All values types and structs
 pub mod value;
 
-use alloc::{string::String, vec::Vec};
+use alloc::{collections::BTreeSet, string::String, vec::Vec};
 pub use geometry::*;
 pub use impls::*;
 pub use map::*;
@@ -163,6 +163,61 @@ impl<M, P: Clone + Default, D: Clone + Default> FeatureCollection<M, P, D> {
         self.bbox = Some(self_bbox);
     }
 }
+impl<M, P: Clone + Default, D: Clone + Default> From<Vec<VectorFeature<M, P, D>>>
+    for FeatureCollection<M, P, D>
+{
+    fn from(mut features: Vec<VectorFeature<M, P, D>>) -> Self {
+        let mut bbox = BBox::default();
+        for feature in features.iter_mut() {
+            bbox.merge_in_place(&BBox::from(feature.geometry.bbox()));
+        }
+        Self {
+            _type: FeatureCollectionType::FeatureCollection,
+            features: features.into_iter().map(Features::VectorFeature).collect(),
+            attributions: None,
+            bbox: Some(bbox),
+        }
+    }
+}
+impl<M, P: Clone + Default, D: Clone + Default> From<Vec<Feature<M, P, D>>>
+    for FeatureCollection<M, P, D>
+{
+    fn from(mut features: Vec<Feature<M, P, D>>) -> Self {
+        let mut bbox: BBox = BBox::default();
+        for feature in features.iter_mut() {
+            bbox.merge_in_place(&BBox::from(feature.geometry.bbox()));
+        }
+        Self {
+            _type: FeatureCollectionType::FeatureCollection,
+            features: features.into_iter().map(Features::Feature).collect(),
+            attributions: None,
+            bbox: Some(bbox),
+        }
+    }
+}
+impl<M, P: Clone + Default, D: Clone + Default> From<Vec<Features<M, P, D>>>
+    for FeatureCollection<M, P, D>
+{
+    fn from(mut features: Vec<Features<M, P, D>>) -> Self {
+        let mut bbox: BBox = BBox::default();
+        for feature in features.iter_mut() {
+            match feature {
+                Features::Feature(f) => {
+                    bbox.merge_in_place(&BBox::from(f.geometry.bbox()));
+                }
+                Features::VectorFeature(f) => {
+                    bbox.merge_in_place(&BBox::from(f.geometry.bbox()));
+                }
+            }
+        }
+        Self {
+            _type: FeatureCollectionType::FeatureCollection,
+            features,
+            attributions: None,
+            bbox: Some(bbox),
+        }
+    }
+}
 
 /// S2 FeatureCollection
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Default)]
@@ -205,6 +260,25 @@ impl<M, P: Clone + Default, D: Clone + Default> S2FeatureCollection<M, P, D> {
     pub fn add_face(&mut self, face: Face) {
         if !self.faces.contains(&face) {
             self.faces.push(face);
+        }
+    }
+}
+impl<M, P: Clone + Default, D: Clone + Default> From<Vec<VectorFeature<M, P, D>>>
+    for S2FeatureCollection<M, P, D>
+{
+    fn from(mut features: Vec<VectorFeature<M, P, D>>) -> Self {
+        let mut bbox = BBox::default();
+        let mut faces: BTreeSet<Face> = BTreeSet::new();
+        for feature in features.iter_mut() {
+            bbox.merge_in_place(&BBox::from(feature.geometry.bbox()));
+            faces.insert(feature.face);
+        }
+        Self {
+            _type: S2FeatureCollectionType::S2FeatureCollection,
+            features,
+            attributions: None,
+            faces: faces.into_iter().collect(),
+            bbox: Some(bbox),
         }
     }
 }
@@ -389,6 +463,20 @@ pub enum FeatureCollections<M = (), P: Clone + Default = Properties, D: Clone + 
     /// An S2 FeatureCollection
     S2FeatureCollection(S2FeatureCollection<M, P, D>),
 }
+impl<M, P: Clone + Default, D: Clone + Default> From<FeatureCollection<M, P, D>>
+    for FeatureCollections<M, P, D>
+{
+    fn from(f: FeatureCollection<M, P, D>) -> Self {
+        FeatureCollections::FeatureCollection(f)
+    }
+}
+impl<M, P: Clone + Default, D: Clone + Default> From<S2FeatureCollection<M, P, D>>
+    for FeatureCollections<M, P, D>
+{
+    fn from(f: S2FeatureCollection<M, P, D>) -> Self {
+        FeatureCollections::S2FeatureCollection(f)
+    }
+}
 
 /// Either an S2, Vector WG or WG Feature
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
@@ -398,6 +486,16 @@ pub enum Features<M = (), P: Clone + Default = Properties, D: Clone + Default = 
     Feature(Feature<M, P, D>),
     /// An WG or S2 Vector Feature
     VectorFeature(VectorFeature<M, P, D>),
+}
+impl<M, P: Clone + Default, D: Clone + Default> From<Feature<M, P, D>> for Features<M, P, D> {
+    fn from(f: Feature<M, P, D>) -> Self {
+        Features::Feature(f)
+    }
+}
+impl<M, P: Clone + Default, D: Clone + Default> From<VectorFeature<M, P, D>> for Features<M, P, D> {
+    fn from(f: VectorFeature<M, P, D>) -> Self {
+        Features::VectorFeature(f)
+    }
 }
 
 /// All major GeoJSON and S2JSON types
@@ -412,4 +510,30 @@ pub enum JSONCollection<M = (), P: Clone + Default = Properties, D: Clone + Defa
     Feature(Feature<M, P, D>),
     /// An WG Vector Feature
     VectorFeature(VectorFeature<M, P, D>),
+}
+impl<M, P: Clone + Default, D: Clone + Default> From<FeatureCollection<M, P, D>>
+    for JSONCollection<M, P, D>
+{
+    fn from(f: FeatureCollection<M, P, D>) -> Self {
+        JSONCollection::FeatureCollection(f)
+    }
+}
+impl<M, P: Clone + Default, D: Clone + Default> From<S2FeatureCollection<M, P, D>>
+    for JSONCollection<M, P, D>
+{
+    fn from(f: S2FeatureCollection<M, P, D>) -> Self {
+        JSONCollection::S2FeatureCollection(f)
+    }
+}
+impl<M, P: Clone + Default, D: Clone + Default> From<Feature<M, P, D>> for JSONCollection<M, P, D> {
+    fn from(f: Feature<M, P, D>) -> Self {
+        JSONCollection::Feature(f)
+    }
+}
+impl<M, P: Clone + Default, D: Clone + Default> From<VectorFeature<M, P, D>>
+    for JSONCollection<M, P, D>
+{
+    fn from(f: VectorFeature<M, P, D>) -> Self {
+        JSONCollection::VectorFeature(f)
+    }
 }

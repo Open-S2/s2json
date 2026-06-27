@@ -397,6 +397,85 @@ impl<M: Clone + Default> Default for Geometry<M> {
         Geometry::Point(PointGeometry::<M>::default())
     }
 }
+impl<M: Clone + Default> Geometry<M> {
+    /// Get the bbox of the geometry
+    pub fn bbox(&mut self) -> BBox3D {
+        match self {
+            Geometry::Point(g) => {
+                if g.bbox.is_none() {
+                    g.bbox = Some(BBox::from_point(&g.coordinates));
+                }
+                g.bbox.unwrap().into()
+            }
+            Geometry::MultiPoint(g) => {
+                if g.bbox.is_none() {
+                    g.bbox = Some(BBox::from_linestring(&g.coordinates));
+                }
+                g.bbox.unwrap().into()
+            }
+            Geometry::LineString(g) => {
+                if g.bbox.is_none() {
+                    g.bbox = Some(BBox::from_linestring(&g.coordinates));
+                }
+                g.bbox.unwrap().into()
+            }
+            Geometry::MultiLineString(g) => {
+                if g.bbox.is_none() {
+                    g.bbox = Some(BBox::from_multi_linestring(&g.coordinates));
+                }
+                g.bbox.unwrap().into()
+            }
+            Geometry::Polygon(g) => {
+                if g.bbox.is_none() {
+                    g.bbox = Some(BBox::from_polygon(&g.coordinates));
+                }
+                g.bbox.unwrap().into()
+            }
+            Geometry::MultiPolygon(g) => {
+                if g.bbox.is_none() {
+                    g.bbox = Some(BBox::from_multi_polygon(&g.coordinates));
+                }
+                g.bbox.unwrap().into()
+            }
+            Geometry::Point3D(g) => {
+                if g.bbox.is_none() {
+                    g.bbox = Some(BBox3D::from_point(&g.coordinates));
+                }
+                g.bbox.unwrap()
+            }
+            Geometry::MultiPoint3D(g) => {
+                if g.bbox.is_none() {
+                    g.bbox = Some(BBox3D::from_linestring(&g.coordinates));
+                }
+                g.bbox.unwrap()
+            }
+            Geometry::LineString3D(g) => {
+                if g.bbox.is_none() {
+                    g.bbox = Some(BBox3D::from_linestring(&g.coordinates));
+                }
+                g.bbox.unwrap()
+            }
+            Geometry::MultiLineString3D(g) => {
+                if g.bbox.is_none() {
+                    g.bbox = Some(BBox3D::from_multi_linestring(&g.coordinates));
+                }
+                g.bbox.unwrap()
+            }
+            Geometry::Polygon3D(g) => {
+                if g.bbox.is_none() {
+                    g.bbox = Some(BBox3D::from_polygon(&g.coordinates));
+                }
+                g.bbox.unwrap()
+            }
+            Geometry::MultiPolygon3D(g) => {
+                if g.bbox.is_none() {
+                    g.bbox = Some(BBox3D::from_multi_polygon(&g.coordinates));
+                }
+                g.bbox.unwrap()
+            }
+        }
+    }
+}
 
 /// BaseGeometry is the a generic geometry type
 #[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Default)]
